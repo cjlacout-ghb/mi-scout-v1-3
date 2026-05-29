@@ -2,8 +2,6 @@
 
 import type { EstadoPartido, Bateador, TurnoAlBate, Partido } from './types';
 
-const STORAGE_KEY = 'mi_scout_estado';
-
 export const estadoInicial: EstadoPartido = {
   partido: null,
   lineupVisitante: [],
@@ -18,32 +16,10 @@ export const estadoInicial: EstadoPartido = {
   perspectivaZona: 'catcher',
 };
 
-export function cargarEstado(): EstadoPartido {
-  if (typeof window === 'undefined') return estadoInicial;
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return estadoInicial;
-    return JSON.parse(raw) as EstadoPartido;
-  } catch {
-    return estadoInicial;
-  }
-}
-
-export function guardarEstado(estado: EstadoPartido): void {
-  if (typeof window === 'undefined') return;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(estado));
-}
-
-export function limpiarEstado(): void {
-  if (typeof window === 'undefined') return;
-  localStorage.removeItem(STORAGE_KEY);
-}
-
 // UUID simple sin dependencias externas
 export function generarId(): string {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 9);
 }
-
 // ─── Helpers de estadísticas ───────────────────────────────────────────────────
 import type { EstadisticasBateador, ZonaStrike } from './types';
 

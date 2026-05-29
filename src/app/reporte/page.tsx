@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useScout } from '@/context/ScoutContext';
 import { calcularEstadisticas, generarReporteMD } from '@/lib/storage';
-import type { Bateador } from '@/lib/types';
+import type { Bateador, TurnoAlBate } from '@/lib/types';
 
 function descargarMD(contenido: string, nombreArchivo: string) {
   const blob = new Blob([contenido], { type: 'text/markdown;charset=utf-8' });
@@ -25,7 +25,8 @@ export default function ReportePage() {
   const { estado } = useScout();
   const [selId, setSelId] = useState<string>('');
   const [preview, setPreview] = useState<string>('');
-  const [modo, setModo] = useState<'individual' | 'equipo' | null>(null);
+  const [modo, setModo] = useState<'individual' | 'equipo' | 'acumulado' | null>(null);
+  const [cargando, setCargando] = useState(false);
 
   const todos = [...(estado.lineupVisitante || []), ...(estado.lineupLocal || [])];
   const partido = estado.partido;
@@ -46,6 +47,44 @@ export default function ReportePage() {
     setPreview(md);
     setModo('individual');
     setSelId(b.id);
+  };
+
+  const generarAcumulado = async (b: Bateador) => {
+    setCargando(true);
+    try {
+      const params = new URLSearchParams({
+        apellido: b.apellido,
+        numero: b.numero,
+        equipo: b.equipo
+      });
+      const res = await fetch(`/api/jugador/stats?${params.toString()}`);
+      const data = await res.json();
+      const turnosAcumulados: TurnoAlBate[] = data.turnos || [];
+      
+      const turnosHomogeneos = turnosAcumulados.map(t => ({...t, bateadorId: b.id}));
+      const stats = calcularEstadisticas(b.id, turnosHomogeneos);
+      
+      let md = `# Reporte de Scouting Acumulado — ${b.apellido}${b.nombre ? `, ${b.nombre}` : ''} (#${b.numero})\n\n`;
+      md += `**Equipo:** ${b.equipo}\n\n`;
+      md += `*Datos agregados de todos los partidos registrados.*\n\n`;
+      md += `---\n\n`;
+
+      const avg = stats.turnosAlBate > 0 ? stats.promedio.toFixed(3).replace('0.', '.') : '0.000';
+      
+      md += `## Resumen Global\n\n`;
+      md += `| AB | H | 2B | 3B | HR | KS | KL | BB/HBP | OUT | AVG |\n`;
+      md += `|----|---|----|----|----|----|----|----|-----|-----|\n`;
+      md += `| ${stats.turnosAlBate} | ${stats.hits} | ${stats.dobles} | ${stats.triples} | ${stats.homeRuns} | ${stats.strikeoutsSwinging} | ${stats.strikeoutsLooking} | ${stats.basesPorBolas} | ${stats.outs} | ${avg} |\n\n`;
+
+      md += `---\n\n*Para más detalles por zona, consultá la sección de Estadísticas.*\n\n*Generado por Mi Scout v1.1*\n`;
+      setPreview(md);
+      setModo('acumulado');
+      setSelId(b.id);
+    } catch (e) {
+      console.error(e);
+      alert('Error cargando historial del jugador');
+    }
+    setCargando(false);
   };
 
   const generarEquipo = (equipo: string, lineup: Bateador[]) => {
@@ -82,6 +121,10 @@ export default function ReportePage() {
     if (!preview) return;
     if (modo === 'equipo') {
       descargarMD(preview, `scout_equipo.md`);
+    } else if (modo === 'acumulado') {
+      const b = todos.find((x) => x.id === selId);
+      if (!b) return;
+      descargarMD(preview, `scout_acumulado_${slugify(b.apellido)}_${slugify(b.nombre || 'x')}.md`);
     } else {
       const b = todos.find((x) => x.id === selId);
       if (!b) return;
@@ -102,7 +145,7 @@ export default function ReportePage() {
 
         {/* Individual */}
         <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <p style={{ fontWeight: 700, fontSize: '0.88rem' }}>👤 Reporte individual</p>
+          <p style={{ fontWeight: 700, fontSize: '0.88rem' }}>👤 Reporte del jugador</p>
           <select
             className="input"
             value={selId}
@@ -115,17 +158,30 @@ export default function ReportePage() {
               </option>
             ))}
           </select>
-          <button
-            className="btn btn-primary btn-full"
-            disabled={!selId}
-            onClick={() => {
-              const b = todos.find((x) => x.id === selId);
-              if (b) generarIndividual(b);
-            }}
-            style={!selId ? { opacity: 0.5 } : undefined}
-          >
-            Generar reporte individual
-          </button>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button
+              className="btn btn-primary"
+              disabled={!selId || cargando}
+              onClick={() => {
+                const b = todos.find((x) => x.id === selId);
+                if (b) generarIndividual(b);
+              }}
+              style={!selId || cargando ? { opacity: 0.5, flex: 1 } : { flex: 1 }}
+            >
+              Partido actual
+            </button>
+            <button
+              className="btn btn-primary"
+              disabled={!selId || cargando}
+              onClick={() => {
+                const b = todos.find((x) => x.id === selId);
+                if (b) generarAcumulado(b);
+              }}
+              style={!selId || cargando ? { opacity: 0.5, flex: 1, background: 'var(--accent)', color: '#000' } : { flex: 1, background: 'var(--accent)', color: '#000' }}
+            >
+              {cargando ? 'Cargando...' : 'Acumulado'}
+            </button>
+          </div>
         </div>
 
         {/* Equipo */}

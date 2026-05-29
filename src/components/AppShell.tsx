@@ -45,11 +45,20 @@ const IconReporte = () => (
   </svg>
 );
 
+const IconHistorial = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+    <path d="M3 3v18h18" />
+    <path d="M18 9l-5-5-4 4-5-5" />
+    <circle cx="18" cy="9" r="2" />
+  </svg>
+);
+
 const NAV_ITEMS = [
   { href: '/',          label: 'Line-Up',  Icon: IconLineup   },
   { href: '/tracking',  label: 'Tracking', Icon: IconTracking },
   { href: '/stats',     label: 'Stats',    Icon: IconStats    },
   { href: '/reporte',   label: 'Reporte',  Icon: IconReporte  },
+  { href: '/historial', label: 'Historial',Icon: IconHistorial},
 ];
 
 export default function AppShell({ children }: { children: React.ReactNode }) {

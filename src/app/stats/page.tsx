@@ -1,12 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useScout } from '@/context/ScoutContext';
 import ZonaStrikeComponent from '@/components/ZonaStrike';
 import { calcularEstadisticas } from '@/lib/storage';
-import type { Bateador, ZonaStrike } from '@/lib/types';
+import type { Bateador, ZonaStrike, TurnoAlBate } from '@/lib/types';
 
-function calcHeatMap(bateadorId: string, turnos: import('@/lib/types').TurnoAlBate[]): Partial<Record<ZonaStrike, number>> {
+function calcHeatMap(bateadorId: string, turnos: TurnoAlBate[]): Partial<Record<ZonaStrike, number>> {
   const stats = calcularEstadisticas(bateadorId, turnos);
   const mapa: Partial<Record<ZonaStrike, number>> = {};
   let maxPitches = 0;
@@ -17,7 +17,6 @@ function calcHeatMap(bateadorId: string, turnos: import('@/lib/types').TurnoAlBa
   for (let z = 1; z <= 8; z++) {
     const d = stats.porZona[z as ZonaStrike];
     if (d.pitches === 0) { mapa[z as ZonaStrike] = 0; continue; }
-    // Intensidad basada en tasa de contacto (hits / pitches)
     mapa[z as ZonaStrike] = d.hits / d.pitches;
   }
   return mapa;
@@ -29,6 +28,33 @@ export default function StatsPage() {
   const activos = todos.filter((b) => b.activo);
 
   const [selId, setSelId] = useState<string | null>(null);
+  const [modoAcumulado, setModoAcumulado] = useState(false);
+  
+  const [turnosAcumulados, setTurnosAcumulados] = useState<TurnoAlBate[]>([]);
+  const [cargandoAcumulado, setCargandoAcumulado] = useState(false);
+
+  const bateadorSel: Bateador | null =
+    todos.find((b) => b.id === selId) ??
+    activos[0] ??
+    null;
+
+  useEffect(() => {
+    if (modoAcumulado && bateadorSel) {
+      setCargandoAcumulado(true);
+      const params = new URLSearchParams({
+        apellido: bateadorSel.apellido,
+        numero: bateadorSel.numero,
+        equipo: bateadorSel.equipo
+      });
+      fetch(`/api/jugador/stats?${params.toString()}`)
+        .then(r => r.json())
+        .then(data => {
+          if (data.turnos) setTurnosAcumulados(data.turnos);
+          setCargandoAcumulado(false);
+        })
+        .catch(() => setCargandoAcumulado(false));
+    }
+  }, [modoAcumulado, bateadorSel]);
 
   if (!estado.partido) {
     return (
@@ -40,16 +66,13 @@ export default function StatsPage() {
     );
   }
 
-  const bateadorSel: Bateador | null =
-    todos.find((b) => b.id === selId) ??
-    activos[0] ??
-    null;
+  const turnosAMostrar = modoAcumulado ? turnosAcumulados : estado.turnosAlBate;
 
   const stats = bateadorSel
-    ? calcularEstadisticas(bateadorSel.id, estado.turnosAlBate)
+    ? calcularEstadisticas(bateadorSel.id, turnosAMostrar.map(t => ({...t, bateadorId: bateadorSel.id})))
     : null;
 
-  const heatMap = bateadorSel ? calcHeatMap(bateadorSel.id, estado.turnosAlBate) : undefined;
+  const heatMap = bateadorSel ? calcHeatMap(bateadorSel.id, turnosAMostrar.map(t => ({...t, bateadorId: bateadorSel.id}))) : undefined;
 
   const avg = stats && stats.turnosAlBate > 0
     ? stats.promedio.toFixed(3).replace('0.', '.')
@@ -64,7 +87,7 @@ export default function StatsPage() {
           className="input"
           value={selId ?? bateadorSel?.id ?? ''}
           onChange={(e) => setSelId(e.target.value || null)}
-          style={{ fontWeight: 600 }}
+          style={{ fontWeight: 600, marginBottom: 12 }}
         >
           {todos.map((b) => (
             <option key={b.id} value={b.id}>
@@ -72,6 +95,24 @@ export default function StatsPage() {
             </option>
           ))}
         </select>
+
+        {/* Toggle Acumulado */}
+        <div style={{ display: 'flex', gap: 8, background: 'var(--bg-elevated)', padding: 4, borderRadius: 8 }}>
+          <button
+            className={`btn btn-sm ${!modoAcumulado ? 'btn-primary' : ''}`}
+            style={{ flex: 1, background: !modoAcumulado ? '' : 'transparent', color: !modoAcumulado ? '' : 'var(--text-secondary)' }}
+            onClick={() => setModoAcumulado(false)}
+          >
+            Este partido
+          </button>
+          <button
+            className={`btn btn-sm ${modoAcumulado ? 'btn-primary' : ''}`}
+            style={{ flex: 1, background: modoAcumulado ? '' : 'transparent', color: modoAcumulado ? '' : 'var(--text-secondary)' }}
+            onClick={() => setModoAcumulado(true)}
+          >
+            Acumulado
+          </button>
+        </div>
       </div>
 
       {!bateadorSel && (
@@ -80,7 +121,13 @@ export default function StatsPage() {
         </div>
       )}
 
-      {bateadorSel && stats && (
+      {cargandoAcumulado && modoAcumulado && (
+        <div style={{ padding: 24, textAlign: 'center', color: 'var(--text-secondary)' }}>
+          Cargando stats acumuladas...
+        </div>
+      )}
+
+      {!cargandoAcumulado && bateadorSel && stats && (
         <>
           {/* Stats cards */}
           <div className="stats-row" style={{ paddingTop: 12 }}>

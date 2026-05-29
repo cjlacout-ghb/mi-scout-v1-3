@@ -2,10 +2,10 @@
 
 import React, { createContext, useContext, useReducer, useEffect, useCallback } from 'react';
 import type { EstadoPartido, Bateador, TurnoAlBate, Partido } from '@/lib/types';
-import { cargarEstado, guardarEstado, estadoInicial, generarId } from '@/lib/storage';
+import { estadoInicial, generarId } from '@/lib/storage';
 
 // ─── Acciones ─────────────────────────────────────────────────────────────────
-type Accion =
+export type Accion =
   | { type: 'INICIAR_PARTIDO'; payload: { partido: Partido; lineupVisitante: Bateador[]; lineupLocal: Bateador[]; perspectivaZona?: 'catcher' | 'pitcher' } }
   | { type: 'NUEVO_PARTIDO' }
   | { type: 'AGREGAR_BATEADOR'; payload: Omit<Bateador, 'id'> }
@@ -18,7 +18,6 @@ type Accion =
   | { type: 'AVANZAR_BATEADOR' }
   | { type: 'CAMBIAR_MITAD_INNING' }
   | { type: 'RETROCEDER_MITAD_INNING' }
-
   | { type: 'SET_BATEADOR_ACTUAL'; payload: { rol: 'visitante' | 'local'; indice: number } }
   | { type: 'SET_INNING'; payload: number }
   | { type: 'EDITAR_TURNO_AL_BATE'; payload: { id: string; datos: Partial<Omit<TurnoAlBate, 'id' | 'timestamp'>> } }
@@ -48,7 +47,7 @@ function reducer(estado: EstadoPartido, accion: Accion): EstadoPartido {
       return { ...estado, perspectivaZona: accion.payload };
 
     case 'AGREGAR_BATEADOR': {
-      const nuevo: Bateador = { ...accion.payload, id: generarId() };
+      const nuevo: Bateador = { ...accion.payload, id: (accion as any)._id || generarId() };
       if (nuevo.rol === 'visitante') {
         return { ...estado, lineupVisitante: [...estado.lineupVisitante, nuevo] };
       }
@@ -58,7 +57,9 @@ function reducer(estado: EstadoPartido, accion: Accion): EstadoPartido {
     case 'AGREGAR_BATEADORES_MASIVO': {
       if (accion.payload.length === 0) return estado;
       const rol = accion.payload[0].rol;
-      const nuevos: Bateador[] = accion.payload.map(b => ({ ...b, id: generarId() }));
+      // Use pre-generated IDs if available in the payload, otherwise generate
+      const ids = (accion as any)._ids || accion.payload.map(() => generarId());
+      const nuevos: Bateador[] = accion.payload.map((b, i) => ({ ...b, id: ids[i] }));
       if (rol === 'visitante') {
         return { ...estado, lineupVisitante: [...estado.lineupVisitante, ...nuevos] };
       }
@@ -90,7 +91,7 @@ function reducer(estado: EstadoPartido, accion: Accion): EstadoPartido {
       const saliente = lineup.find((b) => b.id === salienteId);
       if (!saliente) return estado;
 
-      const nuevoId = generarId();
+      const nuevoId = (accion as any)._nuevoId || generarId();
       const newLineup = lineup.map((b) => {
         if (b.id === salienteId) {
           return { ...b, activo: false, reemplazadoPorId: nuevoId, reemplazadoAInning: inning };
@@ -140,8 +141,8 @@ function reducer(estado: EstadoPartido, accion: Accion): EstadoPartido {
     case 'REGISTRAR_TURNO': {
       const turno: TurnoAlBate = {
         ...accion.payload,
-        id: generarId(),
-        timestamp: new Date().toISOString(),
+        id: (accion as any)._id || generarId(),
+        timestamp: (accion as any)._timestamp || new Date().toISOString(),
       };
       return { ...estado, turnosAlBate: [...estado.turnosAlBate, turno] };
     }
@@ -188,7 +189,6 @@ function reducer(estado: EstadoPartido, accion: Accion): EstadoPartido {
       
       let nuevoIndice = isVisitante ? estado.indiceVisitante : estado.indiceLocal;
       
-      // Auto-detectar el último bateador en turno y sumar 1
       const turnosEquipo = estado.turnosAlBate.filter(t => activos.some(b => b.id === t.bateadorId));
       if (turnosEquipo.length > 0) {
         const ultimoTurno = turnosEquipo[turnosEquipo.length - 1];
@@ -242,8 +242,6 @@ function reducer(estado: EstadoPartido, accion: Accion): EstadoPartido {
       }
     }
 
-
-
     case 'SET_BATEADOR_ACTUAL': {
       if (accion.payload.rol === 'visitante') {
         return { ...estado, indiceVisitante: accion.payload.indice };
@@ -259,6 +257,88 @@ function reducer(estado: EstadoPartido, accion: Accion): EstadoPartido {
   }
 }
 
+// ─── API Sync ─────────────────────────────────────────────────────────────────
+async function syncApi(accion: Accion, nuevoEstado: EstadoPartido, oldEstado: EstadoPartido) {
+  try {
+    switch (accion.type) {
+      case 'INICIAR_PARTIDO':
+        await fetch('/api/partido', { method: 'POST', body: JSON.stringify(accion) });
+        break;
+      case 'NUEVO_PARTIDO':
+        // En vez de DELETE, llamamos a finalizar
+        await fetch('/api/partido/finalizar', { method: 'POST' });
+        break;
+      case 'SET_PERSPECTIVA':
+      case 'SET_BATEADOR_ACTUAL':
+      case 'SET_INNING':
+      case 'AVANZAR_BATEADOR':
+      case 'CAMBIAR_MITAD_INNING':
+      case 'RETROCEDER_MITAD_INNING':
+        await fetch('/api/partido/estado', {
+          method: 'PATCH',
+          body: JSON.stringify({
+            type: accion.type,
+            payload: 'payload' in accion ? accion.payload : { estado: nuevoEstado }
+          })
+        });
+        break;
+      case 'AGREGAR_BATEADOR': {
+        const _id = (accion as any)._id;
+        const b = { ...accion.payload, id: _id };
+        await fetch('/api/bateadores', { method: 'POST', body: JSON.stringify({ type: accion.type, payload: b }) });
+        break;
+      }
+      case 'AGREGAR_BATEADORES_MASIVO': {
+        const _ids = (accion as any)._ids;
+        const bs = accion.payload.map((b, i) => ({ ...b, id: _ids[i] }));
+        await fetch('/api/bateadores', { method: 'POST', body: JSON.stringify({ type: accion.type, payload: bs }) });
+        break;
+      }
+      case 'EDITAR_BATEADOR':
+      case 'REORDENAR_BATEADORES':
+        await fetch('/api/bateadores', { method: 'PATCH', body: JSON.stringify(accion) });
+        break;
+      case 'SUSTITUIR_BATEADOR': {
+        const entranteId = (accion as any)._nuevoId;
+        const _entrante = { ...accion.payload.entrante, id: entranteId, rol: accion.payload.rol };
+        await fetch('/api/bateadores', { method: 'PATCH', body: JSON.stringify({
+          type: accion.type,
+          payload: { ...accion.payload, entrante: _entrante }
+        })});
+        break;
+      }
+      case 'REINGRESAR_ABRIDOR': {
+        // Compute sustitutoId to send
+        const lineup = accion.payload.rol === 'visitante' ? oldEstado.lineupVisitante : oldEstado.lineupLocal;
+        const abridor = lineup.find(b => b.id === accion.payload.id);
+        const sustitutoId = abridor?.reemplazadoPorId;
+        await fetch('/api/bateadores', { method: 'PATCH', body: JSON.stringify({
+          type: accion.type,
+          payload: { ...accion.payload, sustitutoId }
+        })});
+        break;
+      }
+      case 'REGISTRAR_TURNO': {
+        const t: TurnoAlBate = {
+          ...accion.payload,
+          id: (accion as any)._id,
+          timestamp: (accion as any)._timestamp,
+        };
+        await fetch('/api/turnos', { method: 'POST', body: JSON.stringify(t) });
+        break;
+      }
+      case 'EDITAR_TURNO_AL_BATE':
+        await fetch('/api/turnos', { method: 'PATCH', body: JSON.stringify(accion.payload) });
+        break;
+      case 'ELIMINAR_TURNO_AL_BATE':
+        await fetch(`/api/turnos?id=${accion.payload}`, { method: 'DELETE' });
+        break;
+    }
+  } catch (error) {
+    console.error('Error syncing to API:', error);
+  }
+}
+
 // ─── Contexto ─────────────────────────────────────────────────────────────────
 interface ContextType {
   estado: EstadoPartido;
@@ -271,24 +351,47 @@ interface ContextType {
 const ScoutContext = createContext<ContextType | null>(null);
 
 export function ScoutProvider({ children }: { children: React.ReactNode }) {
-  const [estado, dispatch] = useReducer(reducer, estadoInicial);
+  const [estado, _dispatch] = useReducer(reducer, estadoInicial);
   const [mounted, setMounted] = React.useState(false);
 
-  // Cargar desde localStorage al montar
-  useEffect(() => {
-    const guardado = cargarEstado();
-    if (guardado && guardado.partido) {
-      dispatch({ type: 'CARGAR_ESTADO', payload: guardado });
+  // Custom dispatch to handle API sync side-effects and inject IDs
+  const dispatch = useCallback(async (accion: Accion) => {
+    // Inject IDs for creates so we know them synchronously for API and Reducer
+    if (accion.type === 'AGREGAR_BATEADOR') (accion as any)._id = generarId();
+    if (accion.type === 'AGREGAR_BATEADORES_MASIVO') (accion as any)._ids = accion.payload.map(() => generarId());
+    if (accion.type === 'SUSTITUIR_BATEADOR') (accion as any)._nuevoId = generarId();
+    if (accion.type === 'REGISTRAR_TURNO') {
+      (accion as any)._id = generarId();
+      (accion as any)._timestamp = new Date().toISOString();
     }
-    setMounted(true);
-  }, []);
 
-  // Guardar en localStorage en cada cambio de estado
-  useEffect(() => {
-    if (estado.partido) {
-      guardarEstado(estado);
+    // 1. Update React State immediately (optimistic UI)
+    _dispatch(accion);
+
+    // 2. Compute new state for some actions
+    const nuevoEstado = reducer(estado, accion);
+
+    // 3. Sync to API in background
+    if (accion.type !== 'CARGAR_ESTADO') {
+      syncApi(accion, nuevoEstado, estado);
     }
   }, [estado]);
+
+  // Fetch initial state from API
+  useEffect(() => {
+    fetch('/api/partido')
+      .then(r => r.json())
+      .then(data => {
+        if (data.estado && data.estado.partido) {
+          dispatch({ type: 'CARGAR_ESTADO', payload: data.estado });
+        }
+        setMounted(true);
+      })
+      .catch(err => {
+        console.error('Error fetching initial state', err);
+        setMounted(true);
+      });
+  }, [dispatch]);
 
   const equipoAlBate = estado.mitadInning === 'alta' ? 'visitante' : 'local';
   const lineupActual = (equipoAlBate === 'visitante' ? estado.lineupVisitante : estado.lineupLocal) || [];
