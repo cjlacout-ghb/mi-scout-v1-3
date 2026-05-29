@@ -73,7 +73,7 @@ export default function ReportePage() {
       md += `---\n\n`;
     }
 
-    md += `*Generado por Mi Scout v1.0*\n`;
+    md += `*Generado por Mi Scout v1.1*\n`;
     setPreview(md);
     setModo('equipo');
   };

@@ -197,6 +197,6 @@ export function generarReporteMD(bateador: import('./types').Bateador, stats: Es
     md += '\n\n';
   }
 
-  md += `---\n\n*Generado por Mi Scout v1.0*\n`;
+  md += `---\n\n*Generado por Mi Scout v1.1*\n`;
   return md;
 }

@@ -87,7 +87,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           }}
         >
           <div>Mi<span>Scout</span></div>
-          <span style={{ fontSize: '0.7rem', color: '#ffffff', fontWeight: 400, letterSpacing: '0.5px' }}>v1.0</span>
+          <span style={{ fontSize: '0.7rem', color: '#ffffff', fontWeight: 400, letterSpacing: '0.5px' }}>v1.1</span>
         </div>
         <div className="app-header__info" style={{ textAlign: 'center' }}>
           {partidoInfo ? (
