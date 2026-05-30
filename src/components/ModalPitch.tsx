@@ -241,7 +241,7 @@ export default function ModalPitch({ zona, onConfirmar, onCancelar }: Props) {
       case 'numero_defensor': {
         return (
           <div className="number-grid">
-            {([1, 2, 3, 4, 5, 6, 7, '7/8', 8, '8/9', 9, 10] as NumeroDefensor[]).map((n) => (
+            {([1, 2, 3, 4, 5, 6, 7, '7/8', 8, '8/9', 9] as NumeroDefensor[]).map((n) => (
               <button key={n} className="number-btn" onClick={() => elegirNumero(n)}>
                 {n}
               </button>

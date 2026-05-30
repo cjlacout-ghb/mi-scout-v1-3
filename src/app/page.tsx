@@ -396,7 +396,7 @@ export default function LineupPage() {
   return (
     <div style={{ paddingBottom: 80 }}>
       {/* ── Landing Page (Sin partido) ── */}
-      {!estado.partido && (
+      {(!estado.partido || estado.partido.finalizado) && (
         <div style={{ 
           display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', 
           minHeight: 'calc(100vh - 160px)', padding: '32px 24px', textAlign: 'center',
@@ -421,7 +421,7 @@ export default function LineupPage() {
       )}
 
       {/* ── Con partido ── */}
-      {estado.partido && (
+      {(estado.partido && !estado.partido.finalizado) && (
         <>
           {/* Info adicional del evento */}
           {estado.partido.descripcion && (

@@ -8,6 +8,7 @@ import { estadoInicial, generarId } from '@/lib/storage';
 export type Accion =
   | { type: 'INICIAR_PARTIDO'; payload: { partido: Partido; lineupVisitante: Bateador[]; lineupLocal: Bateador[]; perspectivaZona?: 'catcher' | 'pitcher' } }
   | { type: 'NUEVO_PARTIDO' }
+  | { type: 'FINALIZAR_PARTIDO' }
   | { type: 'AGREGAR_BATEADOR'; payload: Omit<Bateador, 'id'> }
   | { type: 'AGREGAR_BATEADORES_MASIVO'; payload: Array<Omit<Bateador, 'id'>> }
   | { type: 'EDITAR_BATEADOR'; payload: { id: string; rol: 'visitante' | 'local'; datos: Partial<Omit<Bateador, 'id'>> } }
@@ -33,6 +34,12 @@ function reducer(estado: EstadoPartido, accion: Accion): EstadoPartido {
 
     case 'NUEVO_PARTIDO':
       return estadoInicial;
+
+    case 'FINALIZAR_PARTIDO':
+      if (estado.partido) {
+        return { ...estado, partido: { ...estado.partido, finalizado: true } };
+      }
+      return estado;
 
     case 'INICIAR_PARTIDO':
       return {
@@ -265,6 +272,7 @@ async function syncApi(accion: Accion, nuevoEstado: EstadoPartido, oldEstado: Es
         await fetch('/api/partido', { method: 'POST', body: JSON.stringify(accion) });
         break;
       case 'NUEVO_PARTIDO':
+      case 'FINALIZAR_PARTIDO':
         // En vez de DELETE, llamamos a finalizar
         await fetch('/api/partido/finalizar', { method: 'POST' });
         break;
@@ -356,8 +364,15 @@ export function ScoutProvider({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(true);
 
+  const estadoRef = React.useRef(estado);
+  React.useEffect(() => {
+    estadoRef.current = estado;
+  }, [estado]);
+
   // Custom dispatch to handle API sync side-effects and inject IDs
   const dispatch = useCallback(async (accion: Accion) => {
+    const currentState = estadoRef.current;
+    
     // Inject IDs for creates so we know them synchronously for API and Reducer
     if (accion.type === 'AGREGAR_BATEADOR') (accion as any)._id = generarId();
     if (accion.type === 'AGREGAR_BATEADORES_MASIVO') (accion as any)._ids = accion.payload.map(() => generarId());
@@ -371,13 +386,13 @@ export function ScoutProvider({ children }: { children: React.ReactNode }) {
     _dispatch(accion);
 
     // 2. Compute new state for some actions
-    const nuevoEstado = reducer(estado, accion);
+    const nuevoEstado = reducer(currentState, accion);
 
     // 3. Sync to API in background
     if (accion.type !== 'CARGAR_ESTADO') {
-      syncApi(accion, nuevoEstado, estado);
+      syncApi(accion, nuevoEstado, currentState);
     }
-  }, [estado]);
+  }, []);
 
   // Fetch initial state from API
   useEffect(() => {
@@ -395,7 +410,7 @@ export function ScoutProvider({ children }: { children: React.ReactNode }) {
         setMounted(true);
         setIsLoading(false);
       });
-  }, [dispatch]);
+  }, []);
 
   const equipoAlBate = estado.mitadInning === 'alta' ? 'visitante' : 'local';
   const lineupActual = (equipoAlBate === 'visitante' ? estado.lineupVisitante : estado.lineupLocal) || [];

@@ -7,11 +7,18 @@ function parseDetalle(jsonStr: string | null) {
   try { return JSON.parse(jsonStr); } catch { return undefined; }
 }
 
-export async function GET() {
+export async function GET(req: Request) {
   const db = getDb();
+  const url = new URL(req.url);
+  const id = url.searchParams.get('id');
   
-  // Buscar partido activo (finalizado = 0)
-  const partidoRow = db.prepare('SELECT * FROM partidos WHERE finalizado = 0 LIMIT 1').get() as any;
+  let partidoRow;
+  if (id) {
+    partidoRow = db.prepare('SELECT * FROM partidos WHERE id = ?').get(id) as any;
+  } else {
+    // Buscar partido activo (finalizado = 0)
+    partidoRow = db.prepare('SELECT * FROM partidos WHERE finalizado = 0 LIMIT 1').get() as any;
+  }
   
   if (!partidoRow) {
     return NextResponse.json({ estado: null });
@@ -24,7 +31,8 @@ export async function GET() {
     local: partidoRow.local,
     descripcion: partidoRow.descripcion,
     innings: partidoRow.innings,
-    creadoEn: partidoRow.creado_en
+    creadoEn: partidoRow.creado_en,
+    finalizado: partidoRow.finalizado === 1
   };
 
   const bateadoresRows = db.prepare('SELECT * FROM bateadores WHERE partido_id = ? ORDER BY orden ASC').all(partido.id) as any[];

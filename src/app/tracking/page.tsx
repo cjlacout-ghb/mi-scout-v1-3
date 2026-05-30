@@ -47,6 +47,23 @@ export default function TrackingPage() {
     }
   }, [estado.partido, equipoAlBate, bateadoresActivos.length, estado.indiceVisitante, estado.indiceLocal, showAgregarBateador]);
 
+  if (estado.partido?.finalizado) {
+    return (
+      <div className="empty-state">
+        <div className="empty-state__icon">🏁</div>
+        <div className="empty-state__title">Partido finalizado</div>
+        <p className="empty-state__text">Podés consultar el Reporte, las Stats o ir al Historial.</p>
+        <button 
+          className="btn btn-primary" 
+          style={{ marginTop: 16 }}
+          onClick={() => dispatch({ type: 'NUEVO_PARTIDO' })}
+        >
+          Iniciar nuevo partido
+        </button>
+      </div>
+    );
+  }
+
   // ─── Sin partido activo ────────────────────────────────────────────────────
   if (!estado.partido) {
     return (
@@ -512,7 +529,7 @@ export default function TrackingPage() {
           mensaje="¿Finalizar el partido? Esta acción no se puede deshacer."
           onConfirmar={() => {
             setShowFinPartido(false);
-            dispatch({ type: 'NUEVO_PARTIDO' });
+            dispatch({ type: 'FINALIZAR_PARTIDO' });
           }}
           onCancelar={() => setShowFinPartido(false)}
         />

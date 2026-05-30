@@ -18,7 +18,7 @@ export type CalidadContacto = 'soft' | 'hard';
 export type ZonaStrike = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
 
 // Número de defensor o ubicación de bateo (1-10)
-export type NumeroDefensor = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | '7/8' | '8/9';
+export type NumeroDefensor = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | '7/8' | '8/9';
 
 export interface DetalleOut {
   tipo: TipoOut;
@@ -73,6 +73,7 @@ export interface Partido {
   descripcion: string;
   innings: number;       // Innings jugados
   creadoEn: string;
+  finalizado?: boolean;
 }
 
 export interface EstadisticasBateador {
