@@ -64,7 +64,7 @@ const NAV_ITEMS = [
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { estado, dispatch } = useScout();
+  const { estado, dispatch, isLoading } = useScout();
   const [showConfirm, setShowConfirm] = useState(false);
 
   const partidoInfo = estado.partido;
@@ -99,10 +99,15 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           <span style={{ fontSize: '0.7rem', color: '#ffffff', fontWeight: 400, letterSpacing: '0.5px' }}>v1.1</span>
         </div>
         <div className="app-header__info" style={{ textAlign: 'center' }}>
-          {partidoInfo ? (
+          {isLoading ? (
+            <div style={{ width: 160, height: 32, borderRadius: 4, 
+                          background: 'var(--bg-elevated)', opacity: 0.4 }} />
+          ) : partidoInfo ? (
             <>
               <div>{new Date(partidoInfo.fecha).toLocaleDateString('es-AR')}</div>
-              <div style={{ fontWeight: 700, fontSize: '0.8rem', color: 'var(--text-primary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+              <div style={{ fontWeight: 700, fontSize: '0.8rem', 
+                            color: 'var(--text-primary)', textTransform: 'uppercase', 
+                            letterSpacing: '0.04em' }}>
                 {partidoInfo.visitante} vs {partidoInfo.local}
               </div>
             </>
@@ -133,7 +138,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       </header>
 
       {/* Contenido principal */}
-      <main className="app-main">
+      <main className="app-main" style={{ minHeight: '100dvh' }}>
         {children}
       </main>
 

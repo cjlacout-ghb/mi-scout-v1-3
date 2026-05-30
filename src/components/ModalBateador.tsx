@@ -14,12 +14,14 @@ export default function ModalBateador({
   inicial,
   titulo,
   subtitulo,
+  equipo,
   onGuardar,
   onClose,
 }: {
   inicial?: FormBateador;
   titulo: string;
   subtitulo?: string;
+  equipo?: string;
   onGuardar: (d: FormBateador) => void;
   onClose: () => void;
 }) {
@@ -41,8 +43,28 @@ export default function ModalBateador({
 
   return (
     <div className="overlay" onClick={onClose}>
-      <div className="bottom-sheet" onClick={(e) => e.stopPropagation()}>
+      <div className="bottom-sheet" onClick={(e) => e.stopPropagation()} style={{ position: 'relative' }}>
+        <button
+          onClick={onClose}
+          style={{
+            position: 'absolute',
+            top: 16,
+            right: 16,
+            background: 'none',
+            border: 'none',
+            color: 'var(--text-secondary)',
+            fontSize: '1.2rem',
+            cursor: 'pointer',
+            padding: '4px',
+            lineHeight: 1,
+            zIndex: 10
+          }}
+          aria-label="Cerrar"
+        >
+          ✕
+        </button>
         <div className="sheet-handle" />
+        {equipo && <p style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--accent)', textAlign: 'center', letterSpacing: '0.08em', marginBottom: 4 }}>{equipo.toUpperCase()}</p>}
         <h2 className="sheet-title">{titulo}</h2>
         {subtitulo && <p className="sheet-subtitle">{subtitulo}</p>}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>

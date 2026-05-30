@@ -67,8 +67,9 @@ export default function ZonaStrikeComponent({ onZonaClick, marcadores = [], heat
     if (container) {
       const rect = container.getBoundingClientRect();
       const x = (e.clientX - rect.left) / rect.width;
+      const xCanonical = perspectiva === 'pitcher' ? 1 - x : x;
       const y = (e.clientY - rect.top) / rect.height;
-      onZonaClick(zona, { x, y });
+      onZonaClick(zona, { x: xCanonical, y });
     } else {
       onZonaClick(zona);
     }
@@ -167,24 +168,16 @@ export default function ZonaStrikeComponent({ onZonaClick, marcadores = [], heat
           let topStr, leftStr;
           
           if (m.coordenadas) {
-            // Coordenadas exactas proporcionadas
-            let xVisual = m.coordenadas.x;
-            if (perspectiva === 'pitcher') {
-              xVisual = 1 - m.coordenadas.x;
-            }
+            // Coordenadas almacenadas en espacio canónico (catcher); invertir X para pitcher
+            const xVisual = perspectiva === 'pitcher' ? 1 - m.coordenadas.x : m.coordenadas.x;
             topStr = `${(m.coordenadas.y * 100).toFixed(2)}%`;
             leftStr = `${(xVisual * 100).toFixed(2)}%`;
           } else {
             // Fallback para turnos viejos sin coordenadas (usa offset estático)
             const pos = ZONA_OFFSET[m.zona] || { top: '50%', left: '50%' };
-            let leftVal = parseInt(pos.left);
-            if (perspectiva === 'pitcher' && !isNaN(leftVal)) {
-              leftVal = 100 - leftVal;
-            }
-            const leftCalc = isNaN(leftVal) ? pos.left : `${leftVal}%`;
-            const jitter = i * 4; // Solo aplicamos jitter a los viejos
+            const jitter = i * 4;
             topStr = `calc(${pos.top} + ${jitter % 8}px)`;
-            leftStr = `calc(${leftCalc} + ${(jitter * 1.5) % 10}px)`;
+            leftStr = `calc(${pos.left} + ${(jitter * 1.5) % 10}px)`;
           }
 
           let colorResultado = 'var(--text-primary)';

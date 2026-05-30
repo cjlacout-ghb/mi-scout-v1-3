@@ -346,6 +346,7 @@ interface ContextType {
   bateadorActual: Bateador | null;
   bateadoresActivos: Bateador[];
   equipoAlBate: 'visitante' | 'local';
+  isLoading: boolean;
 }
 
 const ScoutContext = createContext<ContextType | null>(null);
@@ -353,6 +354,7 @@ const ScoutContext = createContext<ContextType | null>(null);
 export function ScoutProvider({ children }: { children: React.ReactNode }) {
   const [estado, _dispatch] = useReducer(reducer, estadoInicial);
   const [mounted, setMounted] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(true);
 
   // Custom dispatch to handle API sync side-effects and inject IDs
   const dispatch = useCallback(async (accion: Accion) => {
@@ -386,10 +388,12 @@ export function ScoutProvider({ children }: { children: React.ReactNode }) {
           dispatch({ type: 'CARGAR_ESTADO', payload: data.estado });
         }
         setMounted(true);
+        setIsLoading(false);
       })
       .catch(err => {
         console.error('Error fetching initial state', err);
         setMounted(true);
+        setIsLoading(false);
       });
   }, [dispatch]);
 
@@ -400,7 +404,7 @@ export function ScoutProvider({ children }: { children: React.ReactNode }) {
   const bateadorActual = bateadoresActivos[indiceActivo] ?? null;
 
   return (
-    <ScoutContext.Provider value={{ estado, dispatch, bateadorActual, bateadoresActivos, equipoAlBate }}>
+    <ScoutContext.Provider value={{ estado, dispatch, bateadorActual, bateadoresActivos, equipoAlBate, isLoading }}>
       {children}
     </ScoutContext.Provider>
   );

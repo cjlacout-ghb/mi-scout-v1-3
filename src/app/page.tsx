@@ -336,7 +336,7 @@ function ModalCargaMasiva({
 
 // ─── Pantalla principal: LINE-UP ──────────────────────────────────────────────
 export default function LineupPage() {
-  const { estado, dispatch, bateadorActual, bateadoresActivos } = useScout();
+  const { estado, dispatch, bateadorActual, bateadoresActivos, equipoAlBate } = useScout();
   const router = useRouter();
 
   const [showNuevoPartido, setShowNuevoPartido] = useState(false);
@@ -345,7 +345,7 @@ export default function LineupPage() {
   const [showConfirmReset, setShowConfirmReset] = useState(false);
   const [editando, setEditando] = useState<Bateador | null>(null);
   const [sustituyendo, setSustituyendo] = useState<Bateador | null>(null);
-  const [activeTab, setActiveTab] = useState<'visitante' | 'local'>('visitante');
+  const [activeTab, setActiveTab] = useState<'visitante' | 'local'>(equipoAlBate || 'visitante');
 
   const equipoActual = activeTab === 'visitante' ? estado.partido?.visitante : estado.partido?.local;
   const lineupActual = (activeTab === 'visitante' ? estado.lineupVisitante : estado.lineupLocal) || [];
@@ -357,6 +357,15 @@ export default function LineupPage() {
       type: 'AGREGAR_BATEADOR',
       payload: { ...d, equipo: equipoActual || '', rol: activeTab, orden, activo: true, esAbridor: true },
     });
+    // activosCount + 1 because AGREGAR_BATEADOR already added the new player
+    // We point to the newly added player, not the next empty slot
+    const activosCount = lineupActual.filter((b) => b.activo).length;
+    dispatch({
+      type: 'SET_BATEADOR_ACTUAL',
+      payload: { rol: activeTab, indice: activosCount - 1 }
+    });
+    setShowAgregarBateador(false);
+    setTimeout(() => router.push('/tracking'), 50);
   };
 
   const agregarBateadoresMasivo = (bateadores: Array<Omit<Bateador, 'id'>>) => {
@@ -526,14 +535,14 @@ export default function LineupPage() {
 
           {/* Acciones */}
           <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {ordenMaximo === 0 && (
-              <button className="btn btn-primary btn-full" onClick={() => setShowCargaMasiva(true)}>
-                Carga rápida (Line-Up Completo)
+            {ordenMaximo < 15 && (
+              <button className="btn btn-primary btn-full" onClick={() => setShowAgregarBateador(true)}>
+                Agregar 1 jugador
               </button>
             )}
-            {ordenMaximo < 15 && (
-              <button className={`btn ${ordenMaximo === 0 ? 'btn-ghost' : 'btn-primary'} btn-full`} onClick={() => setShowAgregarBateador(true)}>
-                Agregar 1 jugador
+            {ordenMaximo === 0 && (
+              <button className="btn btn-primary btn-full" onClick={() => setShowCargaMasiva(true)}>
+                Line-up completo
               </button>
             )}
             {bateadorActual && (
@@ -554,6 +563,7 @@ export default function LineupPage() {
         <ModalBateador
           titulo="Agregar bateador"
           subtitulo={`Orden al bate: ${ordenMaximo + 1}`}
+          equipo={equipoActual || ''}
           onGuardar={agregarBateador}
           onClose={() => setShowAgregarBateador(false)}
         />
@@ -569,6 +579,7 @@ export default function LineupPage() {
         <ModalBateador
           titulo="Editar bateador"
           subtitulo={`Orden al bate: ${editando.orden}`}
+          equipo={editando.equipo}
           inicial={{ numero: editando.numero, apellido: editando.apellido, nombre: editando.nombre, equipo: editando.equipo, ladoBateo: editando.ladoBateo || 'D' }}
           onGuardar={(d) => editarBateador(editando, d)}
           onClose={() => setEditando(null)}

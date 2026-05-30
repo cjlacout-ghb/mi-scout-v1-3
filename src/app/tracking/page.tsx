@@ -71,6 +71,7 @@ export default function TrackingPage() {
           <ModalBateador
             titulo="Primer bateador"
             subtitulo="Orden al bate: 1"
+            equipo={equipoAlBate === 'visitante' ? estado.partido!.visitante : estado.partido!.local}
             onGuardar={(d: import('@/components/ModalBateador').FormBateador) => {
               dispatch({
                 type: 'AGREGAR_BATEADOR',
@@ -520,6 +521,7 @@ export default function TrackingPage() {
         <ModalBateador
           titulo="Siguiente bateador"
           subtitulo={`Orden al bate: ${bateadoresActivos.length + 1}`}
+          equipo={equipoAlBate === 'visitante' ? estado.partido!.visitante : estado.partido!.local}
           onGuardar={(d: FormBateador) => {
             const lineupActual = equipoAlBate === 'visitante' ? estado.lineupVisitante : estado.lineupLocal;
             const ordenMaximo = Math.max(0, ...lineupActual.map(b => b.orden));
