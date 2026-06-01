@@ -12,6 +12,8 @@ interface Props {
   ladoBateo?: 'D' | 'Z' | 'S';
   /** Vista de la zona: catcher o pitcher */
   perspectiva?: 'catcher' | 'pitcher';
+  /** Desglose estadístico por zona para mostrar en tooltip */
+  zoneStats?: Partial<Record<ZonaStrike, { pitches: number; hits: number; outs: number; contacto: number }>>;
 }
 
 // Mapeo de resultado → tipo de marcador
@@ -32,7 +34,7 @@ const ZONA_OFFSET: Record<ZonaStrike, { top: string; left: string }> = {
 
 function heatColor(intensity: number): string {
   // 0 = frío (#1A3A5C) → 0.5 = neutro → 1 = caliente (#E74C3C)
-  if (intensity <= 0) return 'transparent';
+  if (intensity < 0) return 'transparent';
   const stops = [
     [0.0,  [26,  58,  92 ]],  // cold
     [0.25, [41,  128, 185]],  // cool
@@ -54,7 +56,7 @@ function heatColor(intensity: number): string {
   return `rgba(${r},${g},${b},0.65)`;
 }
 
-export default function ZonaStrikeComponent({ onZonaClick, marcadores = [], heatMap, ladoBateo, perspectiva = 'catcher' }: Props) {
+export default function ZonaStrikeComponent({ onZonaClick, marcadores = [], heatMap, ladoBateo, perspectiva = 'catcher', zoneStats }: Props) {
   const hmColores: Partial<Record<ZonaStrike, string>> = {};
   if (heatMap) {
     for (const [z, v] of Object.entries(heatMap)) {
@@ -124,7 +126,28 @@ export default function ZonaStrikeComponent({ onZonaClick, marcadores = [], heat
               style={hmColores[logicalZone] ? { background: hmColores[logicalZone] } : undefined}
               role="button"
               aria-label={`Zona ${logicalZone}`}
-            />
+            >
+              {zoneStats && zoneStats[logicalZone] && zoneStats[logicalZone]!.pitches > 0 && (
+                <div className="zone-tooltip" style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontWeight: 400 }}>
+                  <div style={{ display: 'flex', gap: '6px', alignItems: 'center', justifyContent: 'center' }}>
+                    <span style={{ color: 'var(--text-primary)' }}>{zoneStats[logicalZone]!.hits + zoneStats[logicalZone]!.outs + zoneStats[logicalZone]!.ks + zoneStats[logicalZone]!.kl} AB</span>
+                    <span style={{ color: 'var(--text-muted)' }}>|</span>
+                    <span style={{ color: 'var(--danger)' }}>{zoneStats[logicalZone]!.hits} H</span>
+                    <span style={{ color: 'var(--text-muted)' }}>|</span>
+                    <span style={{ color: 'var(--success)' }}>{zoneStats[logicalZone]!.outs} O</span>
+                    <span style={{ color: 'var(--text-muted)' }}>|</span>
+                    <span style={{ color: 'var(--success)' }}>{zoneStats[logicalZone]!.ks + zoneStats[logicalZone]!.kl} K</span>
+                    <span style={{ color: 'var(--text-muted)' }}>|</span>
+                    <span style={{ color: 'var(--info)' }}>{zoneStats[logicalZone]!.bb} BB/HBP</span>
+                  </div>
+                  <div style={{ color: 'var(--accent)', fontSize: '0.75rem', textAlign: 'center' }}>
+                    {((zoneStats[logicalZone]!.hits + zoneStats[logicalZone]!.outs + zoneStats[logicalZone]!.ks + zoneStats[logicalZone]!.kl) > 0)
+                      ? (zoneStats[logicalZone]!.hits / (zoneStats[logicalZone]!.hits + zoneStats[logicalZone]!.outs + zoneStats[logicalZone]!.ks + zoneStats[logicalZone]!.kl)).toFixed(3).replace('0.', '.')
+                      : '---'} AVG
+                  </div>
+                </div>
+              )}
+            </div>
           );
         })}
 
@@ -158,6 +181,26 @@ export default function ZonaStrikeComponent({ onZonaClick, marcadores = [], heat
                 aria-label={`Zona ${logicalZone}`}
               >
                 <span className={`zona-corner-label ${cornerClass}`}>{logicalZone}</span>
+                {zoneStats && zoneStats[logicalZone] && zoneStats[logicalZone]!.pitches > 0 && (
+                  <div className="zone-tooltip" style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontWeight: 400 }}>
+                    <div style={{ display: 'flex', gap: '6px', alignItems: 'center', justifyContent: 'center' }}>
+                      <span style={{ color: 'var(--text-primary)' }}>{zoneStats[logicalZone]!.hits + zoneStats[logicalZone]!.outs + zoneStats[logicalZone]!.ks + zoneStats[logicalZone]!.kl} AB</span>
+                      <span style={{ color: 'var(--text-muted)' }}>|</span>
+                      <span style={{ color: 'var(--danger)' }}>{zoneStats[logicalZone]!.hits} H</span>
+                      <span style={{ color: 'var(--text-muted)' }}>|</span>
+                      <span style={{ color: 'var(--success)' }}>{zoneStats[logicalZone]!.outs} O</span>
+                      <span style={{ color: 'var(--text-muted)' }}>|</span>
+                      <span style={{ color: 'var(--success)' }}>{zoneStats[logicalZone]!.ks + zoneStats[logicalZone]!.kl} K</span>
+                      <span style={{ color: 'var(--text-muted)' }}>|</span>
+                      <span style={{ color: 'var(--info)' }}>{zoneStats[logicalZone]!.bb} BB/HBP</span>
+                    </div>
+                    <div style={{ color: 'var(--accent)', fontSize: '0.75rem', textAlign: 'center' }}>
+                      {((zoneStats[logicalZone]!.hits + zoneStats[logicalZone]!.outs + zoneStats[logicalZone]!.ks + zoneStats[logicalZone]!.kl) > 0)
+                        ? (zoneStats[logicalZone]!.hits / (zoneStats[logicalZone]!.hits + zoneStats[logicalZone]!.outs + zoneStats[logicalZone]!.ks + zoneStats[logicalZone]!.kl)).toFixed(3).replace('0.', '.')
+                        : '---'} AVG
+                    </div>
+                  </div>
+                )}
               </div>
             );
           })}

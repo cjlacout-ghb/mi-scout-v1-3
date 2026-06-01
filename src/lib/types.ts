@@ -88,7 +88,7 @@ export interface EstadisticasBateador {
   basesPorBolas: number;      // BB/HBP
   outs: number;
   promedio: number;           // AVG = H / AB
-  porZona: Record<ZonaStrike, { pitches: number; hits: number; outs: number; contacto: number }>;
+  porZona: Record<ZonaStrike, { pitches: number; hits: number; outs: number; contacto: number; ks: number; kl: number; bb: number }>;
 }
 
 // Estado global del partido en curso

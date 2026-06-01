@@ -593,6 +593,11 @@ body {
 
 .zona-cuadrante:hover {
   background: var(--accent-dim);
+  z-index: 50;
+}
+
+.zona-inner:has(.zona-cuadrante:hover) {
+  z-index: 60;
 }
 
 .zona-cuadrante:active {
@@ -620,7 +625,7 @@ body {
   border-radius: 2px;
 }
 
-.zona-esquina:hover  { background: var(--accent-dim); }
+.zona-esquina:hover  { background: var(--accent-dim); z-index: 50; }
 .zona-esquina:active { background: rgba(245, 166, 35, 0.25); }
 
 /* Cada esquina: 20% x 20% del total */
@@ -669,6 +674,35 @@ body {
 .pitch-marker:hover .pitch-tooltip {
   opacity: 1;
   transform: translateX(-50%) scale(1);
+}
+
+/* Tooltip de zonas (hover) */
+.zone-tooltip {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.8);
+  background: #161A22;
+  border: 1px solid var(--border);
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-size: 0.65rem;
+  font-weight: 400;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--shadow);
+  z-index: 100;
+  color: var(--text-primary);
+  text-align: center;
+  line-height: 1.4;
+}
+
+.zona-esquina:hover .zone-tooltip,
+.zona-cuadrante:hover .zone-tooltip {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
 }
 
 /* ─── Lineup Table ───────────────────────────────────────────────────────────── */

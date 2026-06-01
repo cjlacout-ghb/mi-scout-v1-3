@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useScout } from '@/context/ScoutContext';
 import ZonaStrikeComponent from '@/components/ZonaStrike';
 import { calcularEstadisticas } from '@/lib/storage';
@@ -9,15 +9,19 @@ import type { Bateador, ZonaStrike, TurnoAlBate } from '@/lib/types';
 function calcHeatMap(bateadorId: string, turnos: TurnoAlBate[]): Partial<Record<ZonaStrike, number>> {
   const stats = calcularEstadisticas(bateadorId, turnos);
   const mapa: Partial<Record<ZonaStrike, number>> = {};
-  let maxPitches = 0;
-  for (let z = 1; z <= 8; z++) {
-    maxPitches = Math.max(maxPitches, stats.porZona[z as ZonaStrike].pitches);
-  }
-  if (maxPitches === 0) return mapa;
+  
   for (let z = 1; z <= 8; z++) {
     const d = stats.porZona[z as ZonaStrike];
-    if (d.pitches === 0) { mapa[z as ZonaStrike] = 0; continue; }
-    mapa[z as ZonaStrike] = d.hits / d.pitches;
+    if (d.contacto > 0) {
+      // Si hubo contacto (Hit o Out en juego), evaluamos el AVG en esa zona.
+      mapa[z as ZonaStrike] = d.hits / d.contacto;
+    } else if (d.pitches > 0 && d.hits === 0) {
+      // Si hubo pitcheos pero no hits ni contacto (ej. strikes/bolas), es zona fría.
+      mapa[z as ZonaStrike] = 0;
+    } else {
+      // Sin pitcheos = transparente
+      mapa[z as ZonaStrike] = -1;
+    }
   }
   return mapa;
 }
@@ -66,13 +70,15 @@ export default function StatsPage() {
     );
   }
 
-  const turnosAMostrar = modoAcumulado ? turnosAcumulados : estado.turnosAlBate;
+  const turnosParaStats = modoAcumulado 
+    ? turnosAcumulados.map(t => ({...t, bateadorId: bateadorSel?.id || ''}))
+    : estado.turnosAlBate;
 
   const stats = bateadorSel
-    ? calcularEstadisticas(bateadorSel.id, turnosAMostrar.map(t => ({...t, bateadorId: bateadorSel.id})))
+    ? calcularEstadisticas(bateadorSel.id, turnosParaStats)
     : null;
 
-  const heatMap = bateadorSel ? calcHeatMap(bateadorSel.id, turnosAMostrar.map(t => ({...t, bateadorId: bateadorSel.id}))) : undefined;
+  const heatMap = bateadorSel ? calcHeatMap(bateadorSel.id, turnosParaStats) : undefined;
 
   const avg = stats && stats.turnosAlBate > 0
     ? stats.promedio.toFixed(3).replace('0.', '.')
@@ -87,11 +93,11 @@ export default function StatsPage() {
           className="input"
           value={selId ?? bateadorSel?.id ?? ''}
           onChange={(e) => setSelId(e.target.value || null)}
-          style={{ fontWeight: 600, marginBottom: 12 }}
+          style={{ marginBottom: 12 }}
         >
           {todos.map((b) => (
             <option key={b.id} value={b.id}>
-              #{b.numero} {b.apellido}{b.nombre ? `, ${b.nombre}` : ''} {!b.activo ? '(sale)' : ''}
+              #{b.numero} {b.apellido}{b.nombre ? `, ${b.nombre}` : ''} - {b.equipo ? b.equipo.replace(/\w\S*/g, txt => txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase()) : ''} {!b.activo ? '(sale)' : ''}
             </option>
           ))}
         </select>
@@ -132,12 +138,11 @@ export default function StatsPage() {
           {/* Stats cards */}
           <div className="stats-row" style={{ paddingTop: 12 }}>
             {[
-              { label: 'AB', value: stats.turnosAlBate },
+              { label: 'AB', value: stats.turnosAlBate, color: '#FFFFFF' },
               { label: 'H',  value: stats.hits,  color: 'var(--danger)' },
-              { label: 'KS', value: stats.strikeoutsSwinging, color: 'var(--success)' },
-              { label: 'KL', value: stats.strikeoutsLooking,  color: 'var(--success)' },
+              { label: 'A/F',value: stats.outs, color: 'var(--success)' },
+              { label: 'KS/KL', value: stats.strikeoutsSwinging + stats.strikeoutsLooking, color: 'var(--success)' },
               { label: 'BB/HBP', value: stats.basesPorBolas, color: 'var(--info)' },
-              { label: 'OUT',value: stats.outs },
               { label: 'AVG',value: avg, color: 'var(--accent)' },
             ].map(({ label, value, color }) => (
               <div className="stat-card" key={label}>
@@ -149,15 +154,16 @@ export default function StatsPage() {
 
           {/* Leyenda heat map */}
           <div className="heatmap-legend">
-            <span className="heatmap-legend__label">FRÍO</span>
+            <span className="heatmap-legend__label">PITCHEAR</span>
             <div className="heatmap-legend__bar" />
-            <span className="heatmap-legend__label">CALIENTE</span>
+            <span className="heatmap-legend__label">NO PITCHEAR</span>
           </div>
 
           {/* Zona heat map */}
           <ZonaStrikeComponent
             onZonaClick={() => {}}
             heatMap={heatMap}
+            zoneStats={stats.porZona}
           />
 
           {/* Tabla por zona */}
@@ -179,9 +185,10 @@ export default function StatsPage() {
                     const d = stats.porZona[z];
                     const pct = d.pitches > 0 ? Math.round((d.contacto / d.pitches) * 100) : 0;
                     return (
-                      <tr key={z}>
+                      <React.Fragment key={z}>
+                      <tr>
                         <td>
-                          <span style={{ fontWeight: 700 }}>Zona {z}</span>
+                          <span>Zona {z}</span>
                         </td>
                         <td style={{ textAlign: 'center' }}>{d.pitches}</td>
                         <td style={{ textAlign: 'center', color: d.hits > 0 ? 'var(--danger)' : 'var(--text-secondary)' }}>
@@ -190,10 +197,15 @@ export default function StatsPage() {
                         <td style={{ textAlign: 'center', color: d.outs > 0 ? 'var(--success)' : 'var(--text-secondary)' }}>
                           {d.outs}
                         </td>
-                        <td style={{ textAlign: 'center', fontWeight: 700, color: pct > 50 ? 'var(--danger)' : pct > 25 ? 'var(--warning)' : 'var(--text-secondary)' }}>
-                          {d.pitches > 0 ? `${pct}%` : '—'}
+                        <td style={{ textAlign: 'center' }}>
                         </td>
                       </tr>
+                      {z === 4 && (
+                        <tr>
+                          <td colSpan={5} style={{ padding: 0, height: 2, background: 'var(--text-muted)' }} />
+                        </tr>
+                      )}
+                      </React.Fragment>
                     );
                   })}
                 </tbody>

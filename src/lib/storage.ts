@@ -31,7 +31,7 @@ export function calcularEstadisticas(
 
   const porZona = {} as EstadisticasBateador['porZona'];
   for (let z = 1; z <= 8; z++) {
-    porZona[z as ZonaStrike] = { pitches: 0, hits: 0, outs: 0, contacto: 0 };
+    porZona[z as ZonaStrike] = { pitches: 0, hits: 0, outs: 0, contacto: 0, ks: 0, kl: 0, bb: 0 };
   }
 
   let hits = 0, dobles = 0, triples = 0, homeRuns = 0;
@@ -55,10 +55,10 @@ export function calcularEstadisticas(
         porZona[z].outs++;
         porZona[z].contacto++;
         break;
-      case 'KS': ks++; break;
-      case 'KL': kl++; break;
+      case 'KS': ks++; porZona[z].ks++; break;
+      case 'KL': kl++; porZona[z].kl++; break;
       case 'BB':
-      case 'HBP': bb++; break;
+      case 'HBP': bb++; porZona[z].bb++; break;
     }
   }
 

@@ -151,10 +151,10 @@ export default function ReportePage() {
             value={selId}
             onChange={(e) => setSelId(e.target.value)}
           >
-            <option value="">— Seleccioná un bateador —</option>
+            <option value="" disabled hidden>— Seleccioná un bateador —</option>
             {todos.map((b) => (
               <option key={b.id} value={b.id}>
-                #{b.numero} {b.apellido}{b.nombre ? `, ${b.nombre}` : ''}
+                #{b.numero} {b.apellido}{b.nombre ? `, ${b.nombre}` : ''} - {b.equipo ? b.equipo.replace(/\w\S*/g, txt => txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase()) : ''}
               </option>
             ))}
           </select>
