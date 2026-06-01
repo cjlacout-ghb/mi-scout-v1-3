@@ -24,6 +24,7 @@ export type Accion =
   | { type: 'EDITAR_TURNO_AL_BATE'; payload: { id: string; datos: Partial<Omit<TurnoAlBate, 'id' | 'timestamp'>> } }
   | { type: 'ELIMINAR_TURNO_AL_BATE'; payload: string }
   | { type: 'SET_PERSPECTIVA'; payload: 'catcher' | 'pitcher' }
+  | { type: 'SET_EQUIPO_AL_BATE'; payload: 'visitante' | 'local' }
   | { type: 'CARGAR_ESTADO'; payload: EstadoPartido };
 
 // ─── Reducer ──────────────────────────────────────────────────────────────────
@@ -258,6 +259,9 @@ function reducer(estado: EstadoPartido, accion: Accion): EstadoPartido {
 
     case 'SET_INNING':
       return { ...estado, inningActual: accion.payload };
+
+    case 'SET_EQUIPO_AL_BATE':
+      return { ...estado, mitadInning: accion.payload === 'visitante' ? 'alta' : 'baja' };
 
     default:
       return estado;

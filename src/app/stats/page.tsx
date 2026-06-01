@@ -27,7 +27,7 @@ function calcHeatMap(bateadorId: string, turnos: TurnoAlBate[]): Partial<Record<
 }
 
 export default function StatsPage() {
-  const { estado } = useScout();
+  const { estado, bateadorActual } = useScout();
   const todos = [...(estado.lineupVisitante || []), ...(estado.lineupLocal || [])];
   const activos = todos.filter((b) => b.activo);
 
@@ -41,6 +41,11 @@ export default function StatsPage() {
     todos.find((b) => b.id === selId) ??
     activos[0] ??
     null;
+
+  // Sync selId with bateadorActual from context (set by lineup in read-only mode)
+  useEffect(() => {
+    if (bateadorActual) setSelId(bateadorActual.id);
+  }, [bateadorActual?.id]);
 
   useEffect(() => {
     if (modoAcumulado && bateadorSel) {

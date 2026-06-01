@@ -8,3 +8,6 @@ This version has breaking changes — APIs, conventions, and file structure may 
 1. **Botones Proactivos (Proactive Buttons):** Any button that performs a primary, constructive, or forward-moving action (e.g., "Comenzar", "Completar line-up", "Guardar", "Generar", "Confirmar") MUST use the `btn-primary` class (golden background, black letters).
 2. **Botones Destructivos (Destructive Buttons):** Any button that breaks, deletes, or resets something (e.g., "Nuevo partido", "Eliminar", "Cancelar") MUST use the `btn-danger` class (red/dark red appearance).
 3. **No Icons:** Do not use emojis or icons inside button text. Keep buttons text-only to maintain a clean, simple, and serious look and feel.
+
+# Perspectiva de Visualización
+1. **Stats y Reportes:** Sin importar en qué perspectiva (pitcher o catcher) se haya hecho el tracking de los lanzamientos durante el partido, las secciones de Estadísticas (Stats) y Reporte SIEMPRE deben mostrar la información y la zona de strike desde la perspectiva del catcher (catcher's perspective).

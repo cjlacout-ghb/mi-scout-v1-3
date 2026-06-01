@@ -40,6 +40,23 @@ export default function HistorialPage() {
     setCargandoId(null);
   };
 
+  // Load partida and navigate to lineup (read‑only)
+  const cargarPartidoLineup = async (id: string) => {
+    setCargandoId(id);
+    try {
+      const res = await fetch(`/api/partido?id=${id}`);
+      const data = await res.json();
+      if (data.estado && data.estado.partido) {
+        data.estado.partido.finalizado = true;
+        dispatch({ type: 'CARGAR_ESTADO', payload: data.estado });
+        router.push('/');
+      }
+    } catch (err) {
+      console.error('Error cargando partido:', err);
+    }
+    setCargandoId(null);
+  };
+
   const pedirEliminar = (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
     setConfirmandoEliminar(id);
@@ -99,16 +116,34 @@ export default function HistorialPage() {
                 Cargando...
               </span>
             )}
-            {cargandoId !== p.id && (
+                        {cargandoId !== p.id && (
               <button
-                onClick={(e) => pedirEliminar(e, p.id)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  pedirEliminar(e, p.id);
+                }}
                 style={{
-                  position: 'absolute', top: 12, right: 12,
+                  position: 'absolute', top: '50%', right: 12, transform: 'translateY(-50%)',
                   background: 'none', border: 'none', color: 'var(--danger)',
                   cursor: 'pointer', fontSize: '1.2rem', opacity: 0.7
                 }}
               >
                 ✕
+              </button>
+            )}
+            {cargandoId !== p.id && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  cargarPartidoLineup(p.id);
+                }}
+                className="btn btn-primary"
+                style={{
+                  position: 'absolute', top: '50%', right: 44, transform: 'translateY(-50%)',
+                  padding: '6px 10px', fontSize: '0.75rem', lineHeight: 1.2, textAlign: 'center'
+                }}
+              >
+                Seleccionar<br/>jugador
               </button>
             )}
           </div>

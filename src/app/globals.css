@@ -643,7 +643,7 @@ body {
   transform: translate(-50%, -50%);
   border: 1.5px solid rgba(255,255,255,0.4);
   pointer-events: auto; /* Para permitir el hover */
-  z-index: 10;
+  z-index: 100; /* ensure above other elements */
   cursor: pointer;
 }
 
@@ -657,23 +657,27 @@ body {
   bottom: calc(100% + 4px);
   left: 50%;
   transform: translateX(-50%) scale(0.8);
-  background: var(--bg-surface);
+  background: #161A22;
   border: 1px solid var(--border);
   padding: 2px 6px;
   border-radius: 4px;
   font-size: 0.65rem;
-  font-weight: 800;
+  font-weight: 400;
   white-space: nowrap;
   opacity: 0;
   pointer-events: none;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: var(--shadow-sm);
-  z-index: 20;
+  z-index: 100;
 }
 
 .pitch-marker:hover .pitch-tooltip {
   opacity: 1;
   transform: translateX(-50%) scale(1);
+}
+
+.pitch-marker:hover {
+  z-index: 50;
 }
 
 /* Tooltip de zonas (hover) */

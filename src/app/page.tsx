@@ -396,7 +396,7 @@ export default function LineupPage() {
   return (
     <div style={{ paddingBottom: 80 }}>
       {/* ── Landing Page (Sin partido) ── */}
-      {(!estado.partido || estado.partido.finalizado) && (
+      {!estado.partido && (
         <div style={{ 
           display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', 
           minHeight: 'calc(100vh - 160px)', padding: '32px 24px', textAlign: 'center',
@@ -421,7 +421,7 @@ export default function LineupPage() {
       )}
 
       {/* ── Con partido ── */}
-      {(estado.partido && !estado.partido.finalizado) && (
+      {estado.partido && (
         <>
           {/* Info adicional del evento */}
           {estado.partido.descripcion && (
@@ -478,10 +478,16 @@ export default function LineupPage() {
                   className={`lineup-row${esActual ? ' current' : ''}${!b.activo ? ' inactivo' : ''}`}
                   onClick={() => {
                     if (!b.activo || idxActivo === undefined) return;
+                    if (estado.partido?.finalizado) {
+                      dispatch({ type: 'SET_EQUIPO_AL_BATE', payload: activeTab });
+                    }
                     seleccionarAlBate(idxActivo);
                   }}
                   onDoubleClick={() => {
                     if (!b.activo || idxActivo === undefined) return;
+                    if (estado.partido?.finalizado) {
+                      dispatch({ type: 'SET_EQUIPO_AL_BATE', payload: activeTab });
+                    }
                     seleccionarAlBate(idxActivo);
                     router.push('/tracking');
                   }}
@@ -496,26 +502,28 @@ export default function LineupPage() {
                     </span>
                   </div>
                   <span className="lineup-equipo">{b.equipo}</span>
-                  <button
-                    className="btn btn-ghost"
-                    style={{ padding: 6, border: 'none', marginLeft: 4, color: 'var(--text-secondary)' }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setEditando(b);
-                    }}
-                  >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                    </svg>
-                  </button>
+                  {!estado.partido?.finalizado && (
+                    <button
+                      className="btn btn-ghost"
+                      style={{ padding: 6, border: 'none', marginLeft: 4, color: 'var(--text-secondary)' }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setEditando(b);
+                      }}
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                      </svg>
+                    </button>
+                  )}
                 </div>
 
                 {/* Nota de sustitución */}
                 {!b.activo && sustituido && (
                   <div className="lineup-sustitucion" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingRight: 16 }}>
                     <span>↳ Reemplazado por #{sustituido.numero} {sustituido.apellido} (Inning {b.reemplazadoAInning})</span>
-                    {b.esAbridor && (
+                    {b.esAbridor && !estado.partido?.finalizado && (
                       <button
                         className="btn btn-ghost btn-sm"
                         style={{ padding: '2px 8px', fontSize: '0.7rem', color: 'var(--accent)', border: '1px solid var(--accent)' }}
@@ -533,27 +541,29 @@ export default function LineupPage() {
             );
           })}
 
-          {/* Acciones */}
-          <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {ordenMaximo < 15 && (
-              <button className="btn btn-primary btn-full" onClick={() => setShowAgregarBateador(true)}>
-                Agregar 1 jugador
+          {/* Acciones — solo en modo edición */}
+          {!estado.partido?.finalizado && (
+            <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {ordenMaximo < 15 && (
+                <button className="btn btn-primary btn-full" onClick={() => setShowAgregarBateador(true)}>
+                  Agregar 1 jugador
+                </button>
+              )}
+              {ordenMaximo === 0 && (
+                <button className="btn btn-primary btn-full" onClick={() => setShowCargaMasiva(true)}>
+                  Line-up completo
+                </button>
+              )}
+              {bateadorActual && (
+                <button className="btn btn-ghost btn-full" style={{ color: 'var(--warning)', borderColor: 'var(--warning)' }} onClick={() => setSustituyendo(bateadorActual)}>
+                  Sustitución del bateador actual
+                </button>
+              )}
+              <button className="btn btn-danger btn-full" onClick={() => setShowConfirmReset(true)}>
+                Nuevo partido
               </button>
-            )}
-            {ordenMaximo === 0 && (
-              <button className="btn btn-primary btn-full" onClick={() => setShowCargaMasiva(true)}>
-                Line-up completo
-              </button>
-            )}
-            {bateadorActual && (
-              <button className="btn btn-ghost btn-full" style={{ color: 'var(--warning)', borderColor: 'var(--warning)' }} onClick={() => setSustituyendo(bateadorActual)}>
-                Sustitución del bateador actual
-              </button>
-            )}
-            <button className="btn btn-danger btn-full" onClick={() => setShowConfirmReset(true)}>
-              Nuevo partido
-            </button>
-          </div>
+            </div>
+          )}
         </>
       )}
 

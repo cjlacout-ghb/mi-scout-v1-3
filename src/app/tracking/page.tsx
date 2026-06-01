@@ -47,22 +47,6 @@ export default function TrackingPage() {
     }
   }, [estado.partido, equipoAlBate, bateadoresActivos.length, estado.indiceVisitante, estado.indiceLocal, showAgregarBateador]);
 
-  if (estado.partido?.finalizado) {
-    return (
-      <div className="empty-state">
-        <div className="empty-state__icon">🏁</div>
-        <div className="empty-state__title">Partido finalizado</div>
-        <p className="empty-state__text">Podés consultar el Reporte, las Stats o ir al Historial.</p>
-        <button 
-          className="btn btn-primary" 
-          style={{ marginTop: 16 }}
-          onClick={() => dispatch({ type: 'NUEVO_PARTIDO' })}
-        >
-          Iniciar nuevo partido
-        </button>
-      </div>
-    );
-  }
 
   // ─── Sin partido activo ────────────────────────────────────────────────────
   if (!estado.partido) {
@@ -131,6 +115,7 @@ export default function TrackingPage() {
   });
 
   const handleZonaClick = (zona: ZonaStrike, coordenadas?: Coordenadas) => {
+    if (estado.partido?.finalizado) return;
     if (esperandoConfirmacion) return;
     setZonaSeleccionada(zona);
     setCoordenadasSeleccionadas(coordenadas || null);
@@ -245,13 +230,17 @@ export default function TrackingPage() {
 
           {/* Inning control */}
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
-            <button onClick={avanzarMitad} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', fontSize: '1.5rem', lineHeight: 1 }}>+</button>
+            {!estado.partido?.finalizado && (
+              <button onClick={avanzarMitad} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', fontSize: '1.5rem', lineHeight: 1 }}>+</button>
+            )}
             <div style={{ fontSize: '1.1rem', fontWeight: 900, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
               {estado.mitadInning === 'alta' ? <span style={{ color: 'var(--text-secondary)', lineHeight: 1 }}>▲</span> : <span style={{ opacity: 0, lineHeight: 1 }}>▲</span>}
               <span style={{ color: 'var(--text-primary)', lineHeight: 1 }}>{estado.inningActual}</span>
               {estado.mitadInning === 'baja' ? <span style={{ color: 'var(--text-secondary)', lineHeight: 1 }}>▼</span> : <span style={{ opacity: 0, lineHeight: 1 }}>▼</span>}
             </div>
-            <button onClick={retrocederMitad} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', fontSize: '1.5rem', lineHeight: 1 }}>−</button>
+            {!estado.partido?.finalizado && (
+              <button onClick={retrocederMitad} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', fontSize: '1.5rem', lineHeight: 1 }}>−</button>
+            )}
           </div>
         </div>
 
@@ -332,13 +321,15 @@ export default function TrackingPage() {
           fontSize: '0.72rem',
           fontWeight: 900,
           letterSpacing: '0.08em',
-          color: 'var(--accent)',
+          color: estado.partido?.finalizado ? 'var(--text-secondary)' : 'var(--accent)',
           textTransform: 'uppercase',
           position: 'relative',
           top: 10,
           marginBottom: 4,
         }}>
-          {esperandoConfirmacion ? 'Confirmar resultado' : turnoEditando ? 'Reubicá el lanzamiento' : 'MARCA EL LANZAMIENTO EN LA ZONA'}
+          {estado.partido?.finalizado 
+            ? 'PARTIDO FINALIZADO - MODO SOLO LECTURA' 
+            : (esperandoConfirmacion ? 'Confirmar resultado' : turnoEditando ? 'Reubicá el lanzamiento' : 'MARCA EL LANZAMIENTO EN LA ZONA')}
         </p>
         <ZonaStrikeComponent 
           onZonaClick={handleZonaClick} 
@@ -346,7 +337,7 @@ export default function TrackingPage() {
           ladoBateo={bateadorActual?.ladoBateo} 
           perspectiva={estado.perspectivaZona} 
         />
-        {esperandoConfirmacion && (
+        {!estado.partido?.finalizado && esperandoConfirmacion && (
           <div style={{ display: 'flex', justifyContent: 'center', gap: 12, marginTop: 16 }}>
             <button
               className="btn btn-ghost btn-sm"
@@ -412,29 +403,31 @@ export default function TrackingPage() {
             ))}
           </div>
           
-          <button
-            onClick={() => {
-              avanzarMitad();
-            }}
-            style={{
-              flexShrink: 0,
-              padding: '6px 10px',
-              minWidth: 40,
-              height: 40, // Height of the mini cards is roughly 40px
-              borderRadius: 8,
-              background: 'var(--bg-elevated)',
-              border: '1px solid var(--border)',
-              color: '#8892A4',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 2px 4px rgba(0,0,0,0.15)',
-            }}
-            title="Cambiar equipo al bate"
-          >
-            <span style={{ fontSize: '1.2rem', lineHeight: 1 }}>⇄</span>
-          </button>
+          {!estado.partido?.finalizado && (
+            <button
+              onClick={() => {
+                avanzarMitad();
+              }}
+              style={{
+                flexShrink: 0,
+                padding: '6px 10px',
+                minWidth: 40,
+                height: 40, // Height of the mini cards is roughly 40px
+                borderRadius: 8,
+                background: 'var(--bg-elevated)',
+                border: '1px solid var(--border)',
+                color: '#8892A4',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.15)',
+              }}
+              title="Cambiar equipo al bate"
+            >
+              <span style={{ fontSize: '1.2rem', lineHeight: 1 }}>⇄</span>
+            </button>
+          )}
         </div>
       </div>
 
@@ -468,39 +461,43 @@ export default function TrackingPage() {
                 {t.detalleHit && ` (${t.detalleHit.tipo}) ${t.detalleHit.ubicacion} ${t.detalleHit.calidad}`}
                 {t.detalleOut && ` (${t.detalleOut.tipo}) ${t.detalleOut.defensor} ${t.detalleOut.calidad}`}
               </span>
-              <div style={{ display: 'flex', gap: 8, opacity: 0.7 }}>
-                <button
-                  onClick={() => {
-                    setEsperandoConfirmacion(false);
-                    setTurnoEditando(t);
-                  }}
-                  style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.9rem', color: 'var(--text-secondary)' }}
-                  title="Editar"
-                >
-                  ✎
-                </button>
-                <button
-                  onClick={() => setTurnoAEliminar(t.id)}
-                  style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.9rem', color: 'var(--danger)' }}
-                  title="Eliminar"
-                >
-                  ✕
-                </button>
-              </div>
+              {!estado.partido?.finalizado && (
+                <div style={{ display: 'flex', gap: 8, opacity: 0.7 }}>
+                  <button
+                    onClick={() => {
+                      setEsperandoConfirmacion(false);
+                      setTurnoEditando(t);
+                    }}
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.9rem', color: 'var(--text-secondary)' }}
+                    title="Editar"
+                  >
+                    ✎
+                  </button>
+                  <button
+                    onClick={() => setTurnoAEliminar(t.id)}
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.9rem', color: 'var(--danger)' }}
+                    title="Eliminar"
+                  >
+                    ✕
+                  </button>
+                </div>
+              )}
             </div>
           ))}
         </div>
       )}
 
       {/* ── Fin Partido ── */}
-      <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-        <button
-          className="btn btn-danger btn-full"
-          onClick={() => setShowFinPartido(true)}
-        >
-          Finalizar partido
-        </button>
-      </div>
+      {!estado.partido?.finalizado && (
+        <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <button
+            className="btn btn-danger btn-full"
+            onClick={() => setShowFinPartido(true)}
+          >
+            Finalizar partido
+          </button>
+        </div>
+      )}
 
       {/* ── Modales ── */}
       {zonaSeleccionada !== null && (
