@@ -25,7 +25,8 @@ export type Accion =
   | { type: 'ELIMINAR_TURNO_AL_BATE'; payload: string }
   | { type: 'SET_PERSPECTIVA'; payload: 'catcher' | 'pitcher' }
   | { type: 'SET_EQUIPO_AL_BATE'; payload: 'visitante' | 'local' }
-  | { type: 'CARGAR_ESTADO'; payload: EstadoPartido };
+  | { type: 'CARGAR_ESTADO'; payload: EstadoPartido }
+  | { type: 'SELECCIONAR_JUGADOR'; payload: string | null };
 
 // ─── Reducer ──────────────────────────────────────────────────────────────────
 function reducer(estado: EstadoPartido, accion: Accion): EstadoPartido {
@@ -252,9 +253,9 @@ function reducer(estado: EstadoPartido, accion: Accion): EstadoPartido {
 
     case 'SET_BATEADOR_ACTUAL': {
       if (accion.payload.rol === 'visitante') {
-        return { ...estado, indiceVisitante: accion.payload.indice };
+        return { ...estado, indiceVisitante: accion.payload.indice, jugadorSeleccionadoId: null };
       }
-      return { ...estado, indiceLocal: accion.payload.indice };
+      return { ...estado, indiceLocal: accion.payload.indice, jugadorSeleccionadoId: null };
     }
 
     case 'SET_INNING':
@@ -262,6 +263,9 @@ function reducer(estado: EstadoPartido, accion: Accion): EstadoPartido {
 
     case 'SET_EQUIPO_AL_BATE':
       return { ...estado, mitadInning: accion.payload === 'visitante' ? 'alta' : 'baja' };
+
+    case 'SELECCIONAR_JUGADOR':
+      return { ...estado, jugadorSeleccionadoId: accion.payload };
 
     default:
       return estado;
@@ -286,6 +290,7 @@ async function syncApi(accion: Accion, nuevoEstado: EstadoPartido, oldEstado: Es
       case 'AVANZAR_BATEADOR':
       case 'CAMBIAR_MITAD_INNING':
       case 'RETROCEDER_MITAD_INNING':
+      case 'SELECCIONAR_JUGADOR':
         await fetch('/api/partido/estado', {
           method: 'PATCH',
           body: JSON.stringify({
@@ -420,7 +425,17 @@ export function ScoutProvider({ children }: { children: React.ReactNode }) {
   const lineupActual = (equipoAlBate === 'visitante' ? estado.lineupVisitante : estado.lineupLocal) || [];
   const bateadoresActivos = lineupActual.filter((b) => b.activo);
   const indiceActivo = equipoAlBate === 'visitante' ? (estado.indiceVisitante || 0) : (estado.indiceLocal || 0);
-  const bateadorActual = bateadoresActivos[indiceActivo] ?? null;
+  
+  let bateadorActual = bateadoresActivos[indiceActivo] ?? null;
+
+  // Si estamos en modo lectura y hay un jugador seleccionado explícitamente, usar ese.
+  if (estado.partido?.finalizado && estado.jugadorSeleccionadoId) {
+    const todos = [...(estado.lineupVisitante || []), ...(estado.lineupLocal || [])];
+    const seleccionado = todos.find(b => b.id === estado.jugadorSeleccionadoId);
+    if (seleccionado) {
+      bateadorActual = seleccionado;
+    }
+  }
 
   return (
     <ScoutContext.Provider value={{ estado, dispatch, bateadorActual, bateadoresActivos, equipoAlBate, isLoading }}>

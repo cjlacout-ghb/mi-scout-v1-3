@@ -33,14 +33,14 @@ const ZONA_OFFSET: Record<ZonaStrike, { top: string; left: string }> = {
 };
 
 function heatColor(intensity: number): string {
-  // 0 = frío (#1A3A5C) → 0.5 = neutro → 1 = caliente (#E74C3C)
+  // 0 = cold (green) → 0.5 = neutral (blue) → 1 = hot (red)
   if (intensity < 0) return 'transparent';
   const stops = [
-    [0.0,  [26,  58,  92 ]],  // cold
-    [0.25, [41,  128, 185]],  // cool
-    [0.5,  [61,  90,  110]],  // neutral
-    [0.75, [243, 156, 18 ]],  // warm
-    [1.0,  [231, 76,  60 ]],  // hot
+    [0.0,  [39,  174, 96 ]],  // cold  — #27AE60 (green)
+    [0.25, [46,  173, 150]],  // cool  — teal
+    [0.5,  [52,  152, 219]],  // neutral — #3498DB (blue)
+    [0.75, [155, 89,  182]],  // warm  — purple
+    [1.0,  [231, 76,  60 ]],  // hot   — #E74C3C (plain red)
   ] as [number, number[]][];
 
   let lo = stops[0], hi = stops[stops.length - 1];
@@ -53,7 +53,7 @@ function heatColor(intensity: number): string {
   const r = Math.round(lo[1][0] + t * (hi[1][0] - lo[1][0]));
   const g = Math.round(lo[1][1] + t * (hi[1][1] - lo[1][1]));
   const b = Math.round(lo[1][2] + t * (hi[1][2] - lo[1][2]));
-  return `rgba(${r},${g},${b},0.65)`;
+  return `rgba(${r},${g},${b},0.9)`;
 }
 
 export default function ZonaStrikeComponent({ onZonaClick, marcadores = [], heatMap, ladoBateo, perspectiva = 'catcher', zoneStats }: Props) {

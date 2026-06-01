@@ -97,7 +97,11 @@ export default function StatsPage() {
         <select
           className="input"
           value={selId ?? bateadorSel?.id ?? ''}
-          onChange={(e) => setSelId(e.target.value || null)}
+          onChange={(e) => {
+            const id = e.target.value || null;
+            setSelId(id);
+            dispatch({ type: 'SELECCIONAR_JUGADOR', payload: id });
+          }}
           style={{ marginBottom: 12 }}
         >
           {todos.map((b) => (
@@ -159,9 +163,9 @@ export default function StatsPage() {
 
           {/* Leyenda heat map */}
           <div className="heatmap-legend">
-            <span className="heatmap-legend__label">PITCHEAR</span>
+            <span className="heatmap-legend__label">COLD</span>
             <div className="heatmap-legend__bar" />
-            <span className="heatmap-legend__label">NO PITCHEAR</span>
+            <span className="heatmap-legend__label">HOT</span>
           </div>
 
           {/* Zona heat map */}
@@ -179,30 +183,32 @@ export default function StatsPage() {
                 <thead>
                   <tr>
                     <th>Zona</th>
-                    <th style={{ textAlign: 'center' }}>Pitches</th>
+                    <th style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>Pitches</th>
                     <th style={{ textAlign: 'center' }}>Hits</th>
                     <th style={{ textAlign: 'center' }}>Outs</th>
-                    <th style={{ textAlign: 'center' }}>% Cont.</th>
+                    <th style={{ textAlign: 'center' }}>AVG</th>
                   </tr>
                 </thead>
                 <tbody>
                   {([1,2,3,4,5,6,7,8] as ZonaStrike[]).map((z) => {
                     const d = stats.porZona[z];
-                    const pct = d.pitches > 0 ? Math.round((d.contacto / d.pitches) * 100) : 0;
+                    const abZona = d.hits + d.outs + d.ks + d.kl;
+                    const avgZona = abZona > 0 ? (d.hits / abZona).toFixed(3).replace('0.', '.') : '---';
                     return (
                       <React.Fragment key={z}>
                       <tr>
                         <td>
                           <span>Zona {z}</span>
                         </td>
-                        <td style={{ textAlign: 'center' }}>{d.pitches}</td>
+                        <td style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>{d.pitches}</td>
                         <td style={{ textAlign: 'center', color: d.hits > 0 ? 'var(--danger)' : 'var(--text-secondary)' }}>
                           {d.hits}
                         </td>
                         <td style={{ textAlign: 'center', color: d.outs > 0 ? 'var(--success)' : 'var(--text-secondary)' }}>
                           {d.outs}
                         </td>
-                        <td style={{ textAlign: 'center' }}>
+                        <td style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>
+                          {avgZona}
                         </td>
                       </tr>
                       {z === 4 && (
@@ -217,6 +223,50 @@ export default function StatsPage() {
               </table>
             </div>
           </div>
+
+          {/* Tabla por tipo de pitch */}
+          <div style={{ padding: '0 16px 16px' }}>
+            <p className="section-title" style={{ marginBottom: 8 }}>Por tipo de pitch</p>
+            <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+              <table className="data-table">
+                <thead>
+                  <tr>
+                    <th>Pitch</th>
+                    <th style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>Vistos</th>
+                    <th style={{ textAlign: 'center' }}>AVG</th>
+                    <th style={{ textAlign: 'center' }}>K%</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {(['drop', 'riser', 'curva', 'cambio', 'screw', 'otro'] as const)
+                    .map((p) => ({ p, d: stats.porPitch[p] }))
+                    .filter(({ d }) => d.pitches > 0)
+                    .sort((a, b) => b.d.pitches - a.d.pitches)
+                    .map(({ p, d }) => {
+                      const avgPitch = d.ab > 0
+                        ? (d.hits / d.ab).toFixed(3).replace('0.', '.')
+                        : '---';
+                      const kPct = d.pitches > 0
+                        ? Math.round(((d.ks + d.kl) / d.pitches) * 100) + '%'
+                        : '---';
+                      return (
+                        <tr key={p}>
+                          <td style={{ textTransform: 'capitalize', fontWeight: 700 }}>{p}</td>
+                          <td style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>{d.pitches}</td>
+                          <td style={{ textAlign: 'center', color: d.hits > 0 ? 'var(--danger)' : 'var(--text-secondary)' }}>
+                            {avgPitch}
+                          </td>
+                          <td style={{ textAlign: 'center', color: (d.ks + d.kl) > 0 ? 'var(--success)' : 'var(--text-secondary)' }}>
+                            {kPct}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
         </>
       )}
     </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import type { EstadoPartido, Bateador, TurnoAlBate, Partido } from './types';
+import type { EstadoPartido, Bateador, TurnoAlBate, Partido, TipoPitch } from './types';
 
 export const estadoInicial: EstadoPartido = {
   partido: null,
@@ -23,6 +23,8 @@ export function generarId(): string {
 // ─── Helpers de estadísticas ───────────────────────────────────────────────────
 import type { EstadisticasBateador, ZonaStrike } from './types';
 
+const TIPOS_PITCH: TipoPitch[] = ['drop', 'riser', 'curva', 'cambio', 'screw', 'otro'];
+
 export function calcularEstadisticas(
   bateadorId: string,
   turnos: TurnoAlBate[]
@@ -34,18 +36,27 @@ export function calcularEstadisticas(
     porZona[z as ZonaStrike] = { pitches: 0, hits: 0, outs: 0, contacto: 0, ks: 0, kl: 0, bb: 0 };
   }
 
+  const porPitch = {} as EstadisticasBateador['porPitch'];
+  for (const p of TIPOS_PITCH) {
+    porPitch[p] = { pitches: 0, hits: 0, ab: 0, ks: 0, kl: 0 };
+  }
+
   let hits = 0, dobles = 0, triples = 0, homeRuns = 0;
   let ks = 0, kl = 0, bb = 0, outs = 0;
 
   for (const t of misTurnos) {
     const z = t.zona;
+    const p = t.tipoPitch;
     porZona[z].pitches++;
+    porPitch[p].pitches++;
 
     switch (t.resultado) {
       case 'HIT':
         hits++;
         porZona[z].hits++;
         porZona[z].contacto++;
+        porPitch[p].hits++;
+        porPitch[p].ab++;
         if (t.detalleHit?.tipo === 'doble') dobles++;
         if (t.detalleHit?.tipo === 'triple') triples++;
         if (t.detalleHit?.tipo === 'homerun') homeRuns++;
@@ -54,11 +65,25 @@ export function calcularEstadisticas(
         outs++;
         porZona[z].outs++;
         porZona[z].contacto++;
+        porPitch[p].ab++;
         break;
-      case 'KS': ks++; porZona[z].ks++; break;
-      case 'KL': kl++; porZona[z].kl++; break;
+      case 'KS':
+        ks++;
+        porZona[z].ks++;
+        porPitch[p].ks++;
+        porPitch[p].ab++;
+        break;
+      case 'KL':
+        kl++;
+        porZona[z].kl++;
+        porPitch[p].kl++;
+        porPitch[p].ab++;
+        break;
       case 'BB':
-      case 'HBP': bb++; porZona[z].bb++; break;
+      case 'HBP':
+        bb++;
+        porZona[z].bb++;
+        break;
     }
   }
 
@@ -78,6 +103,7 @@ export function calcularEstadisticas(
     outs,
     promedio,
     porZona,
+    porPitch,
   };
 }
 

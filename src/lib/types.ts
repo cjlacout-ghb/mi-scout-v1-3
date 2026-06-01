@@ -89,6 +89,7 @@ export interface EstadisticasBateador {
   outs: number;
   promedio: number;           // AVG = H / AB
   porZona: Record<ZonaStrike, { pitches: number; hits: number; outs: number; contacto: number; ks: number; kl: number; bb: number }>;
+  porPitch: Record<TipoPitch, { pitches: number; hits: number; ab: number; ks: number; kl: number }>;
 }
 
 // Estado global del partido en curso
@@ -104,4 +105,5 @@ export interface EstadoPartido {
   vueltasAlOrdenVisitante: number;
   vueltasAlOrdenLocal: number;
   perspectivaZona: 'catcher' | 'pitcher';
+  jugadorSeleccionadoId?: string | null;
 }
