@@ -63,6 +63,7 @@ export interface Bateador {
   reemplazadoPorId?: string;   // ID del bateador que lo reemplazó
   reemplazadoAInning?: number;
   rol?: 'visitante' | 'local'; // Equipo al que pertenece
+  notas?: string;              // Notas del usuario sobre el bateador
 }
 
 export interface Partido {

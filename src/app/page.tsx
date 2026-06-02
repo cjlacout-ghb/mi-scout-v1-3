@@ -355,17 +355,10 @@ export default function LineupPage() {
     const orden = ordenMaximo + 1;
     dispatch({
       type: 'AGREGAR_BATEADOR',
-      payload: { ...d, equipo: equipoActual || '', rol: activeTab, orden, activo: true, esAbridor: true },
-    });
-    // activosCount + 1 because AGREGAR_BATEADOR already added the new player
-    // We point to the newly added player, not the next empty slot
-    const activosCount = lineupActual.filter((b) => b.activo).length;
-    dispatch({
-      type: 'SET_BATEADOR_ACTUAL',
-      payload: { rol: activeTab, indice: activosCount - 1 }
+      payload: { ...d, equipo: equipoActual || '', rol: activeTab, orden, activo: true, esAbridor: true, hacerActivo: true } as any,
     });
     setShowAgregarBateador(false);
-    setTimeout(() => router.push('/tracking'), 50);
+    router.push('/tracking');
   };
 
   const agregarBateadoresMasivo = (bateadores: Array<Omit<Bateador, 'id'>>) => {

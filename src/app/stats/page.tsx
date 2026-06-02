@@ -26,6 +26,29 @@ function calcHeatMap(bateadorId: string, turnos: TurnoAlBate[]): Partial<Record<
   return mapa;
 }
 
+function valueColor(val: number | null): string {
+  if (val === null) return 'var(--text-secondary)';
+  const stops = [
+    [0.0,  [39,  174, 96 ]],  // cold  — green
+    [0.25, [46,  173, 150]],  // cool  — teal
+    [0.5,  [52,  152, 219]],  // neutral — blue
+    [0.75, [155, 89,  182]],  // warm  — purple
+    [1.0,  [231, 76,  60 ]],  // hot   — red
+  ] as [number, number[]][];
+
+  let lo = stops[0], hi = stops[stops.length - 1];
+  for (let i = 0; i < stops.length - 1; i++) {
+    if (val >= stops[i][0] && val <= stops[i + 1][0]) {
+      lo = stops[i]; hi = stops[i + 1]; break;
+    }
+  }
+  const t = (val - lo[0]) / (hi[0] - lo[0]);
+  const r = Math.round(lo[1][0] + t * (hi[1][0] - lo[1][0]));
+  const g = Math.round(lo[1][1] + t * (hi[1][1] - lo[1][1]));
+  const b = Math.round(lo[1][2] + t * (hi[1][2] - lo[1][2]));
+  return `rgb(${r},${g},${b})`;
+}
+
 export default function StatsPage() {
   const { estado, bateadorActual } = useScout();
   const todos = [...(estado.lineupVisitante || []), ...(estado.lineupLocal || [])];
@@ -70,7 +93,7 @@ export default function StatsPage() {
       <div className="empty-state">
         <div className="empty-state__icon">📊</div>
         <div className="empty-state__title">Sin partido activo</div>
-        <p className="empty-state__text">Iniciá un partido para ver las estadísticas.</p>
+        <p className="empty-state__text">Inicia un partido para ver las estadísticas.</p>
       </div>
     );
   }
@@ -193,7 +216,8 @@ export default function StatsPage() {
                   {([1,2,3,4,5,6,7,8] as ZonaStrike[]).map((z) => {
                     const d = stats.porZona[z];
                     const abZona = d.hits + d.outs + d.ks + d.kl;
-                    const avgZona = abZona > 0 ? (d.hits / abZona).toFixed(3).replace('0.', '.') : '---';
+                    const avgZonaVal = abZona > 0 ? (d.hits / abZona) : null;
+                    const avgZona = abZona > 0 ? avgZonaVal!.toFixed(3).replace('0.', '.') : '---';
                     return (
                       <React.Fragment key={z}>
                       <tr>
@@ -207,7 +231,7 @@ export default function StatsPage() {
                         <td style={{ textAlign: 'center', color: d.outs > 0 ? 'var(--success)' : 'var(--text-secondary)' }}>
                           {d.outs}
                         </td>
-                        <td style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>
+                        <td style={{ textAlign: 'center', color: valueColor(avgZonaVal), fontWeight: avgZonaVal !== null ? 600 : 'normal' }}>
                           {avgZona}
                         </td>
                       </tr>
@@ -243,20 +267,22 @@ export default function StatsPage() {
                     .filter(({ d }) => d.pitches > 0)
                     .sort((a, b) => b.d.pitches - a.d.pitches)
                     .map(({ p, d }) => {
+                      const avgPitchVal = d.ab > 0 ? (d.hits / d.ab) : null;
                       const avgPitch = d.ab > 0
-                        ? (d.hits / d.ab).toFixed(3).replace('0.', '.')
+                        ? avgPitchVal!.toFixed(3).replace('0.', '.')
                         : '---';
+                      const kPctVal = d.pitches > 0 ? ((d.ks + d.kl) / d.pitches) : null;
                       const kPct = d.pitches > 0
-                        ? Math.round(((d.ks + d.kl) / d.pitches) * 100) + '%'
+                        ? Math.round(kPctVal! * 100) + '%'
                         : '---';
                       return (
                         <tr key={p}>
                           <td style={{ textTransform: 'capitalize', fontWeight: 700 }}>{p}</td>
                           <td style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>{d.pitches}</td>
-                          <td style={{ textAlign: 'center', color: d.hits > 0 ? 'var(--danger)' : 'var(--text-secondary)' }}>
+                          <td style={{ textAlign: 'center', color: valueColor(avgPitchVal), fontWeight: avgPitchVal !== null ? 600 : 'normal' }}>
                             {avgPitch}
                           </td>
-                          <td style={{ textAlign: 'center', color: (d.ks + d.kl) > 0 ? 'var(--success)' : 'var(--text-secondary)' }}>
+                          <td style={{ textAlign: 'center', color: valueColor(kPctVal), fontWeight: kPctVal !== null ? 600 : 'normal' }}>
                             {kPct}
                           </td>
                         </tr>

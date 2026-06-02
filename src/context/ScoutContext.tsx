@@ -57,10 +57,27 @@ function reducer(estado: EstadoPartido, accion: Accion): EstadoPartido {
 
     case 'AGREGAR_BATEADOR': {
       const nuevo: Bateador = { ...accion.payload, id: (accion as any)._id || generarId() };
-      if (nuevo.rol === 'visitante') {
-        return { ...estado, lineupVisitante: [...estado.lineupVisitante, nuevo] };
+      const isVisitante = nuevo.rol === 'visitante';
+      const lineup = isVisitante ? estado.lineupVisitante : estado.lineupLocal;
+      const newLineup = [...lineup, nuevo];
+      
+      const newState = {
+        ...estado,
+        [isVisitante ? 'lineupVisitante' : 'lineupLocal']: newLineup
+      };
+
+      if ((accion.payload as any).hacerActivo) {
+        const nuevosActivos = newLineup.filter(b => b.activo);
+        if (isVisitante) {
+          newState.indiceVisitante = nuevosActivos.length - 1;
+          newState.jugadorSeleccionadoId = null;
+        } else {
+          newState.indiceLocal = nuevosActivos.length - 1;
+          newState.jugadorSeleccionadoId = null;
+        }
       }
-      return { ...estado, lineupLocal: [...estado.lineupLocal, nuevo] };
+      
+      return newState as EstadoPartido;
     }
 
     case 'AGREGAR_BATEADORES_MASIVO': {
@@ -428,8 +445,8 @@ export function ScoutProvider({ children }: { children: React.ReactNode }) {
   
   let bateadorActual = bateadoresActivos[indiceActivo] ?? null;
 
-  // Si estamos en modo lectura y hay un jugador seleccionado explícitamente, usar ese.
-  if (estado.partido?.finalizado && estado.jugadorSeleccionadoId) {
+  // Si hay un jugador seleccionado explícitamente, usar ese siempre.
+  if (estado.jugadorSeleccionadoId) {
     const todos = [...(estado.lineupVisitante || []), ...(estado.lineupLocal || [])];
     const seleccionado = todos.find(b => b.id === estado.jugadorSeleccionadoId);
     if (seleccionado) {

@@ -18,8 +18,26 @@ export default function TrackingPage() {
   const [avisoInning, setAvisoInning] = useState(false);
   const [showAgregarBateador, setShowAgregarBateador] = useState(false);
   const [showFinPartido, setShowFinPartido] = useState(false);
+  const [notas, setNotas] = useState('');
 
+  useEffect(() => {
+    setNotas(bateadorActual?.notas || '');
+  }, [bateadorActual?.id]);
 
+  useEffect(() => {
+    if (!bateadorActual || notas === (bateadorActual.notas || '')) return;
+    const timeout = setTimeout(() => {
+      dispatch({
+        type: 'EDITAR_BATEADOR',
+        payload: {
+          id: bateadorActual.id,
+          rol: bateadorActual.rol as 'visitante' | 'local',
+          datos: { notas }
+        }
+      });
+    }, 500);
+    return () => clearTimeout(timeout);
+  }, [notas, bateadorActual, dispatch]);
   const prevEquipoRef = useRef(equipoAlBate);
   const prevInningRef = useRef(estado.inningActual);
 
@@ -54,7 +72,7 @@ export default function TrackingPage() {
       <div className="empty-state">
         <div className="empty-state__icon">🎯</div>
         <div className="empty-state__title">Sin partido activo</div>
-        <p className="empty-state__text">Iniciá un partido desde el Line-Up para comenzar el tracking.</p>
+        <p className="empty-state__text">Inicia un partido desde el Line-Up para comenzar el tracking.</p>
       </div>
     );
   }
@@ -83,11 +101,8 @@ export default function TrackingPage() {
                   orden: 1,
                   activo: true,
                   esAbridor: true,
-                },
-              });
-              dispatch({
-                type: 'SET_BATEADOR_ACTUAL',
-                payload: { rol: equipoAlBate, indice: 0 },
+                  hacerActivo: true,
+                } as any,
               });
               setShowAgregarBateador(false);
             }}
@@ -319,7 +334,6 @@ export default function TrackingPage() {
         <p style={{
           textAlign: 'center',
           fontSize: '0.72rem',
-          fontWeight: 900,
           letterSpacing: '0.08em',
           color: estado.partido?.finalizado ? 'var(--text-secondary)' : 'var(--accent)',
           textTransform: 'uppercase',
@@ -369,9 +383,9 @@ export default function TrackingPage() {
         )}
       </div>
 
-      <div style={{ padding: '8px 16px' }}>
-        <p className="text-xs text-secondary" style={{ marginBottom: 6 }}>Orden al bate</p>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+      <div style={{ padding: '24px 16px 16px' }}>
+        <p className="text-xs text-secondary" style={{ marginBottom: 12 }}>Orden al bate</p>
+        <div style={{ display: 'flex', alignItems: 'stretch', gap: 8 }}>
           <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4, flex: 1 }}>
             {bateadoresActivos.map((b, i) => (
               <button
@@ -410,9 +424,8 @@ export default function TrackingPage() {
               }}
               style={{
                 flexShrink: 0,
-                padding: '6px 10px',
-                minWidth: 40,
-                height: 40, // Height of the mini cards is roughly 40px
+                padding: '0 10px',
+                marginBottom: 4, // To account for the paddingBottom: 4 of the scroll container
                 borderRadius: 8,
                 background: 'var(--bg-elevated)',
                 border: '1px solid var(--border)',
@@ -433,8 +446,8 @@ export default function TrackingPage() {
 
       {/* ── Historial de turnos del bateador actual ── */}
       {turnosBateador.length > 0 && (
-        <div style={{ padding: '8px 16px' }}>
-          <p className="text-xs text-secondary" style={{ marginBottom: 6 }}>Historial</p>
+        <div style={{ padding: '24px 16px 16px' }}>
+          <p className="text-xs text-secondary" style={{ marginBottom: 12 }}>Historial</p>
           {[...turnosBateador].reverse().map((t, i) => (
             <div
               key={t.id}
@@ -487,9 +500,26 @@ export default function TrackingPage() {
         </div>
       )}
 
+      {/* ── Notas del jugador ── */}
+      {bateadorActual && (
+        <div style={{ padding: '24px 16px', marginBottom: 24 }}>
+          <p className="text-xs text-secondary" style={{ marginBottom: 12, textTransform: 'uppercase', fontWeight: 600 }}>
+            Notas sobre el jugador
+          </p>
+          <textarea
+            className="input"
+            style={{ width: '100%', minHeight: 80, resize: 'vertical' }}
+            placeholder="Escribe notas sobre el jugador (fortalezas, debilidades, tendencias...)"
+            value={notas}
+            onChange={(e) => setNotas(e.target.value)}
+            disabled={estado.partido?.finalizado}
+          />
+        </div>
+      )}
+
       {/* ── Fin Partido ── */}
       {!estado.partido?.finalizado && (
-        <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <div style={{ padding: '24px 16px 40px', display: 'flex', flexDirection: 'column', gap: 10 }}>
           <button
             className="btn btn-danger btn-full"
             onClick={() => setShowFinPartido(true)}

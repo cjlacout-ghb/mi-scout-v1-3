@@ -36,7 +36,7 @@ export default function ReportePage() {
       <div className="empty-state">
         <div className="empty-state__icon">📄</div>
         <div className="empty-state__title">Sin partido activo</div>
-        <p className="empty-state__text">Iniciá un partido y registrá al menos un turno al bate para generar reportes.</p>
+        <p className="empty-state__text">Inicia un partido y registra al menos un turno al bate para generar reportes.</p>
       </div>
     );
   }
