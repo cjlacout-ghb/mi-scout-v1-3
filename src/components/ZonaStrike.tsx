@@ -103,11 +103,7 @@ export default function ZonaStrikeComponent({ onZonaClick, marcadores = [], heat
         className="zona-outer"
         style={{ position: 'relative', background: 'var(--bg-elevated)' }}
       >
-        {/* ── Etiquetas de esquinas (5, 6, 7, 8) ── */}
-        <span className="zona-corner-label tl">{perspectiva === 'pitcher' ? '8' : '7'}</span>
-        <span className="zona-corner-label tr">{perspectiva === 'pitcher' ? '7' : '8'}</span>
-        <span className="zona-corner-label bl">{perspectiva === 'pitcher' ? '6' : '5'}</span>
-        <span className="zona-corner-label br">{perspectiva === 'pitcher' ? '5' : '6'}</span>
+
 
         {/* ── Zonas esquina clicables ── */}
         {([7, 8, 5, 6] as const).map((cssId) => {
@@ -118,6 +114,8 @@ export default function ZonaStrikeComponent({ onZonaClick, marcadores = [], heat
             if (cssId === 5) logicalZone = 6;
             if (cssId === 6) logicalZone = 5;
           }
+          const isShaded = hmColores[logicalZone] && hmColores[logicalZone] !== 'transparent';
+          const cornerClass = cssId === 7 ? 'tl' : cssId === 8 ? 'tr' : cssId === 5 ? 'bl' : 'br';
           return (
             <div
               key={cssId}
@@ -127,6 +125,9 @@ export default function ZonaStrikeComponent({ onZonaClick, marcadores = [], heat
               role="button"
               aria-label={`Zona ${logicalZone}`}
             >
+              <span className={`zona-corner-label ${cornerClass}`} style={isShaded ? { color: '#000' } : undefined}>
+                {logicalZone}
+              </span>
               {zoneStats && zoneStats[logicalZone] && zoneStats[logicalZone]!.pitches > 0 && (
                 <div className="zone-tooltip" style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontWeight: 400 }}>
                   <div style={{ display: 'flex', gap: '6px', alignItems: 'center', justifyContent: 'center' }}>
@@ -171,6 +172,7 @@ export default function ZonaStrikeComponent({ onZonaClick, marcadores = [], heat
               if (cssId === 2) logicalZone = 1;
             }
             const cornerClass = cssId === 3 ? 'tl' : cssId === 4 ? 'tr' : cssId === 1 ? 'bl' : 'br';
+            const isShaded = hmColores[logicalZone] && hmColores[logicalZone] !== 'transparent';
             return (
               <div
                 key={cssId}
@@ -180,7 +182,9 @@ export default function ZonaStrikeComponent({ onZonaClick, marcadores = [], heat
                 role="button"
                 aria-label={`Zona ${logicalZone}`}
               >
-                <span className={`zona-corner-label ${cornerClass}`}>{logicalZone}</span>
+                <span className={`zona-corner-label ${cornerClass}`} style={isShaded ? { color: '#000' } : undefined}>
+                  {logicalZone}
+                </span>
                 {zoneStats && zoneStats[logicalZone] && zoneStats[logicalZone]!.pitches > 0 && (
                   <div className="zone-tooltip" style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontWeight: 400 }}>
                     <div style={{ display: 'flex', gap: '6px', alignItems: 'center', justifyContent: 'center' }}>

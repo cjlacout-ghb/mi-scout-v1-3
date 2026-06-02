@@ -196,6 +196,7 @@ export default function StatsPage() {
             onZonaClick={() => {}}
             heatMap={heatMap}
             zoneStats={stats.porZona}
+            ladoBateo={bateadorSel.ladoBateo}
           />
 
           {/* Tabla por zona */}

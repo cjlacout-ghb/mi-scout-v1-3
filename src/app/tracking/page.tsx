@@ -19,6 +19,28 @@ export default function TrackingPage() {
   const [showAgregarBateador, setShowAgregarBateador] = useState(false);
   const [showFinPartido, setShowFinPartido] = useState(false);
   const [notas, setNotas] = useState('');
+  
+  const [modoAcumulado, setModoAcumulado] = useState(false);
+  const [turnosAcumulados, setTurnosAcumulados] = useState<TurnoAlBate[]>([]);
+  const [cargandoAcumulado, setCargandoAcumulado] = useState(false);
+
+  useEffect(() => {
+    if (modoAcumulado && bateadorActual) {
+      setCargandoAcumulado(true);
+      const params = new URLSearchParams({
+        apellido: bateadorActual.apellido,
+        numero: bateadorActual.numero,
+        equipo: bateadorActual.equipo
+      });
+      fetch(`/api/jugador/stats?${params.toString()}`)
+        .then(r => r.json())
+        .then(data => {
+          if (data.turnos) setTurnosAcumulados(data.turnos);
+          setCargandoAcumulado(false);
+        })
+        .catch(() => setCargandoAcumulado(false));
+    }
+  }, [modoAcumulado, bateadorActual]);
 
   useEffect(() => {
     setNotas(bateadorActual?.notas || '');
@@ -118,8 +140,12 @@ export default function TrackingPage() {
     ? estado.turnosAlBate.filter((t) => t.bateadorId === bateadorActual.id)
     : [];
 
-  // Marcadores para mostrar en la zona (todos los turnos del bateador en el partido)
-  const marcadores = turnosBateador.flatMap((t) => {
+  const turnosVista = modoAcumulado
+    ? turnosAcumulados.map(t => ({...t, bateadorId: bateadorActual?.id || ''}))
+    : turnosBateador;
+
+  // Marcadores para mostrar en la zona
+  const marcadores = turnosVista.flatMap((t) => {
     const tipo = (
       t.resultado === 'HIT'   ? 'contact' :
       t.resultado === 'OUT'   ? 'contact' :
@@ -202,11 +228,11 @@ export default function TrackingPage() {
   };
 
   // Contar stats rápidas del bateador actual
-  const ab = turnosBateador.length;
-  const hits = turnosBateador.filter((t) => t.resultado === 'HIT').length;
-  const ks  = turnosBateador.filter((t) => t.resultado === 'KS' || t.resultado === 'KL').length;
-  const bb  = turnosBateador.filter((t) => t.resultado === 'BB' || t.resultado === 'HBP').length;
-  const outs = turnosBateador.filter((t) => t.resultado === 'OUT').length;
+  const ab = turnosVista.length;
+  const hits = turnosVista.filter((t) => t.resultado === 'HIT').length;
+  const ks  = turnosVista.filter((t) => t.resultado === 'KS' || t.resultado === 'KL').length;
+  const bb  = turnosVista.filter((t) => t.resultado === 'BB' || t.resultado === 'HBP').length;
+  const outs = turnosVista.filter((t) => t.resultado === 'OUT').length;
 
   const ultimoTurno = turnosBateador[turnosBateador.length - 1];
 
@@ -299,6 +325,23 @@ export default function TrackingPage() {
 
       {/* ── Zona de strike ── */}
       <div style={{ padding: '8px 0 4px', position: 'relative' }}>
+        {/* Toggle Acumulado */}
+        <div style={{ display: 'flex', gap: 8, background: 'var(--bg-elevated)', padding: 4, borderRadius: 8, margin: '8px 16px 16px' }}>
+          <button
+            className={`btn btn-sm ${!modoAcumulado ? 'btn-primary' : ''}`}
+            style={{ flex: 1, background: !modoAcumulado ? '' : 'transparent', color: !modoAcumulado ? '' : 'var(--text-secondary)' }}
+            onClick={() => setModoAcumulado(false)}
+          >
+            Este partido
+          </button>
+          <button
+            className={`btn btn-sm ${modoAcumulado ? 'btn-primary' : ''}`}
+            style={{ flex: 1, background: modoAcumulado ? '' : 'transparent', color: modoAcumulado ? '' : 'var(--text-secondary)' }}
+            onClick={() => setModoAcumulado(true)}
+          >
+            Acumulado
+          </button>
+        </div>
         {avisoInning && (
           <div style={{
             position: 'absolute',
@@ -447,7 +490,7 @@ export default function TrackingPage() {
       {/* ── Historial de turnos del bateador actual ── */}
       {turnosBateador.length > 0 && (
         <div style={{ padding: '24px 16px 16px' }}>
-          <p className="text-xs text-secondary" style={{ marginBottom: 12 }}>Historial</p>
+          <p className="text-xs text-secondary" style={{ marginBottom: 12 }}>Historial de este partido</p>
           {[...turnosBateador].reverse().map((t, i) => (
             <div
               key={t.id}

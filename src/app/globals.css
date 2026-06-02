@@ -677,7 +677,7 @@ body {
 }
 
 .pitch-marker:hover {
-  z-index: 50;
+  z-index: 200;
 }
 
 /* Tooltip de zonas (hover) */
