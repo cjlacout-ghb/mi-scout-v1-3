@@ -92,9 +92,9 @@ export default function TrackingPage() {
   if (!estado.partido) {
     return (
       <div className="empty-state">
-        <div className="empty-state__icon">🎯</div>
+
         <div className="empty-state__title">Sin partido activo</div>
-        <p className="empty-state__text">Inicia un partido desde el Line-Up para comenzar el tracking.</p>
+        <p className="empty-state__text">Inicia un partido desde el Line-Up para comenzar el tracking. O selecciona desde el Historial.</p>
       </div>
     );
   }

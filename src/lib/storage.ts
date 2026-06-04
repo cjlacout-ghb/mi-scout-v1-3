@@ -123,6 +123,7 @@ const NOMBRE_ZONA: Record<number, string> = {
 
 export function generarReporteMD(bateador: import('./types').Bateador, stats: EstadisticasBateador, turnos: import('./types').TurnoAlBate[], partido: import('./types').Partido): string {
   let md = `# Reporte de Scouting — ${bateador.apellido}${bateador.nombre ? `, ${bateador.nombre}` : ''} (#${bateador.numero})\n\n`;
+  md += `**Equipo:** ${bateador.equipo}\n\n`;
   const avg = stats.promedio.toFixed(3).replace('0.', '.');
   const misTurnos = turnos.filter((t) => t.bateadorId === bateador.id);
 
@@ -135,29 +136,24 @@ export function generarReporteMD(bateador: import('./types').Bateador, stats: Es
     .filter(([, v]) => v.pitches > 0 && v.hits === 0)
     .sort((a, b) => b[1].pitches - a[1].pitches);
   md += `**Partido:** ${partido.descripcion}  \n`;
-  md += `**Fecha:** ${new Date(partido.fecha).toLocaleDateString('es-AR')}  \n`;
-  md += `**Equipo:** ${bateador.equipo}\n\n`;
+  md += `**Fecha:** ${new Date(partido.fecha).toLocaleDateString('es-AR')}\n\n`;
   md += `---\n\n`;
 
   md += `## Resumen\n\n`;
-  md += `| AB | H | 2B | 3B | HR | KS | KL | BB/HBP | OUT | AVG |\n`;
-  md += `|----|---|----|----|----|----|----|----|-----|-----|\n`;
-  md += `| ${stats.turnosAlBate} | ${stats.hits} | ${stats.dobles} | ${stats.triples} | ${stats.homeRuns} | ${stats.strikeoutsSwinging} | ${stats.strikeoutsLooking} | ${stats.basesPorBolas} | ${stats.outs} | ${avg} |\n\n`;
+  const padC = (v: string | number, l: number) => {
+    const s = String(v);
+    const pL = Math.floor((l - s.length) / 2);
+    return ' '.repeat(Math.max(0, pL)) + s + ' '.repeat(Math.max(0, l - s.length - pL));
+  };
+
+  md += `| AB | H | 2B | 3B | HR | K | BB/HBP | AVG  |\n`;
+  md += `|----|---|----|----|----|---|--------|------|\n`;
+  md += `| ${padC(stats.turnosAlBate, 2)} | ${padC(stats.hits, 1)} | ${padC(stats.dobles, 2)} | ${padC(stats.triples, 2)} | ${padC(stats.homeRuns, 2)} | ${padC(stats.strikeoutsSwinging + stats.strikeoutsLooking, 1)} | ${padC(stats.basesPorBolas, 6)} | ${padC(avg, 4)} |\n\n`;
 
   md += `---\n\n`;
-  md += `## Análisis por Zona\n\n`;
-  md += `| Zona | Descripción | Pitches | Hits | Outs | % Contacto |\n`;
-  md += `|------|-------------|---------|------|------|------------|\n`;
-  for (let z = 1; z <= 8; z++) {
-    const d = stats.porZona[z as ZS];
-    const pct = d.pitches > 0 ? Math.round((d.contacto / d.pitches) * 100) : 0;
-    md += `| ${z} | ${NOMBRE_ZONA[z]} | ${d.pitches} | ${d.hits} | ${d.outs} | ${pct}% |\n`;
-  }
-
-  md += `\n---\n\n`;
 
   if (zonasCalientes.length > 0) {
-    md += `## Zonas Calientes 🔥\n\n`;
+    md += `## Zonas Calientes\n\n`;
     for (const [z, v] of zonasCalientes) {
       const pct = v.pitches > 0 ? Math.round((v.hits / v.pitches) * 100) : 0;
       md += `- **Zona ${z}** (${NOMBRE_ZONA[Number(z)]}): ${v.hits} hit(s) en ${v.pitches} pitch(es) — ${pct}% efectividad\n`;
@@ -166,20 +162,11 @@ export function generarReporteMD(bateador: import('./types').Bateador, stats: Es
   }
 
   if (zonasFrias.length > 0) {
-    md += `## Zonas Frías ❄️\n\n`;
+    md += `## Zonas Frías\n\n`;
     for (const [z, v] of zonasFrias) {
       md += `- **Zona ${z}** (${NOMBRE_ZONA[Number(z)]}): 0 hits en ${v.pitches} pitch(es)\n`;
     }
     md += '\n';
-  }
-
-  md += `---\n\n`;
-  md += `## Recomendación de Pitcheo\n\n`;
-  if (zonasFrias.length > 0) {
-    const top = zonasFrias.slice(0, 2).map(([z]) => `Zona ${z}`).join(' y ');
-    md += `Atacar preferentemente ${top} donde el bateador no ha demostrado efectividad.\n\n`;
-  } else {
-    md += `El bateador ha mostrado efectividad en múltiples zonas. Variar velocidad y tipo de pitch.\n\n`;
   }
 
   md += `---\n\n`;

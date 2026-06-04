@@ -34,9 +34,9 @@ export default function ReportePage() {
   if (!partido) {
     return (
       <div className="empty-state">
-        <div className="empty-state__icon">📄</div>
+
         <div className="empty-state__title">Sin partido activo</div>
-        <p className="empty-state__text">Inicia un partido y registra al menos un turno al bate para generar reportes.</p>
+        <p className="empty-state__text">Inicia un partido y registra al menos un turno al bate para generar reportes. O selecciona desde el Historial.</p>
       </div>
     );
   }
@@ -72,11 +72,53 @@ export default function ReportePage() {
       const avg = stats.turnosAlBate > 0 ? stats.promedio.toFixed(3).replace('0.', '.') : '0.000';
       
       md += `## Resumen Global\n\n`;
-      md += `| AB | H | 2B | 3B | HR | KS | KL | BB/HBP | OUT | AVG |\n`;
-      md += `|----|---|----|----|----|----|----|----|-----|-----|\n`;
-      md += `| ${stats.turnosAlBate} | ${stats.hits} | ${stats.dobles} | ${stats.triples} | ${stats.homeRuns} | ${stats.strikeoutsSwinging} | ${stats.strikeoutsLooking} | ${stats.basesPorBolas} | ${stats.outs} | ${avg} |\n\n`;
+      const padC = (v: string | number, l: number) => {
+        const s = String(v);
+        const pL = Math.floor((l - s.length) / 2);
+        return ' '.repeat(Math.max(0, pL)) + s + ' '.repeat(Math.max(0, l - s.length - pL));
+      };
 
-      md += `---\n\n*Para más detalles por zona, consultá la sección de Estadísticas.*\n\n*Generado por Mi Scout v1.1*\n`;
+      md += `| AB | H | 2B | 3B | HR | K | BB/HBP | AVG  |\n`;
+      md += `|----|---|----|----|----|---|--------|------|\n`;
+      md += `| ${padC(stats.turnosAlBate, 2)} | ${padC(stats.hits, 1)} | ${padC(stats.dobles, 2)} | ${padC(stats.triples, 2)} | ${padC(stats.homeRuns, 2)} | ${padC(stats.strikeoutsSwinging + stats.strikeoutsLooking, 1)} | ${padC(stats.basesPorBolas, 6)} | ${padC(avg, 4)} |\n\n`;
+
+
+      const zonasCalientes = ([1,2,3,4,5,6,7,8] as const)
+        .filter((z) => stats.porZona[z].hits > 0)
+        .sort((a, b) => stats.porZona[b].hits - stats.porZona[a].hits);
+
+      const zonasFrias = ([1,2,3,4,5,6,7,8] as const)
+        .filter((z) => stats.porZona[z].pitches > 0 && stats.porZona[z].hits === 0)
+        .sort((a, b) => stats.porZona[b].pitches - stats.porZona[a].pitches);
+
+      const NOMBRE_ZONA: Record<number, string> = {
+        1: 'Interior bajo izquierdo', 2: 'Interior bajo derecho',
+        3: 'Interior alto izquierdo', 4: 'Interior alto derecho',
+        5: 'Esquina inferior izquierda', 6: 'Esquina inferior derecha',
+        7: 'Esquina superior izquierda', 8: 'Esquina superior derecha',
+      };
+
+      if (zonasCalientes.length > 0) {
+        md += `## Zonas Calientes\n\n`;
+        for (const z of zonasCalientes) {
+          const d = stats.porZona[z];
+          const pct = d.pitches > 0 ? Math.round((d.hits / d.pitches) * 100) : 0;
+          md += `- **Zona ${z}** (${NOMBRE_ZONA[z]}): ${d.hits} hit(s) en ${d.pitches} pitch(es) — ${pct}% efectividad\n`;
+        }
+        md += '\n';
+      }
+
+      if (zonasFrias.length > 0) {
+        md += `## Zonas Frías\n\n`;
+        for (const z of zonasFrias) {
+          const d = stats.porZona[z];
+          md += `- **Zona ${z}** (${NOMBRE_ZONA[z]}): 0 hits en ${d.pitches} pitch(es)\n`;
+        }
+        md += '\n';
+      }
+
+
+      md += `---\n\n*Generado por Mi Scout v1.1*\n`;
       setPreview(md);
       setModo('acumulado');
       dispatch({ type: 'SELECCIONAR_JUGADOR', payload: b.id });
@@ -102,7 +144,7 @@ export default function ReportePage() {
       const asistencia = turnoList.filter(t => t.detalleOut?.tipo === 'asistencia').length;
       const fly = turnoList.filter(t => t.detalleOut?.tipo === 'fly').length;
       const afCount = asistencia + fly;
-      md += `AB: ${stats.turnosAlBate} | H: ${stats.hits} | AVG: ${avg} | KS: ${stats.strikeoutsSwinging} | KL: ${stats.strikeoutsLooking} | BB/HBP: ${stats.basesPorBolas} | A/F: ${afCount}\n\n`;
+      md += `AB: ${stats.turnosAlBate} | H: ${stats.hits} | AVG: ${avg} | K: ${stats.strikeoutsSwinging + stats.strikeoutsLooking} | BB/HBP: ${stats.basesPorBolas} | A/F: ${afCount}\n\n`;
       // Zonas calientes
       const calientes = ([1,2,3,4,5,6,7,8] as const)
         .filter((z) => stats.porZona[z].hits > 0)
@@ -145,7 +187,7 @@ export default function ReportePage() {
 
         {/* Individual */}
         <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <p style={{ fontWeight: 700, fontSize: '0.88rem' }}>👤 Reporte del jugador</p>
+          <p style={{ fontWeight: 700, fontSize: '0.88rem' }}>Jugador</p>
           <select
             className="input"
             value={selId}
@@ -186,12 +228,12 @@ export default function ReportePage() {
 
         {/* Equipo */}
         <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <p style={{ fontWeight: 700, fontSize: '0.88rem', marginBottom: 4 }}>👥 Reporte del equipo</p>
-          <button className="btn btn-primary btn-full" onClick={() => generarEquipo(partido.visitante, estado.lineupVisitante)}>
-            Generar reporte completo — {partido.visitante} (Visitante)
+          <p style={{ fontWeight: 700, fontSize: '0.88rem', marginBottom: 4 }}>Equipo</p>
+          <button className="btn btn-ghost btn-full" onClick={() => generarEquipo(partido.visitante, estado.lineupVisitante)}>
+            {partido.visitante} (Visitante)
           </button>
-          <button className="btn btn-primary btn-full" onClick={() => generarEquipo(partido.local, estado.lineupLocal)}>
-            Generar reporte completo — {partido.local} (Local)
+          <button className="btn btn-ghost btn-full" onClick={() => generarEquipo(partido.local, estado.lineupLocal)}>
+            {partido.local} (Local)
           </button>
         </div>
       </div>
@@ -199,15 +241,7 @@ export default function ReportePage() {
       {/* Vista previa */}
       {preview && (
         <div style={{ padding: '0 16px 16px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-            <p className="section-title">Vista previa</p>
-            <button
-              className="btn btn-primary btn-sm"
-              onClick={descargar}
-            >
-              Descargar .md
-            </button>
-          </div>
+          <p className="section-title" style={{ marginBottom: 8 }}>Vista previa</p>
           <div
             className="card"
             style={{
@@ -225,7 +259,7 @@ export default function ReportePage() {
           </div>
 
           <button
-            className="btn btn-primary btn-lg btn-full"
+            className="btn btn-ghost btn-lg btn-full"
             style={{ marginTop: 12 }}
             onClick={descargar}
           >

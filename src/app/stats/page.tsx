@@ -50,7 +50,7 @@ function valueColor(val: number | null): string {
 }
 
 export default function StatsPage() {
-  const { estado, bateadorActual } = useScout();
+  const { estado, dispatch, bateadorActual } = useScout();
   const todos = [...(estado.lineupVisitante || []), ...(estado.lineupLocal || [])];
   const activos = todos.filter((b) => b.activo);
 
@@ -86,9 +86,9 @@ export default function StatsPage() {
   if (!estado.partido) {
     return (
       <div className="empty-state">
-        <div className="empty-state__icon">📊</div>
+
         <div className="empty-state__title">Sin partido activo</div>
-        <p className="empty-state__text">Inicia un partido para ver las estadísticas.</p>
+        <p className="empty-state__text">Inicia un partido para ver las estadísticas. O selecciona desde el Historial.</p>
       </div>
     );
   }

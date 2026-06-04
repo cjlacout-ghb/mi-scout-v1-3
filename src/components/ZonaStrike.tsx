@@ -13,7 +13,7 @@ interface Props {
   /** Vista de la zona: catcher o pitcher */
   perspectiva?: 'catcher' | 'pitcher';
   /** Desglose estadístico por zona para mostrar en tooltip */
-  zoneStats?: Partial<Record<ZonaStrike, { pitches: number; hits: number; outs: number; contacto: number }>>;
+  zoneStats?: Partial<Record<ZonaStrike, { pitches: number; hits: number; outs: number; contacto: number; ks: number; kl: number; bb: number }>>;
 }
 
 // Mapeo de resultado → tipo de marcador
@@ -78,31 +78,32 @@ export default function ZonaStrikeComponent({ onZonaClick, marcadores = [], heat
   };
 
   return (
+    <>
     <div className="zona-container zona-strike" style={{ position: 'relative' }}>
-      {perspectiva === 'catcher' && (
-        <>
-          {ladoBateo === 'Z' && (
-            <div style={{ position: 'absolute', top: 16, bottom: 16, right: 6, width: 8, background: '#FFB83D', borderRadius: 2 }} title="Bateador Zurdo" />
-          )}
-          {ladoBateo === 'D' && (
-            <div style={{ position: 'absolute', top: 16, bottom: 16, left: 6, width: 8, background: '#FFB83D', borderRadius: 2 }} title="Bateador Derecho" />
-          )}
-        </>
-      )}
-      {perspectiva === 'pitcher' && (
-        <>
-          {ladoBateo === 'Z' && (
-            <div style={{ position: 'absolute', top: 16, bottom: 16, left: 6, width: 8, background: '#FFB83D', borderRadius: 2 }} title="Bateador Zurdo (Pitcher view)" />
-          )}
-          {ladoBateo === 'D' && (
-            <div style={{ position: 'absolute', top: 16, bottom: 16, right: 6, width: 8, background: '#FFB83D', borderRadius: 2 }} title="Bateador Derecho (Pitcher view)" />
-          )}
-        </>
-      )}
-      <div
-        className="zona-outer"
-        style={{ position: 'relative', background: 'var(--bg-elevated)' }}
-      >
+        {perspectiva === 'catcher' && (
+          <>
+            {ladoBateo === 'Z' && (
+              <div style={{ position: 'absolute', top: 16, bottom: 16, right: 6, width: 8, background: '#FFB83D', borderRadius: 2 }} title="Bateador Zurdo" />
+            )}
+            {ladoBateo === 'D' && (
+              <div style={{ position: 'absolute', top: 16, bottom: 16, left: 6, width: 8, background: '#FFB83D', borderRadius: 2 }} title="Bateador Derecho" />
+            )}
+          </>
+        )}
+        {perspectiva === 'pitcher' && (
+          <>
+            {ladoBateo === 'Z' && (
+              <div style={{ position: 'absolute', top: 16, bottom: 16, left: 6, width: 8, background: '#FFB83D', borderRadius: 2 }} title="Bateador Zurdo (Pitcher view)" />
+            )}
+            {ladoBateo === 'D' && (
+              <div style={{ position: 'absolute', top: 16, bottom: 16, right: 6, width: 8, background: '#FFB83D', borderRadius: 2 }} title="Bateador Derecho (Pitcher view)" />
+            )}
+          </>
+        )}
+        <div
+          className="zona-outer"
+          style={{ position: 'relative', background: 'var(--bg-elevated)' }}
+        >
 
 
         {/* ── Zonas esquina clicables ── */}
@@ -274,5 +275,9 @@ export default function ZonaStrikeComponent({ onZonaClick, marcadores = [], heat
         })}
       </div>
     </div>
+    <p className="text-xs text-secondary" style={{ textAlign: 'right', marginTop: 4, paddingRight: 16 }}>
+      {perspectiva === 'pitcher' ? 'Vista del pitcher' : 'Vista del catcher'}
+    </p>
+    </>
   );
 }
