@@ -43,14 +43,17 @@ function reducer(estado: EstadoPartido, accion: Accion): EstadoPartido {
       }
       return estado;
 
-    case 'INICIAR_PARTIDO':
+    case 'INICIAR_PARTIDO': {
+      const activosVisitante = accion.payload.lineupVisitante.filter(b => b.activo);
       return {
         ...estadoInicial,
         partido: accion.payload.partido,
         lineupVisitante: accion.payload.lineupVisitante,
         lineupLocal: accion.payload.lineupLocal,
         perspectivaZona: accion.payload.perspectivaZona || 'catcher',
+        jugadorSeleccionadoId: activosVisitante[0]?.id ?? null,
       };
+    }
 
     case 'SET_PERSPECTIVA':
       return { ...estado, perspectivaZona: accion.payload };
@@ -70,10 +73,10 @@ function reducer(estado: EstadoPartido, accion: Accion): EstadoPartido {
         const nuevosActivos = newLineup.filter(b => b.activo);
         if (isVisitante) {
           newState.indiceVisitante = nuevosActivos.length - 1;
-          newState.jugadorSeleccionadoId = null;
+          newState.jugadorSeleccionadoId = nuevo.id;
         } else {
           newState.indiceLocal = nuevosActivos.length - 1;
-          newState.jugadorSeleccionadoId = null;
+          newState.jugadorSeleccionadoId = nuevo.id;
         }
       }
       
@@ -199,10 +202,10 @@ function reducer(estado: EstadoPartido, accion: Accion): EstadoPartido {
       
       if (isVisitante) {
         const vueltas = siguiente < indiceActual ? estado.vueltasAlOrdenVisitante + 1 : estado.vueltasAlOrdenVisitante;
-        return { ...estado, indiceVisitante: siguiente, vueltasAlOrdenVisitante: vueltas };
+        return { ...estado, indiceVisitante: siguiente, vueltasAlOrdenVisitante: vueltas, jugadorSeleccionadoId: activos[siguiente]?.id ?? null };
       } else {
         const vueltas = siguiente < indiceActual ? estado.vueltasAlOrdenLocal + 1 : estado.vueltasAlOrdenLocal;
-        return { ...estado, indiceLocal: siguiente, vueltasAlOrdenLocal: vueltas };
+        return { ...estado, indiceLocal: siguiente, vueltasAlOrdenLocal: vueltas, jugadorSeleccionadoId: activos[siguiente]?.id ?? null };
       }
     }
 
@@ -230,9 +233,9 @@ function reducer(estado: EstadoPartido, accion: Accion): EstadoPartido {
       }
 
       if (isVisitante) {
-        return { ...estado, mitadInning: nuevoMitad, inningActual: nuevoInning, indiceVisitante: nuevoIndice };
+        return { ...estado, mitadInning: nuevoMitad, inningActual: nuevoInning, indiceVisitante: nuevoIndice, jugadorSeleccionadoId: activos[nuevoIndice]?.id ?? null };
       } else {
-        return { ...estado, mitadInning: nuevoMitad, inningActual: nuevoInning, indiceLocal: nuevoIndice };
+        return { ...estado, mitadInning: nuevoMitad, inningActual: nuevoInning, indiceLocal: nuevoIndice, jugadorSeleccionadoId: activos[nuevoIndice]?.id ?? null };
       }
     }
 
@@ -262,17 +265,19 @@ function reducer(estado: EstadoPartido, accion: Accion): EstadoPartido {
       }
 
       if (isVisitante) {
-        return { ...estado, mitadInning: nuevoMitad, inningActual: nuevoInning, indiceVisitante: nuevoIndice };
+        return { ...estado, mitadInning: nuevoMitad, inningActual: nuevoInning, indiceVisitante: nuevoIndice, jugadorSeleccionadoId: activos[nuevoIndice]?.id ?? null };
       } else {
-        return { ...estado, mitadInning: nuevoMitad, inningActual: nuevoInning, indiceLocal: nuevoIndice };
+        return { ...estado, mitadInning: nuevoMitad, inningActual: nuevoInning, indiceLocal: nuevoIndice, jugadorSeleccionadoId: activos[nuevoIndice]?.id ?? null };
       }
     }
 
     case 'SET_BATEADOR_ACTUAL': {
       if (accion.payload.rol === 'visitante') {
-        return { ...estado, indiceVisitante: accion.payload.indice, jugadorSeleccionadoId: null };
+        const activos = estado.lineupVisitante.filter(b => b.activo);
+        return { ...estado, indiceVisitante: accion.payload.indice, jugadorSeleccionadoId: activos[accion.payload.indice]?.id ?? null };
       }
-      return { ...estado, indiceLocal: accion.payload.indice, jugadorSeleccionadoId: null };
+      const activos = estado.lineupLocal.filter(b => b.activo);
+      return { ...estado, indiceLocal: accion.payload.indice, jugadorSeleccionadoId: activos[accion.payload.indice]?.id ?? null };
     }
 
     case 'SET_INNING':

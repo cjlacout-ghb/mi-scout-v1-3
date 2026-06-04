@@ -54,7 +54,7 @@ export default function StatsPage() {
   const todos = [...(estado.lineupVisitante || []), ...(estado.lineupLocal || [])];
   const activos = todos.filter((b) => b.activo);
 
-  const [selId, setSelId] = useState<string | null>(null);
+  const selId = estado.jugadorSeleccionadoId || bateadorActual?.id || null;
   const [modoAcumulado, setModoAcumulado] = useState(false);
   
   const [turnosAcumulados, setTurnosAcumulados] = useState<TurnoAlBate[]>([]);
@@ -64,11 +64,6 @@ export default function StatsPage() {
     todos.find((b) => b.id === selId) ??
     activos[0] ??
     null;
-
-  // Sync selId with bateadorActual from context (set by lineup in read-only mode)
-  useEffect(() => {
-    if (bateadorActual) setSelId(bateadorActual.id);
-  }, [bateadorActual?.id]);
 
   useEffect(() => {
     if (modoAcumulado && bateadorSel) {
@@ -122,7 +117,6 @@ export default function StatsPage() {
           value={selId ?? bateadorSel?.id ?? ''}
           onChange={(e) => {
             const id = e.target.value || null;
-            setSelId(id);
             dispatch({ type: 'SELECCIONAR_JUGADOR', payload: id });
           }}
           style={{ marginBottom: 12 }}
@@ -208,6 +202,7 @@ export default function StatsPage() {
                   <tr>
                     <th>Zona</th>
                     <th style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>Pitches</th>
+                    <th style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>AB</th>
                     <th style={{ textAlign: 'center' }}>Hits</th>
                     <th style={{ textAlign: 'center' }}>Outs</th>
                     <th style={{ textAlign: 'center' }}>AVG</th>
@@ -226,11 +221,12 @@ export default function StatsPage() {
                           <span>Zona {z}</span>
                         </td>
                         <td style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>{d.pitches}</td>
+                        <td style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>{abZona}</td>
                         <td style={{ textAlign: 'center', color: d.hits > 0 ? 'var(--danger)' : 'var(--text-secondary)' }}>
                           {d.hits}
                         </td>
-                        <td style={{ textAlign: 'center', color: d.outs > 0 ? 'var(--success)' : 'var(--text-secondary)' }}>
-                          {d.outs}
+                        <td style={{ textAlign: 'center', color: (d.outs + d.ks + d.kl) > 0 ? 'var(--success)' : 'var(--text-secondary)' }}>
+                          {d.outs + d.ks + d.kl}
                         </td>
                         <td style={{ textAlign: 'center', color: valueColor(avgZonaVal), fontWeight: avgZonaVal !== null ? 600 : 'normal' }}>
                           {avgZona}
@@ -238,7 +234,7 @@ export default function StatsPage() {
                       </tr>
                       {z === 4 && (
                         <tr>
-                          <td colSpan={5} style={{ padding: 0, height: 2, background: 'var(--text-muted)' }} />
+                          <td colSpan={6} style={{ padding: 0, height: 2, background: 'var(--text-muted)' }} />
                         </tr>
                       )}
                       </React.Fragment>
@@ -258,8 +254,9 @@ export default function StatsPage() {
                   <tr>
                     <th>Pitch</th>
                     <th style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>Vistos</th>
-                    <th style={{ textAlign: 'center' }}>AVG</th>
+                    <th style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>AB</th>
                     <th style={{ textAlign: 'center' }}>K%</th>
+                    <th style={{ textAlign: 'center' }}>AVG</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -280,11 +277,12 @@ export default function StatsPage() {
                         <tr key={p}>
                           <td style={{ textTransform: 'capitalize', fontWeight: 700 }}>{p}</td>
                           <td style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>{d.pitches}</td>
-                          <td style={{ textAlign: 'center', color: valueColor(avgPitchVal), fontWeight: avgPitchVal !== null ? 600 : 'normal' }}>
-                            {avgPitch}
-                          </td>
+                          <td style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>{d.ab}</td>
                           <td style={{ textAlign: 'center', color: valueColor(kPctVal), fontWeight: kPctVal !== null ? 600 : 'normal' }}>
                             {kPct}
+                          </td>
+                          <td style={{ textAlign: 'center', color: valueColor(avgPitchVal), fontWeight: avgPitchVal !== null ? 600 : 'normal' }}>
+                            {avgPitch}
                           </td>
                         </tr>
                       );

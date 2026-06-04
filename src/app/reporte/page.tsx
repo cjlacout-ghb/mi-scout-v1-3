@@ -22,8 +22,8 @@ function slugify(s: string) {
 }
 
 export default function ReportePage() {
-  const { estado } = useScout();
-  const [selId, setSelId] = useState<string>('');
+  const { estado, dispatch, bateadorActual } = useScout();
+  const selId = estado.jugadorSeleccionadoId || bateadorActual?.id || '';
   const [preview, setPreview] = useState<string>('');
   const [modo, setModo] = useState<'individual' | 'equipo' | 'acumulado' | null>(null);
   const [cargando, setCargando] = useState(false);
@@ -46,7 +46,7 @@ export default function ReportePage() {
     const md = generarReporteMD(b, stats, estado.turnosAlBate, partido);
     setPreview(md);
     setModo('individual');
-    setSelId(b.id);
+    dispatch({ type: 'SELECCIONAR_JUGADOR', payload: b.id });
   };
 
   const generarAcumulado = async (b: Bateador) => {
@@ -79,7 +79,7 @@ export default function ReportePage() {
       md += `---\n\n*Para más detalles por zona, consultá la sección de Estadísticas.*\n\n*Generado por Mi Scout v1.1*\n`;
       setPreview(md);
       setModo('acumulado');
-      setSelId(b.id);
+      dispatch({ type: 'SELECCIONAR_JUGADOR', payload: b.id });
     } catch (e) {
       console.error(e);
       alert('Error cargando historial del jugador');
@@ -149,7 +149,7 @@ export default function ReportePage() {
           <select
             className="input"
             value={selId}
-            onChange={(e) => setSelId(e.target.value)}
+            onChange={(e) => dispatch({ type: 'SELECCIONAR_JUGADOR', payload: e.target.value })}
           >
             <option value="" disabled hidden>— Seleccioná un bateador —</option>
             {todos.map((b) => (
