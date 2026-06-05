@@ -560,6 +560,11 @@ body {
   pointer-events: none;
   z-index: 3;
 }
+.zona-corner-label.shaded {
+  color: #000000 !important;
+  text-shadow: none !important;
+  opacity: 1 !important;
+}
 .zona-corner-label.tl { top: 5px;    left: 6px;  }
 .zona-corner-label.tr { top: 5px;    right: 6px; }
 .zona-corner-label.bl { bottom: 5px; left: 6px;  }

@@ -126,7 +126,13 @@ export default function ZonaStrikeComponent({ onZonaClick, marcadores = [], heat
               role="button"
               aria-label={`Zona ${logicalZone}`}
             >
-              <span className={`zona-corner-label ${cornerClass}`} style={isShaded ? { color: '#000' } : undefined}>
+              <span 
+                className={`zona-corner-label ${cornerClass}`} 
+                style={{ 
+                  color: (hmColores[logicalZone] && hmColores[logicalZone] !== 'transparent') ? 'black' : 'var(--text-secondary)',
+                  opacity: 1
+                }}
+              >
                 {logicalZone}
               </span>
               {zoneStats && zoneStats[logicalZone] && zoneStats[logicalZone]!.pitches > 0 && (
@@ -173,7 +179,19 @@ export default function ZonaStrikeComponent({ onZonaClick, marcadores = [], heat
               if (cssId === 2) logicalZone = 1;
             }
             const cornerClass = cssId === 3 ? 'tl' : cssId === 4 ? 'tr' : cssId === 1 ? 'bl' : 'br';
-            const isShaded = hmColores[logicalZone] && hmColores[logicalZone] !== 'transparent';
+            const outerCssId = cssId === 3 ? 7 : cssId === 4 ? 8 : cssId === 1 ? 5 : 6;
+            let outerLogicalZone = outerCssId;
+            if (perspectiva === 'pitcher') {
+              if (outerCssId === 7) outerLogicalZone = 8;
+              if (outerCssId === 8) outerLogicalZone = 7;
+              if (outerCssId === 5) outerLogicalZone = 6;
+              if (outerCssId === 6) outerLogicalZone = 5;
+            }
+            
+            const isShadedSelf = hmColores[logicalZone] && hmColores[logicalZone] !== 'transparent';
+            const isShadedOuter = hmColores[outerLogicalZone] && hmColores[outerLogicalZone] !== 'transparent';
+            const needsBlackText = isShadedSelf || isShadedOuter;
+
             return (
               <div
                 key={cssId}
@@ -183,7 +201,13 @@ export default function ZonaStrikeComponent({ onZonaClick, marcadores = [], heat
                 role="button"
                 aria-label={`Zona ${logicalZone}`}
               >
-                <span className={`zona-corner-label ${cornerClass}`} style={isShaded ? { color: '#000' } : undefined}>
+                <span 
+                  className={`zona-corner-label ${cornerClass}`} 
+                  style={{ 
+                    color: needsBlackText ? 'black' : 'var(--text-secondary)',
+                    opacity: 1
+                  }}
+                >
                   {logicalZone}
                 </span>
                 {zoneStats && zoneStats[logicalZone] && zoneStats[logicalZone]!.pitches > 0 && (

@@ -110,16 +110,6 @@ export function calcularEstadisticas(
 // ─── Generador de reporte MD ───────────────────────────────────────────────────
 import type { ZonaStrike as ZS } from './types';
 
-const NOMBRE_ZONA: Record<number, string> = {
-  1: 'Interior bajo izquierdo',
-  2: 'Interior bajo derecho',
-  3: 'Interior alto izquierdo',
-  4: 'Interior alto derecho',
-  5: 'Esquina inferior izquierda',
-  6: 'Esquina inferior derecha',
-  7: 'Esquina superior izquierda',
-  8: 'Esquina superior derecha',
-};
 
 export function generarReporteMD(bateador: import('./types').Bateador, stats: EstadisticasBateador, turnos: import('./types').TurnoAlBate[], partido: import('./types').Partido): string {
   let md = `# Reporte de Scouting — ${bateador.apellido}${bateador.nombre ? `, ${bateador.nombre}` : ''} (#${bateador.numero})\n\n`;
@@ -156,7 +146,7 @@ export function generarReporteMD(bateador: import('./types').Bateador, stats: Es
     md += `## Zonas Calientes\n\n`;
     for (const [z, v] of zonasCalientes) {
       const pct = v.pitches > 0 ? Math.round((v.hits / v.pitches) * 100) : 0;
-      md += `- **Zona ${z}** (${NOMBRE_ZONA[Number(z)]}): ${v.hits} hit(s) en ${v.pitches} pitch(es) — ${pct}% efectividad\n`;
+      md += `- **Zona ${z}**: ${v.hits} hit(s) en ${v.pitches} pitch(es) — ${pct}% efectividad\n`;
     }
     md += '\n';
   }
@@ -164,7 +154,7 @@ export function generarReporteMD(bateador: import('./types').Bateador, stats: Es
   if (zonasFrias.length > 0) {
     md += `## Zonas Frías\n\n`;
     for (const [z, v] of zonasFrias) {
-      md += `- **Zona ${z}** (${NOMBRE_ZONA[Number(z)]}): 0 hits en ${v.pitches} pitch(es)\n`;
+      md += `- **Zona ${z}**: 0 hits en ${v.pitches} pitch(es)\n`;
     }
     md += '\n';
   }
@@ -174,7 +164,7 @@ export function generarReporteMD(bateador: import('./types').Bateador, stats: Es
   for (let i = 0; i < misTurnos.length; i++) {
     const t = misTurnos[i];
     md += `### Turno ${i + 1} — Inning ${t.inning}\n\n`;
-    md += `- **Zona:** ${t.zona} (${NOMBRE_ZONA[t.zona]})\n`;
+    md += `- **Zona:** ${t.zona}\n`;
     md += `- **Tipo de pitch:** ${t.tipoPitch.charAt(0).toUpperCase() + t.tipoPitch.slice(1)}\n`;
     md += `- **Resultado:** ${t.resultado}`;
     if (t.detalleOut) {
@@ -186,6 +176,6 @@ export function generarReporteMD(bateador: import('./types').Bateador, stats: Es
     md += '\n\n';
   }
 
-  md += `---\n\n*Generado por Mi Scout v1.1*\n`;
+  md += `---\n\n*Generado por MiScout v1.1*\n`;
   return md;
 }
