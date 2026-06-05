@@ -26,7 +26,8 @@ export type Accion =
   | { type: 'SET_PERSPECTIVA'; payload: 'catcher' | 'pitcher' }
   | { type: 'SET_EQUIPO_AL_BATE'; payload: 'visitante' | 'local' }
   | { type: 'CARGAR_ESTADO'; payload: EstadoPartido }
-  | { type: 'SELECCIONAR_JUGADOR'; payload: string | null };
+  | { type: 'SELECCIONAR_JUGADOR'; payload: string | null }
+  | { type: 'SET_MODO_ACUMULADO'; payload: boolean };
 
 // ─── Reducer ──────────────────────────────────────────────────────────────────
 function reducer(estado: EstadoPartido, accion: Accion): EstadoPartido {
@@ -289,6 +290,9 @@ function reducer(estado: EstadoPartido, accion: Accion): EstadoPartido {
     case 'SELECCIONAR_JUGADOR':
       return { ...estado, jugadorSeleccionadoId: accion.payload };
 
+    case 'SET_MODO_ACUMULADO':
+      return { ...estado, modoAcumuladoGlobal: accion.payload };
+
     default:
       return estado;
   }
@@ -313,6 +317,7 @@ async function syncApi(accion: Accion, nuevoEstado: EstadoPartido, oldEstado: Es
       case 'CAMBIAR_MITAD_INNING':
       case 'RETROCEDER_MITAD_INNING':
       case 'SELECCIONAR_JUGADOR':
+      case 'SET_MODO_ACUMULADO':
         await fetch('/api/partido/estado', {
           method: 'PATCH',
           body: JSON.stringify({

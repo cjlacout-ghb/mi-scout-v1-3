@@ -189,7 +189,7 @@ export default function ZonaStrikeComponent({ onZonaClick, marcadores = [], heat
             }
             
             const isShadedSelf = hmColores[logicalZone] && hmColores[logicalZone] !== 'transparent';
-            const isShadedOuter = hmColores[outerLogicalZone] && hmColores[outerLogicalZone] !== 'transparent';
+            const isShadedOuter = hmColores[outerLogicalZone as ZonaStrike] && hmColores[outerLogicalZone as ZonaStrike] !== 'transparent';
             const needsBlackText = isShadedSelf || isShadedOuter;
 
             return (

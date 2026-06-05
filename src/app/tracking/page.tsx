@@ -20,7 +20,8 @@ export default function TrackingPage() {
   const [showFinPartido, setShowFinPartido] = useState(false);
   const [notas, setNotas] = useState('');
   
-  const [modoAcumulado, setModoAcumulado] = useState(false);
+  const modoAcumulado = estado.modoAcumuladoGlobal ?? false;
+  const setModoAcumulado = (val: boolean) => dispatch({ type: 'SET_MODO_ACUMULADO', payload: val });
   const [turnosAcumulados, setTurnosAcumulados] = useState<TurnoAlBate[]>([]);
   const [cargandoAcumulado, setCargandoAcumulado] = useState(false);
 

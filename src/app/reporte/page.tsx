@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useScout } from '@/context/ScoutContext';
 import { calcularEstadisticas, generarReporteMD } from '@/lib/storage';
 import type { Bateador, TurnoAlBate } from '@/lib/types';
@@ -24,6 +24,7 @@ function slugify(s: string) {
 export default function ReportePage() {
   const { estado, dispatch, bateadorActual } = useScout();
   const selId = estado.jugadorSeleccionadoId || bateadorActual?.id || '';
+  const modoAcumuladoGlobal = estado.modoAcumuladoGlobal ?? false;
   const [preview, setPreview] = useState<string>('');
   const [modo, setModo] = useState<'individual' | 'equipo' | 'acumulado' | 'equipo_acumulado' | null>(null);
   const [selEquipo, setSelEquipo] = useState<'visitante' | 'local' | ''>('');
@@ -32,10 +33,25 @@ export default function ReportePage() {
   const todos = [...(estado.lineupVisitante || []), ...(estado.lineupLocal || [])];
   const partido = estado.partido;
 
+  // Sincronizar reporte con modo global al cambiar jugador
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (selId && partido) {
+      const b = todos.find(x => x.id === selId);
+      if (b) {
+        // Evitamos regenerar si el modo actual ya coincide con el global
+        if (modoAcumuladoGlobal && modo !== 'acumulado') {
+          generarAcumulado(b);
+        } else if (!modoAcumuladoGlobal && modo !== 'individual') {
+          generarIndividual(b);
+        }
+      }
+    }
+  }, [selId, modoAcumuladoGlobal, partido]);
+
   if (!partido) {
     return (
       <div className="empty-state">
-
         <div className="empty-state__title">Sin partido activo</div>
         <p className="empty-state__text">Inicia un partido y registra al menos un turno al bate para generar reportes. O selecciona desde el Historial.</p>
       </div>
@@ -44,10 +60,11 @@ export default function ReportePage() {
 
   const generarIndividual = (b: Bateador) => {
     const stats = calcularEstadisticas(b.id, estado.turnosAlBate);
-    const md = generarReporteMD(b, stats, estado.turnosAlBate, partido);
+    const md = generarReporteMD(b, stats, estado.turnosAlBate, partido!);
     setPreview(md);
     setModo('individual');
     dispatch({ type: 'SELECCIONAR_JUGADOR', payload: b.id });
+    dispatch({ type: 'SET_MODO_ACUMULADO', payload: false });
   };
 
   const generarAcumulado = async (b: Bateador) => {
@@ -56,11 +73,12 @@ export default function ReportePage() {
       const params = new URLSearchParams({
         apellido: b.apellido,
         numero: b.numero,
-        equipo: b.equipo
+        equipo: b.equipo || ''
       });
       const res = await fetch(`/api/jugador/stats?${params.toString()}`);
       const data = await res.json();
       const turnosAcumulados: TurnoAlBate[] = data.turnos || [];
+
       
       const turnosHomogeneos = turnosAcumulados.map(t => ({...t, bateadorId: b.id}));
       const stats = calcularEstadisticas(b.id, turnosHomogeneos);
@@ -89,7 +107,11 @@ export default function ReportePage() {
         .sort((a, b) => stats.porZona[b].hits - stats.porZona[a].hits);
 
       const zonasFrias = ([1,2,3,4,5,6,7,8] as const)
-        .filter((z) => stats.porZona[z].pitches > 0 && stats.porZona[z].hits === 0)
+        .filter((z) => {
+          const d = stats.porZona[z];
+          const ab = d.hits + d.outs + d.ks + d.kl;
+          return ab > 0 && d.hits === 0;
+        })
         .sort((a, b) => stats.porZona[b].pitches - stats.porZona[a].pitches);
 
 
@@ -117,6 +139,7 @@ export default function ReportePage() {
       setPreview(md);
       setModo('acumulado');
       dispatch({ type: 'SELECCIONAR_JUGADOR', payload: b.id });
+      dispatch({ type: 'SET_MODO_ACUMULADO', payload: true });
     } catch (e) {
       console.error(e);
       alert('Error cargando historial del jugador');
@@ -152,6 +175,7 @@ export default function ReportePage() {
     md += `*Generado por MiScout v1.1*\n`;
     setPreview(md);
     setModo('equipo');
+    dispatch({ type: 'SET_MODO_ACUMULADO', payload: false });
   };
 
   const generarEquipoAcumulado = async (equipo: string, lineup: Bateador[]) => {
@@ -194,6 +218,7 @@ export default function ReportePage() {
       md += `*Generado por MiScout v1.1*\n`;
       setPreview(md);
       setModo('equipo_acumulado');
+      dispatch({ type: 'SET_MODO_ACUMULADO', payload: true });
     } catch (e) {
       console.error(e);
       alert('Error cargando historial acumulado del equipo');

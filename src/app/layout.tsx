@@ -4,13 +4,13 @@ import { ScoutProvider } from '@/context/ScoutContext';
 import AppShell from '@/components/AppShell';
 
 export const metadata: Metadata = {
-  title: 'Mi Scout - Softball Pitch Tracker',
+  title: 'MiScout - Softball Pitcher Tracker',
   description: 'Aplicación de scouting y tracking de lanzamientos para softball. Análisis por bateador con heat map y reportes.',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'Mi Scout',
+    title: 'MiScout',
   },
 };
 

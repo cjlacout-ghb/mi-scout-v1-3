@@ -107,4 +107,5 @@ export interface EstadoPartido {
   vueltasAlOrdenLocal: number;
   perspectivaZona: 'catcher' | 'pitcher';
   jugadorSeleccionadoId?: string | null;
+  modoAcumuladoGlobal?: boolean;
 }

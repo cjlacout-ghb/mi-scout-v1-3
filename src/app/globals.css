@@ -581,7 +581,7 @@ body {
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 1fr 1fr;
   border: 1.5px solid var(--text-muted);
-  z-index: 1;
+  z-index: 10;
 }
 
 .zona-cuadrante {
@@ -593,7 +593,7 @@ body {
   transition: background 0.15s;
   border: 0.5px solid var(--border);
   -webkit-tap-highlight-color: transparent;
-  background: rgba(255,255,255,0.03);
+  background: var(--bg-elevated);
 }
 
 .zona-cuadrante:hover {

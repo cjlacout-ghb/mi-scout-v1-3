@@ -25,6 +25,29 @@ import type { EstadisticasBateador, ZonaStrike } from './types';
 
 const TIPOS_PITCH: TipoPitch[] = ['drop', 'riser', 'curva', 'cambio', 'screw', 'otro'];
 
+// Derivar zona desde coordenadas canónicas (catcher).
+// Inner zone ocupa 20%-80% en ambos ejes.
+function zonaDesdeCoords(x: number, y: number): ZonaStrike {
+  const inner = x >= 0.2 && x <= 0.8 && y >= 0.2 && y <= 0.8;
+  const left = x < 0.5;
+  const top = y < 0.5;
+  if (inner) {
+    if (top && left) return 3;
+    if (top && !left) return 4;
+    if (!top && left) return 1;
+    return 2;
+  }
+  if (top && left) return 7;
+  if (top && !left) return 8;
+  if (!top && left) return 5;
+  return 6;
+}
+
+function zonaReal(t: TurnoAlBate): ZonaStrike {
+  if (t.coordenadas) return zonaDesdeCoords(t.coordenadas.x, t.coordenadas.y);
+  return t.zona;
+}
+
 export function calcularEstadisticas(
   bateadorId: string,
   turnos: TurnoAlBate[]
@@ -45,7 +68,7 @@ export function calcularEstadisticas(
   let ks = 0, kl = 0, bb = 0, outs = 0;
 
   for (const t of misTurnos) {
-    const z = t.zona;
+    const z = zonaReal(t);
     const p = t.tipoPitch;
     porZona[z].pitches++;
     porPitch[p].pitches++;
@@ -122,8 +145,11 @@ export function generarReporteMD(bateador: import('./types').Bateador, stats: Es
     .filter(([, v]) => v.hits > 0)
     .sort((a, b) => b[1].hits - a[1].hits);
 
-  const zonasFrias = (Object.entries(stats.porZona) as [string, { hits: number; pitches: number }][])
-    .filter(([, v]) => v.pitches > 0 && v.hits === 0)
+  const zonasFrias = (Object.entries(stats.porZona) as [string, { hits: number; pitches: number; outs: number; ks: number; kl: number }][])
+    .filter(([, v]) => {
+      const ab = v.hits + v.outs + v.ks + v.kl;
+      return ab > 0 && v.hits === 0;
+    })
     .sort((a, b) => b[1].pitches - a[1].pitches);
   md += `**Partido:** ${partido.descripcion}  \n`;
   md += `**Fecha:** ${new Date(partido.fecha).toLocaleDateString('es-AR')}\n\n`;
