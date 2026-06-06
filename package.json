@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "better-sqlite3": "^12.10.0",
+    "dexie": "^4.4.3",
     "next": "16.2.6",
     "puppeteer": "^22.15.0",
     "react": "19.2.4",

@@ -42,3 +42,6 @@ chrome-user-data.log
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+chrome-profile/
+

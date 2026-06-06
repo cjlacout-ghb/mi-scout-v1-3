@@ -7,6 +7,7 @@ import ModalPitch from '@/components/ModalPitch';
 import ModalConfirm from '@/components/ModalConfirm';
 import ModalBateador, { type FormBateador } from '@/components/ModalBateador';
 import type { ZonaStrike, TurnoAlBate, Coordenadas } from '@/lib/types';
+import { db } from '@/lib/dbClient';
 
 export default function TrackingPage() {
   const { estado, dispatch, bateadorActual, bateadoresActivos, equipoAlBate } = useScout();
@@ -28,18 +29,22 @@ export default function TrackingPage() {
   useEffect(() => {
     if (modoAcumulado && bateadorActual) {
       setCargandoAcumulado(true);
-      const params = new URLSearchParams({
-        apellido: bateadorActual.apellido,
-        numero: bateadorActual.numero,
-        equipo: bateadorActual.equipo
-      });
-      fetch(`/api/jugador/stats?${params.toString()}`)
-        .then(r => r.json())
-        .then(data => {
-          if (data.turnos) setTurnosAcumulados(data.turnos);
+      db.bateadores
+        .where('[apellido+numero+equipo]')
+        .equals([bateadorActual.apellido, bateadorActual.numero, bateadorActual.equipo])
+        .toArray()
+        .then(batters => {
+          const ids = batters.map(b => b.id);
+          return db.turnos_al_bate.where('bateadorId').anyOf(ids).toArray();
+        })
+        .then(turnos => {
+          setTurnosAcumulados(turnos);
           setCargandoAcumulado(false);
         })
-        .catch(() => setCargandoAcumulado(false));
+        .catch((err) => {
+          console.error('Error fetching accumulated tracking stats:', err);
+          setCargandoAcumulado(false);
+        });
     }
   }, [modoAcumulado, bateadorActual]);
 

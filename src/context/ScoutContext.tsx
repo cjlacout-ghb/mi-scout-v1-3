@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useReducer, useEffect, useCallback } from 'react';
 import type { EstadoPartido, Bateador, TurnoAlBate, Partido } from '@/lib/types';
 import { estadoInicial, generarId } from '@/lib/storage';
+import { db, getPartidoActivo } from '@/lib/dbClient';
 
 // ─── Acciones ─────────────────────────────────────────────────────────────────
 export type Accion =
@@ -302,14 +303,41 @@ function reducer(estado: EstadoPartido, accion: Accion): EstadoPartido {
 async function syncApi(accion: Accion, nuevoEstado: EstadoPartido, oldEstado: EstadoPartido) {
   try {
     switch (accion.type) {
-      case 'INICIAR_PARTIDO':
-        await fetch('/api/partido', { method: 'POST', body: JSON.stringify(accion) });
+      case 'INICIAR_PARTIDO': {
+        const { partido, lineupVisitante, lineupLocal, perspectivaZona } = accion.payload;
+        // Mark all previous matches as finished
+        const activeMatches = await db.partidos.filter(p => !p.finalizado).toArray();
+        for (const active of activeMatches) {
+          await db.partidos.update(active.id, { finalizado: true });
+        }
+        
+        await db.partidos.put({
+          ...partido,
+          finalizado: false,
+          indiceVisitante: 0,
+          indiceLocal: 0,
+          mitadInning: 'alta',
+          inningActual: 1,
+          vueltasAlOrdenVisitante: 0,
+          vueltasAlOrdenLocal: 0,
+          perspectivaZona: perspectivaZona || 'catcher'
+        });
+        
+        const bateadores = [...lineupVisitante, ...lineupLocal].map(b => ({
+          ...b,
+          partidoId: partido.id
+        }));
+        await db.bateadores.bulkPut(bateadores);
         break;
+      }
       case 'NUEVO_PARTIDO':
-      case 'FINALIZAR_PARTIDO':
-        // En vez de DELETE, llamamos a finalizar
-        await fetch('/api/partido/finalizar', { method: 'POST' });
+      case 'FINALIZAR_PARTIDO': {
+        const activo = await db.partidos.filter(p => !p.finalizado).first();
+        if (activo) {
+          await db.partidos.update(activo.id, { finalizado: true });
+        }
         break;
+      }
       case 'SET_PERSPECTIVA':
       case 'SET_BATEADOR_ACTUAL':
       case 'SET_INNING':
@@ -317,69 +345,100 @@ async function syncApi(accion: Accion, nuevoEstado: EstadoPartido, oldEstado: Es
       case 'CAMBIAR_MITAD_INNING':
       case 'RETROCEDER_MITAD_INNING':
       case 'SELECCIONAR_JUGADOR':
-      case 'SET_MODO_ACUMULADO':
-        await fetch('/api/partido/estado', {
-          method: 'PATCH',
-          body: JSON.stringify({
-            type: accion.type,
-            payload: 'payload' in accion ? accion.payload : { estado: nuevoEstado }
-          })
-        });
+      case 'SET_MODO_ACUMULADO': {
+        const activo = await db.partidos.filter(p => !p.finalizado).first();
+        if (activo) {
+          await db.partidos.update(activo.id, {
+            indiceVisitante: nuevoEstado.indiceVisitante,
+            indiceLocal: nuevoEstado.indiceLocal,
+            mitadInning: nuevoEstado.mitadInning,
+            inningActual: nuevoEstado.inningActual,
+            vueltasAlOrdenVisitante: nuevoEstado.vueltasAlOrdenVisitante,
+            vueltasAlOrdenLocal: nuevoEstado.vueltasAlOrdenLocal,
+            perspectivaZona: nuevoEstado.perspectivaZona
+          });
+        }
         break;
+      }
       case 'AGREGAR_BATEADOR': {
         const _id = (accion as any)._id;
-        const b = { ...accion.payload, id: _id };
-        await fetch('/api/bateadores', { method: 'POST', body: JSON.stringify({ type: accion.type, payload: b }) });
+        const b = { ...accion.payload, id: _id, partidoId: nuevoEstado.partido?.id || '' };
+        await db.bateadores.put(b);
         break;
       }
       case 'AGREGAR_BATEADORES_MASIVO': {
         const _ids = (accion as any)._ids;
-        const bs = accion.payload.map((b, i) => ({ ...b, id: _ids[i] }));
-        await fetch('/api/bateadores', { method: 'POST', body: JSON.stringify({ type: accion.type, payload: bs }) });
+        const bs = accion.payload.map((b, i) => ({ ...b, id: _ids[i], partidoId: nuevoEstado.partido?.id || '' }));
+        await db.bateadores.bulkPut(bs);
         break;
       }
-      case 'EDITAR_BATEADOR':
-      case 'REORDENAR_BATEADORES':
-        await fetch('/api/bateadores', { method: 'PATCH', body: JSON.stringify(accion) });
+      case 'EDITAR_BATEADOR': {
+        await db.bateadores.update(accion.payload.id, accion.payload.datos);
         break;
+      }
+      case 'REORDENAR_BATEADORES': {
+        const updates = accion.payload.bateadores.map(b => db.bateadores.update(b.id, { orden: b.orden }));
+        await Promise.all(updates);
+        break;
+      }
       case 'SUSTITUIR_BATEADOR': {
         const entranteId = (accion as any)._nuevoId;
-        const _entrante = { ...accion.payload.entrante, id: entranteId, rol: accion.payload.rol };
-        await fetch('/api/bateadores', { method: 'PATCH', body: JSON.stringify({
-          type: accion.type,
-          payload: { ...accion.payload, entrante: _entrante }
-        })});
+        const { salienteId, entrante, inning } = accion.payload;
+        await db.bateadores.update(salienteId, {
+          activo: false,
+          reemplazadoPorId: entranteId,
+          reemplazadoAInning: inning
+        });
+        const lineup = accion.payload.rol === 'visitante' ? oldEstado.lineupVisitante : oldEstado.lineupLocal;
+        const saliente = lineup.find(b => b.id === salienteId);
+        const orden = saliente ? saliente.orden : 0;
+        const nuevoB = {
+          ...entrante,
+          id: entranteId,
+          partidoId: nuevoEstado.partido?.id || '',
+          orden,
+          activo: true,
+        };
+        await db.bateadores.put(nuevoB);
         break;
       }
       case 'REINGRESAR_ABRIDOR': {
-        // Compute sustitutoId to send
+        const { id } = accion.payload;
         const lineup = accion.payload.rol === 'visitante' ? oldEstado.lineupVisitante : oldEstado.lineupLocal;
-        const abridor = lineup.find(b => b.id === accion.payload.id);
+        const abridor = lineup.find(b => b.id === id);
         const sustitutoId = abridor?.reemplazadoPorId;
-        await fetch('/api/bateadores', { method: 'PATCH', body: JSON.stringify({
-          type: accion.type,
-          payload: { ...accion.payload, sustitutoId }
-        })});
+        
+        await db.bateadores.update(id, {
+          activo: true,
+          reemplazadoPorId: undefined,
+          reemplazadoAInning: undefined
+        });
+        if (sustitutoId) {
+          await db.bateadores.update(sustitutoId, { activo: false });
+        }
         break;
       }
       case 'REGISTRAR_TURNO': {
         const t: TurnoAlBate = {
           ...accion.payload,
           id: (accion as any)._id,
+          partidoId: nuevoEstado.partido?.id || '',
           timestamp: (accion as any)._timestamp,
         };
-        await fetch('/api/turnos', { method: 'POST', body: JSON.stringify(t) });
+        await db.turnos_al_bate.put(t);
         break;
       }
-      case 'EDITAR_TURNO_AL_BATE':
-        await fetch('/api/turnos', { method: 'PATCH', body: JSON.stringify(accion.payload) });
+      case 'EDITAR_TURNO_AL_BATE': {
+        await db.turnos_al_bate.update(accion.payload.id, accion.payload.datos);
         break;
-      case 'ELIMINAR_TURNO_AL_BATE':
-        await fetch(`/api/turnos?id=${accion.payload}`, { method: 'DELETE' });
+      }
+      case 'ELIMINAR_TURNO_AL_BATE': {
+        await db.turnos_al_bate.delete(accion.payload);
         break;
+      }
     }
   } catch (error) {
-    console.error('Error syncing to API:', error);
+    console.error('Error syncing to IndexedDB:', error);
   }
 }
 
@@ -424,25 +483,24 @@ export function ScoutProvider({ children }: { children: React.ReactNode }) {
     // 2. Compute new state for some actions
     const nuevoEstado = reducer(currentState, accion);
 
-    // 3. Sync to API in background
+    // 3. Sync to DB in background
     if (accion.type !== 'CARGAR_ESTADO') {
       syncApi(accion, nuevoEstado, currentState);
     }
   }, []);
 
-  // Fetch initial state from API
+  // Fetch initial state from IndexedDB
   useEffect(() => {
-    fetch('/api/partido')
-      .then(r => r.json())
-      .then(data => {
-        if (data.estado && data.estado.partido) {
-          dispatch({ type: 'CARGAR_ESTADO', payload: data.estado });
+    getPartidoActivo()
+      .then(activoEstado => {
+        if (activoEstado && activoEstado.partido) {
+          dispatch({ type: 'CARGAR_ESTADO', payload: activoEstado });
         }
         setMounted(true);
         setIsLoading(false);
       })
       .catch(err => {
-        console.error('Error fetching initial state', err);
+        console.error('Error fetching initial state from IndexedDB', err);
         setMounted(true);
         setIsLoading(false);
       });

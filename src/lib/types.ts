@@ -39,6 +39,7 @@ export interface Coordenadas {
 
 export interface TurnoAlBate {
   id: string;
+  partidoId?: string;
   bateadorId: string;  // ID del bateador en el lineup
   inning: number;
   zona: ZonaStrike;
@@ -52,6 +53,7 @@ export interface TurnoAlBate {
 
 export interface Bateador {
   id: string;
+  partidoId?: string;
   orden: number;         // Posición en el lineup (1-15)
   numero: string;        // Número de camiseta
   apellido: string;

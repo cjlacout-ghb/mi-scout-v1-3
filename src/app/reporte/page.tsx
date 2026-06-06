@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useScout } from '@/context/ScoutContext';
 import { calcularEstadisticas, generarReporteMD } from '@/lib/storage';
 import type { Bateador, TurnoAlBate } from '@/lib/types';
+import { db } from '@/lib/dbClient';
 
 function descargarMD(contenido: string, nombreArchivo: string) {
   const blob = new Blob([contenido], { type: 'text/markdown;charset=utf-8' });
@@ -70,14 +71,12 @@ export default function ReportePage() {
   const generarAcumulado = async (b: Bateador) => {
     setCargando(true);
     try {
-      const params = new URLSearchParams({
-        apellido: b.apellido,
-        numero: b.numero,
-        equipo: b.equipo || ''
-      });
-      const res = await fetch(`/api/jugador/stats?${params.toString()}`);
-      const data = await res.json();
-      const turnosAcumulados: TurnoAlBate[] = data.turnos || [];
+      const batters = await db.bateadores
+        .where('[apellido+numero+equipo]')
+        .equals([b.apellido, b.numero, b.equipo])
+        .toArray();
+      const ids = batters.map(x => x.id);
+      const turnosAcumulados = await db.turnos_al_bate.where('bateadorId').anyOf(ids).toArray();
 
       
       const turnosHomogeneos = turnosAcumulados.map(t => ({...t, bateadorId: b.id}));
@@ -186,15 +185,12 @@ export default function ReportePage() {
       md += `---\n\n`;
 
       for (const b of lineup) {
-        const params = new URLSearchParams({
-          apellido: b.apellido,
-          numero: b.numero,
-          equipo: b.equipo || ''
-        });
-        const res = await fetch(`/api/jugador/stats?${params.toString()}`);
-        if (!res.ok) continue;
-        const data = await res.json();
-        const turnosAcumulados: TurnoAlBate[] = data.turnos || [];
+        const batters = await db.bateadores
+          .where('[apellido+numero+equipo]')
+          .equals([b.apellido, b.numero, b.equipo])
+          .toArray();
+        const ids = batters.map(x => x.id);
+        const turnosAcumulados = await db.turnos_al_bate.where('bateadorId').anyOf(ids).toArray();
         const turnosHomogeneos = turnosAcumulados.map(t => ({...t, bateadorId: b.id}));
         const stats = calcularEstadisticas(b.id, turnosHomogeneos);
         

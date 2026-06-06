@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useScout } from '@/context/ScoutContext';
 import ModalConfirm from '@/components/ModalConfirm';
 import type { Partido } from '@/lib/types';
+import { db, getEstadoPartido } from '@/lib/dbClient';
 
 export default function HistorialPage() {
   const [partidos, setPartidos] = useState<Partido[]>([]);
@@ -15,10 +16,12 @@ export default function HistorialPage() {
   const { dispatch } = useScout();
 
   useEffect(() => {
-    fetch('/api/partidos')
-      .then(res => res.json())
-      .then(data => {
-        if (data.partidos) setPartidos(data.partidos);
+    db.partidos.toArray()
+      .then(list => {
+        const sorted = list
+          .filter(p => p.finalizado === true || (p as any).finalizado === 1)
+          .sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime());
+        setPartidos(sorted);
         setCargando(false);
       })
       .catch(() => setCargando(false));
@@ -27,11 +30,10 @@ export default function HistorialPage() {
   const cargarPartido = async (id: string) => {
     setCargandoId(id);
     try {
-      const res = await fetch(`/api/partido?id=${id}`);
-      const data = await res.json();
-      if (data.estado && data.estado.partido) {
-        data.estado.partido.finalizado = true;
-        dispatch({ type: 'CARGAR_ESTADO', payload: data.estado });
+      const estado = await getEstadoPartido(id);
+      if (estado && estado.partido) {
+        estado.partido.finalizado = true;
+        dispatch({ type: 'CARGAR_ESTADO', payload: estado });
         router.push('/stats');
       }
     } catch (err) {
@@ -44,11 +46,10 @@ export default function HistorialPage() {
   const cargarPartidoLineup = async (id: string) => {
     setCargandoId(id);
     try {
-      const res = await fetch(`/api/partido?id=${id}`);
-      const data = await res.json();
-      if (data.estado && data.estado.partido) {
-        data.estado.partido.finalizado = true;
-        dispatch({ type: 'CARGAR_ESTADO', payload: data.estado });
+      const estado = await getEstadoPartido(id);
+      if (estado && estado.partido) {
+        estado.partido.finalizado = true;
+        dispatch({ type: 'CARGAR_ESTADO', payload: estado });
         router.push('/');
       }
     } catch (err) {
@@ -64,8 +65,14 @@ export default function HistorialPage() {
 
   const confirmarEliminar = async () => {
     if (!confirmandoEliminar) return;
-    await fetch(`/api/partido?id=${confirmandoEliminar}`, { method: 'DELETE' });
-    setPartidos(prev => prev.filter(p => p.id !== confirmandoEliminar));
+    try {
+      await db.partidos.delete(confirmandoEliminar);
+      await db.bateadores.where('partidoId').equals(confirmandoEliminar).delete();
+      await db.turnos_al_bate.where('partidoId').equals(confirmandoEliminar).delete();
+      setPartidos(prev => prev.filter(p => p.id !== confirmandoEliminar));
+    } catch (err) {
+      console.error('Error eliminando partido:', err);
+    }
     setConfirmandoEliminar(null);
   };
 
@@ -76,7 +83,6 @@ export default function HistorialPage() {
   if (partidos.length === 0) {
     return (
       <div className="empty-state">
-        <div className="empty-state__icon">📚</div>
         <div className="empty-state__title">Historial vacío</div>
         <p className="empty-state__text">Cuando finalices un partido, aparecerá guardado aquí para consultas futuras.</p>
       </div>
