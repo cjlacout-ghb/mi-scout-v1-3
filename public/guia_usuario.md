@@ -1,4 +1,4 @@
-# Guía de Usuario - MiScout
+# Guía de Usuario - MiScout v1.2
 
 Bienvenido a **MiScout**, la herramienta definitiva para el seguimiento y análisis de pitcheos y zonas de strike. Esta guía te ayudará a conocer todas las funcionalidades y sacar el máximo provecho de la aplicación durante los partidos.
 

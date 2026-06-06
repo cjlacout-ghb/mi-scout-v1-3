@@ -135,7 +135,7 @@ export default function ReportePage() {
       }
 
 
-      md += `---\n\n*Generado por MiScout v1.1*\n`;
+      md += `---\n\n*Generado por MiScout v1.2*\n`;
       setPreview(md);
       setModo('acumulado');
       dispatch({ type: 'SELECCIONAR_JUGADOR', payload: b.id });
@@ -172,7 +172,7 @@ export default function ReportePage() {
       md += `---\n\n`;
     }
 
-    md += `*Generado por MiScout v1.1*\n`;
+    md += `*Generado por MiScout v1.2*\n`;
     setPreview(md);
     setModo('equipo');
     dispatch({ type: 'SET_MODO_ACUMULADO', payload: false });
@@ -215,7 +215,7 @@ export default function ReportePage() {
         md += `---\n\n`;
       }
 
-      md += `*Generado por MiScout v1.1*\n`;
+      md += `*Generado por MiScout v1.2*\n`;
       setPreview(md);
       setModo('equipo_acumulado');
       dispatch({ type: 'SET_MODO_ACUMULADO', payload: true });

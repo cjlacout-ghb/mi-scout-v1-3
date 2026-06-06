@@ -202,6 +202,6 @@ export function generarReporteMD(bateador: import('./types').Bateador, stats: Es
     md += '\n\n';
   }
 
-  md += `---\n\n*Generado por MiScout v1.1*\n`;
+  md += `---\n\n*Generado por MiScout v1.2*\n`;
   return md;
 }
