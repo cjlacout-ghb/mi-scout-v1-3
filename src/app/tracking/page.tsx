@@ -110,7 +110,7 @@ export default function TrackingPage() {
       <div className="empty-state">
         <div className="empty-state__icon">👥</div>
         <div className="empty-state__title">Line-up vacío</div>
-        <p className="empty-state__text">Cargá el primer bateador para comenzar.</p>
+        <p className="empty-state__text">Carga el primer bateador para comenzar.</p>
         <button className="btn btn-primary" style={{ marginTop: 16 }} onClick={() => setShowAgregarBateador(true)}>
           Agregar Bateador
         </button>
@@ -337,6 +337,7 @@ export default function TrackingPage() {
             className={`btn btn-sm ${!modoAcumulado ? 'btn-primary' : ''}`}
             style={{ flex: 1, background: !modoAcumulado ? '' : 'transparent', color: !modoAcumulado ? '' : 'var(--text-secondary)' }}
             onClick={() => setModoAcumulado(false)}
+            disabled={!estado.partido?.finalizado}
           >
             Este partido
           </button>
@@ -344,6 +345,7 @@ export default function TrackingPage() {
             className={`btn btn-sm ${modoAcumulado ? 'btn-primary' : ''}`}
             style={{ flex: 1, background: modoAcumulado ? '' : 'transparent', color: modoAcumulado ? '' : 'var(--text-secondary)' }}
             onClick={() => setModoAcumulado(true)}
+            disabled={!estado.partido?.finalizado}
           >
             Acumulado
           </button>
@@ -367,7 +369,7 @@ export default function TrackingPage() {
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-primary)', lineHeight: 1.2 }}>
-                Confirmá que se juega la {estado.mitadInning === 'alta' ? 'Alta' : 'Baja'} del {estado.inningActual}
+                Confirma que se juega la {estado.mitadInning === 'alta' ? 'Alta' : 'Baja'} del {estado.inningActual}
               </span>
             </div>
             <button

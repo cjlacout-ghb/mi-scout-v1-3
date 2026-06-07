@@ -275,7 +275,7 @@ function ModalCargaMasiva({
       <div className="bottom-sheet" style={{ maxHeight: '90vh', display: 'flex', flexDirection: 'column' }} onClick={(e) => e.stopPropagation()}>
         <div className="sheet-handle" />
         <h2 className="sheet-title">Line-up: {equipo.toUpperCase()}</h2>
-        <p className="sheet-subtitle">Ingresa en orden a los bateadores</p>
+        <p className="sheet-subtitle">Ingresa el orden de los bateadores</p>
         
         <div style={{ flex: 1, overflowY: 'auto', margin: '12px -24px', padding: '0 24px', display: 'flex', flexDirection: 'column', gap: 8 }}>
           {/* Cabecera miniatura */}
