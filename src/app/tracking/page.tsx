@@ -108,7 +108,6 @@ export default function TrackingPage() {
   if (bateadoresActivos.length === 0) {
     return (
       <div className="empty-state">
-        <div className="empty-state__icon">👥</div>
         <div className="empty-state__title">Line-up vacío</div>
         <p className="empty-state__text">Carga el primer bateador para comenzar.</p>
         <button className="btn btn-primary" style={{ marginTop: 16 }} onClick={() => setShowAgregarBateador(true)}>
@@ -386,15 +385,19 @@ export default function TrackingPage() {
           textAlign: 'center',
           fontSize: '0.72rem',
           letterSpacing: '0.08em',
-          color: estado.partido?.finalizado ? 'var(--text-secondary)' : 'var(--accent)',
+          color: estado.partido?.finalizado ? 'var(--text-secondary)' : (turnoEditando ? 'var(--warning)' : 'var(--accent)'),
           textTransform: 'uppercase',
           position: 'relative',
           top: 10,
           marginBottom: 4,
+          padding: turnoEditando ? '4px' : '0',
+          background: turnoEditando ? 'rgba(243, 156, 18, 0.1)' : 'transparent',
+          borderRadius: 4,
+          fontWeight: turnoEditando ? 800 : 'normal'
         }}>
           {estado.partido?.finalizado 
             ? 'PARTIDO FINALIZADO - MODO SOLO LECTURA' 
-            : (esperandoConfirmacion ? 'Confirmar resultado' : turnoEditando ? 'Reubicá el lanzamiento' : 'MARCA EL LANZAMIENTO EN LA ZONA')}
+            : (esperandoConfirmacion ? 'Confirmar resultado' : turnoEditando ? 'REUBICÁ EL LANZAMIENTO' : 'MARCA EL LANZAMIENTO EN LA ZONA')}
         </p>
         <ZonaStrikeComponent 
           onZonaClick={handleZonaClick} 
@@ -438,13 +441,17 @@ export default function TrackingPage() {
         <p className="text-xs text-secondary" style={{ marginBottom: 12 }}>Orden al bate</p>
         <div style={{ display: 'flex', alignItems: 'stretch', gap: 8 }}>
           <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4, flex: 1 }}>
-            {bateadoresActivos.map((b, i) => (
+            {(estado.partido?.finalizado ? (bateadorActual?.rol === 'visitante' ? estado.lineupVisitante : estado.lineupLocal) : bateadoresActivos).map((b, i) => (
               <button
                 key={b.id}
                 onClick={() => {
                   setEsperandoConfirmacion(false);
                   setTurnoEditando(null);
-                  dispatch({ type: 'SET_BATEADOR_ACTUAL', payload: { rol: equipoAlBate, indice: i } });
+                  if (estado.partido?.finalizado) {
+                    dispatch({ type: 'SELECCIONAR_JUGADOR', payload: b.id });
+                  } else {
+                    dispatch({ type: 'SET_BATEADOR_ACTUAL', payload: { rol: equipoAlBate, indice: i } });
+                  }
                 }}
                 style={{
                   flexShrink: 0,
@@ -460,6 +467,8 @@ export default function TrackingPage() {
                   flexDirection: 'column',
                   alignItems: 'center',
                   gap: 1,
+                  opacity: b.activo ? 1 : 0.5,
+                  textDecoration: b.activo ? 'none' : 'line-through',
                 }}
               >
                 <span style={{ fontSize: '0.6rem' }}>{b.orden}.</span>
@@ -509,6 +518,8 @@ export default function TrackingPage() {
                 borderRadius: 8,
                 marginBottom: 6,
                 borderLeft: `3px solid ${t.resultado === 'HIT' ? 'var(--danger)' : t.resultado === 'OUT' || t.resultado.startsWith('K') ? 'var(--success)' : 'var(--info)'}`,
+                border: t.id === turnoEditando?.id ? '2px solid var(--warning)' : undefined,
+                boxShadow: t.id === turnoEditando?.id ? '0 0 8px rgba(243, 156, 18, 0.4)' : 'none',
               }}
             >
               <span className="text-xs text-secondary">Inn {t.inning}</span>
@@ -522,15 +533,17 @@ export default function TrackingPage() {
                 marginRight: 4
               }}>
                 {t.resultado}
-                {t.detalleHit && ` (${t.detalleHit.tipo}) ${t.detalleHit.ubicacion} ${t.detalleHit.calidad}`}
-                {t.detalleOut && ` (${t.detalleOut.tipo}) ${t.detalleOut.defensor} ${t.detalleOut.calidad}`}
+                {t.detalleHit && ` (${t.detalleHit.tipo}) al ${t.detalleHit.ubicacion} (${t.detalleHit.calidad})`}
+                {t.detalleOut && ` (${t.detalleOut.tipo}) al ${t.detalleOut.defensor} (${t.detalleOut.calidad})`}
               </span>
               {!estado.partido?.finalizado && (
                 <div style={{ display: 'flex', gap: 8, opacity: 0.7 }}>
                   <button
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.stopPropagation();
                       setEsperandoConfirmacion(false);
                       setTurnoEditando(t);
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
                     }}
                     style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.9rem', color: 'var(--text-secondary)' }}
                     title="Editar"

@@ -147,15 +147,15 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         {NAV_ITEMS.map(({ href, label, Icon }) => {
           const isActive = href === '/' ? pathname === '/' : pathname.startsWith(href);
           return (
-            <button
+            <Link
               key={href}
+              href={href}
               className={`nav-item ${isActive ? 'active' : ''}`}
-              onClick={() => router.push(href)}
               aria-label={label}
             >
               <Icon />
               {label}
-            </button>
+            </Link>
           );
         })}
       </nav>

@@ -470,21 +470,26 @@ export default function LineupPage() {
                 <div
                   className={`lineup-row${esActual ? ' current' : ''}${!b.activo ? ' inactivo' : ''}`}
                   onClick={() => {
-                    if (!b.activo || idxActivo === undefined) return;
                     if (estado.partido?.finalizado) {
                       dispatch({ type: 'SET_EQUIPO_AL_BATE', payload: activeTab });
+                      dispatch({ type: 'SELECCIONAR_JUGADOR', payload: b.id });
+                      return;
                     }
+                    if (!b.activo || idxActivo === undefined) return;
                     seleccionarAlBate(idxActivo);
                   }}
                   onDoubleClick={() => {
-                    if (!b.activo || idxActivo === undefined) return;
                     if (estado.partido?.finalizado) {
                       dispatch({ type: 'SET_EQUIPO_AL_BATE', payload: activeTab });
+                      dispatch({ type: 'SELECCIONAR_JUGADOR', payload: b.id });
+                      router.push('/tracking');
+                      return;
                     }
+                    if (!b.activo || idxActivo === undefined) return;
                     seleccionarAlBate(idxActivo);
                     router.push('/tracking');
                   }}
-                  style={{ cursor: b.activo ? 'pointer' : 'default' }}
+                  style={{ cursor: (b.activo || estado.partido?.finalizado) ? 'pointer' : 'default' }}
                 >
                   <span className="lineup-orden">{b.orden}.</span>
                   <div className="lineup-numero">{b.numero}</div>

@@ -229,8 +229,12 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
-.btn:active {
+.btn:active:not(:disabled) {
   transform: scale(0.97);
+}
+
+.btn:disabled {
+  cursor: default;
 }
 
 .btn-primary {
@@ -630,7 +634,7 @@ body {
   border-radius: 2px;
 }
 
-.zona-esquina:hover  { background: var(--accent-dim); z-index: 50; }
+.zona-esquina:hover  { background: var(--accent-dim); z-index: 5; }
 .zona-esquina:active { background: rgba(245, 166, 35, 0.25); }
 
 /* Cada esquina: 20% x 20% del total */

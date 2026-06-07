@@ -136,7 +136,7 @@ import type { ZonaStrike as ZS } from './types';
 
 export function generarReporteMD(bateador: import('./types').Bateador, stats: EstadisticasBateador, turnos: import('./types').TurnoAlBate[], partido: import('./types').Partido): string {
   let md = `# Reporte de Scouting — ${bateador.apellido}${bateador.nombre ? `, ${bateador.nombre}` : ''} (#${bateador.numero})\n\n`;
-  md += `**Equipo:** ${bateador.equipo}\n\n`;
+  md += `Equipo: ${bateador.equipo}\n\n`;
   const avg = stats.promedio.toFixed(3).replace('0.', '.');
   const misTurnos = turnos.filter((t) => t.bateadorId === bateador.id);
 
@@ -151,8 +151,8 @@ export function generarReporteMD(bateador: import('./types').Bateador, stats: Es
       return ab > 0 && v.hits === 0;
     })
     .sort((a, b) => b[1].pitches - a[1].pitches);
-  md += `**Partido:** ${partido.descripcion}  \n`;
-  md += `**Fecha:** ${new Date(partido.fecha).toLocaleDateString('es-AR')}\n\n`;
+  md += `Partido: ${partido.descripcion}  \n`;
+  md += `Fecha: ${new Date(partido.fecha).toLocaleDateString('es-AR')}\n\n`;
   md += `---\n\n`;
 
   md += `## Resumen\n\n`;
@@ -172,7 +172,7 @@ export function generarReporteMD(bateador: import('./types').Bateador, stats: Es
     md += `## Zonas Calientes\n\n`;
     for (const [z, v] of zonasCalientes) {
       const pct = v.pitches > 0 ? Math.round((v.hits / v.pitches) * 100) : 0;
-      md += `- **Zona ${z}**: ${v.hits} hit(s) en ${v.pitches} pitch(es) — ${pct}% efectividad\n`;
+      md += `- Zona ${z}: ${v.hits} hit(s) en ${v.pitches} pitch(es) — ${pct}% efectividad\n`;
     }
     md += '\n';
   }
@@ -180,7 +180,7 @@ export function generarReporteMD(bateador: import('./types').Bateador, stats: Es
   if (zonasFrias.length > 0) {
     md += `## Zonas Frías\n\n`;
     for (const [z, v] of zonasFrias) {
-      md += `- **Zona ${z}**: 0 hits en ${v.pitches} pitch(es)\n`;
+      md += `- Zona ${z}: 0 hits en ${v.pitches} pitch(es)\n`;
     }
     md += '\n';
   }
@@ -190,18 +190,19 @@ export function generarReporteMD(bateador: import('./types').Bateador, stats: Es
   for (let i = 0; i < misTurnos.length; i++) {
     const t = misTurnos[i];
     md += `### Turno ${i + 1} — Inning ${t.inning}\n\n`;
-    md += `- **Zona:** ${t.zona}\n`;
-    md += `- **Tipo de pitch:** ${t.tipoPitch.charAt(0).toUpperCase() + t.tipoPitch.slice(1)}\n`;
-    md += `- **Resultado:** ${t.resultado}`;
+    md += `- Zona: ${t.zona}\n`;
+    md += `- Tipo de pitch: ${t.tipoPitch.charAt(0).toUpperCase() + t.tipoPitch.slice(1)}\n`;
+    md += `- Resultado: ${t.resultado}`;
     if (t.detalleOut) {
-      md += ` → ${t.detalleOut.tipo.charAt(0).toUpperCase() + t.detalleOut.tipo.slice(1)} al #${t.detalleOut.defensor} (${t.detalleOut.calidad.toUpperCase()})`;
+      md += ` → ${t.detalleOut.tipo.charAt(0).toUpperCase() + t.detalleOut.tipo.slice(1)} al ${t.detalleOut.defensor} (${t.detalleOut.calidad.toUpperCase()})`;
     }
     if (t.detalleHit) {
-      md += ` → ${t.detalleHit.tipo.charAt(0).toUpperCase() + t.detalleHit.tipo.slice(1)} a zona ${t.detalleHit.ubicacion} (${t.detalleHit.calidad.toUpperCase()})`;
+      md += ` → ${t.detalleHit.tipo.charAt(0).toUpperCase() + t.detalleHit.tipo.slice(1)} al ${t.detalleHit.ubicacion} (${t.detalleHit.calidad.toUpperCase()})`;
     }
     md += '\n\n';
   }
 
-  md += `---\n\n*Generado por MiScout v1.2*\n`;
+  md += `---\n\nGenerado por MiScout v1.2\n`;
   return md;
 }
+

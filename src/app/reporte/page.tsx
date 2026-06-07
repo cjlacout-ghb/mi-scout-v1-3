@@ -268,32 +268,32 @@ export default function ReportePage() {
           <div style={{ display: 'flex', gap: 8, background: 'var(--bg-elevated)', padding: 4, borderRadius: 8 }}>
             <button
               className={`btn btn-sm ${modo !== 'acumulado' ? 'btn-primary' : ''}`}
-              disabled={!selId || cargando}
+              disabled={!selId || cargando || !partido.finalizado}
               onClick={() => {
                 const b = todos.find((x) => x.id === selId);
                 if (b) generarIndividual(b);
               }}
               style={{
                 flex: 1,
-                background: (!selId || cargando) ? 'transparent' : (modo !== 'acumulado' ? '' : 'transparent'),
-                color: (!selId || cargando) ? 'var(--text-secondary)' : (modo !== 'acumulado' ? '' : 'var(--text-secondary)'),
-                opacity: (!selId || cargando) ? 0.5 : 1
+                background: (!selId || cargando || !partido.finalizado) ? 'transparent' : (modo !== 'acumulado' ? '' : 'transparent'),
+                color: (!selId || cargando || !partido.finalizado) ? 'var(--text-secondary)' : (modo !== 'acumulado' ? '' : 'var(--text-secondary)'),
+                opacity: (!selId || cargando || !partido.finalizado) ? 0.5 : 1
               }}
             >
               Este partido
             </button>
             <button
               className={`btn btn-sm ${modo === 'acumulado' ? 'btn-primary' : ''}`}
-              disabled={!selId || cargando}
+              disabled={!selId || cargando || !partido.finalizado}
               onClick={() => {
                 const b = todos.find((x) => x.id === selId);
                 if (b) generarAcumulado(b);
               }}
               style={{
                 flex: 1,
-                background: (!selId || cargando) ? 'transparent' : (modo === 'acumulado' ? '' : 'transparent'),
-                color: (!selId || cargando) ? 'var(--text-secondary)' : (modo === 'acumulado' ? '' : 'var(--text-secondary)'),
-                opacity: (!selId || cargando) ? 0.5 : 1
+                background: (!selId || cargando || !partido.finalizado) ? 'transparent' : (modo === 'acumulado' ? '' : 'transparent'),
+                color: (!selId || cargando || !partido.finalizado) ? 'var(--text-secondary)' : (modo === 'acumulado' ? '' : 'var(--text-secondary)'),
+                opacity: (!selId || cargando || !partido.finalizado) ? 0.5 : 1
               }}
             >
               {cargando ? 'Cargando...' : 'Acumulado'}
@@ -316,32 +316,32 @@ export default function ReportePage() {
           <div style={{ display: 'flex', gap: 8, background: 'var(--bg-elevated)', padding: 4, borderRadius: 8 }}>
             <button
               className={`btn btn-sm ${modo !== 'equipo_acumulado' ? 'btn-primary' : ''}`}
-              disabled={!selEquipo || cargando}
+              disabled={!selEquipo || cargando || !partido.finalizado}
               onClick={() => {
                 if (selEquipo === 'visitante') generarEquipo(partido.visitante, estado.lineupVisitante);
                 else if (selEquipo === 'local') generarEquipo(partido.local, estado.lineupLocal);
               }}
               style={{
                 flex: 1,
-                background: (!selEquipo || cargando) ? 'transparent' : (modo !== 'equipo_acumulado' ? '' : 'transparent'),
-                color: (!selEquipo || cargando) ? 'var(--text-secondary)' : (modo !== 'equipo_acumulado' ? '' : 'var(--text-secondary)'),
-                opacity: (!selEquipo || cargando) ? 0.5 : 1
+                background: (!selEquipo || cargando || !partido.finalizado) ? 'transparent' : (modo !== 'equipo_acumulado' ? '' : 'transparent'),
+                color: (!selEquipo || cargando || !partido.finalizado) ? 'var(--text-secondary)' : (modo !== 'equipo_acumulado' ? '' : 'var(--text-secondary)'),
+                opacity: (!selEquipo || cargando || !partido.finalizado) ? 0.5 : 1
               }}
             >
               Este partido
             </button>
             <button
               className={`btn btn-sm ${modo === 'equipo_acumulado' ? 'btn-primary' : ''}`}
-              disabled={!selEquipo || cargando}
+              disabled={!selEquipo || cargando || !partido.finalizado}
               onClick={() => {
                 if (selEquipo === 'visitante') generarEquipoAcumulado(partido.visitante, estado.lineupVisitante);
                 else if (selEquipo === 'local') generarEquipoAcumulado(partido.local, estado.lineupLocal);
               }}
               style={{
                 flex: 1,
-                background: (!selEquipo || cargando) ? 'transparent' : (modo === 'equipo_acumulado' ? '' : 'transparent'),
-                color: (!selEquipo || cargando) ? 'var(--text-secondary)' : (modo === 'equipo_acumulado' ? '' : 'var(--text-secondary)'),
-                opacity: (!selEquipo || cargando) ? 0.5 : 1
+                background: (!selEquipo || cargando || !partido.finalizado) ? 'transparent' : (modo === 'equipo_acumulado' ? '' : 'transparent'),
+                color: (!selEquipo || cargando || !partido.finalizado) ? 'var(--text-secondary)' : (modo === 'equipo_acumulado' ? '' : 'var(--text-secondary)'),
+                opacity: (!selEquipo || cargando || !partido.finalizado) ? 0.5 : 1
               }}
             >
               {cargando ? 'Cargando...' : 'Acumulado'}

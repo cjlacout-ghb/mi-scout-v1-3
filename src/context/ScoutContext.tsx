@@ -397,6 +397,7 @@ async function syncApi(accion: Accion, nuevoEstado: EstadoPartido, oldEstado: Es
           id: entranteId,
           partidoId: nuevoEstado.partido?.id || '',
           orden,
+          rol: accion.payload.rol,
           activo: true,
         };
         await db.bateadores.put(nuevoB);

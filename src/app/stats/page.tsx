@@ -218,14 +218,16 @@ export default function StatsPage() {
         <div style={{ display: 'flex', gap: 8, background: 'var(--bg-elevated)', padding: 4, borderRadius: 8 }}>
           <button
             className={`btn btn-sm ${!modoAcumulado ? 'btn-primary' : ''}`}
-            style={{ flex: 1, background: !modoAcumulado ? '' : 'transparent', color: !modoAcumulado ? '' : 'var(--text-secondary)' }}
+            style={{ flex: 1, background: !modoAcumulado ? '' : 'transparent', color: !modoAcumulado ? '' : 'var(--text-secondary)', opacity: !estado.partido?.finalizado ? 0.5 : 1 }}
+            disabled={!estado.partido?.finalizado}
             onClick={() => setModoAcumulado(false)}
           >
             Este partido
           </button>
           <button
             className={`btn btn-sm ${modoAcumulado ? 'btn-primary' : ''}`}
-            style={{ flex: 1, background: modoAcumulado ? '' : 'transparent', color: modoAcumulado ? '' : 'var(--text-secondary)' }}
+            style={{ flex: 1, background: modoAcumulado ? '' : 'transparent', color: modoAcumulado ? '' : 'var(--text-secondary)', opacity: !estado.partido?.finalizado ? 0.5 : 1 }}
+            disabled={!estado.partido?.finalizado}
             onClick={() => setModoAcumulado(true)}
           >
             Acumulado

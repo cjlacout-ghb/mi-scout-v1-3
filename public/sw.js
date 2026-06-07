@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mi-scout-v1';
+const CACHE_NAME = 'mi-scout-v1.1';
 
 // Assets to precache on install
 const PRECACHE_URLS = [
