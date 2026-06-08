@@ -178,14 +178,14 @@ export default function StatsPage() {
           <div style={{ display: 'flex', gap: 4, background: 'var(--bg-elevated)', padding: 3, borderRadius: 6 }}>
             <button
               className="btn btn-sm"
-              style={{ padding: '2px 8px', fontSize: '0.65rem', background: !ordenarPorAvg ? 'var(--bg-surface)' : 'transparent', color: !ordenarPorAvg ? 'var(--text-primary)' : 'var(--text-secondary)', border: !ordenarPorAvg ? '1px solid var(--border)' : 'none' }}
+              style={{ padding: '2px 8px', fontSize: '0.65rem', background: !ordenarPorAvg ? 'var(--accent)' : 'transparent', color: !ordenarPorAvg ? '#000' : 'var(--text-secondary)', border: !ordenarPorAvg ? '1px solid var(--accent)' : 'none', fontWeight: !ordenarPorAvg ? 'bold' : 'normal' }}
               onClick={() => setOrdenarPorAvg(false)}
             >
               Orden al bate
             </button>
             <button
               className="btn btn-sm"
-              style={{ padding: '2px 8px', fontSize: '0.65rem', background: ordenarPorAvg ? 'var(--bg-surface)' : 'transparent', color: ordenarPorAvg ? 'var(--accent)' : 'var(--text-secondary)', border: ordenarPorAvg ? '1px solid var(--border)' : 'none' }}
+              style={{ padding: '2px 8px', fontSize: '0.65rem', background: ordenarPorAvg ? 'var(--accent)' : 'transparent', color: ordenarPorAvg ? '#000' : 'var(--text-secondary)', border: ordenarPorAvg ? '1px solid var(--accent)' : 'none', fontWeight: ordenarPorAvg ? 'bold' : 'normal' }}
               onClick={() => setOrdenarPorAvg(true)}
             >
               AVG ↓

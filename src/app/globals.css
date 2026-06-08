@@ -17,10 +17,10 @@
 
   /* Heat map */
   --heat-hot:      #E74C3C;
-  --heat-warm:     #9B59B6;
-  --heat-neutral:  #3498DB;
-  --heat-cool:     #2EAD6A;
-  --heat-cold:     #27AE60;
+  --heat-warm:     #877D4E;
+  --heat-neutral:  #27AE60;
+  --heat-cool:     #2EA39E;
+  --heat-cold:     #3498DB;
 
   /* Status */
   --success:       #27AE60;
