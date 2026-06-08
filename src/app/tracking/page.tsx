@@ -46,7 +46,7 @@ export default function TrackingPage() {
           setCargandoAcumulado(false);
         });
     }
-  }, [modoAcumulado, bateadorActual]);
+  }, [modoAcumulado, bateadorActual?.id]);
 
   useEffect(() => {
     setNotas(bateadorActual?.notas || '');

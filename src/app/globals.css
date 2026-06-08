@@ -15,16 +15,15 @@
   --accent-dim:    rgba(245, 166, 35, 0.15);
   --accent-border: rgba(245, 166, 35, 0.35);
 
-  /* Heat map */
-  --heat-hot:      #E74C3C;
-  --heat-warm:     #877D4E;
-  --heat-neutral:  #27AE60;
-  --heat-cool:     #2EA39E;
-  --heat-cold:     #3498DB;
+  --heat-hot:      #F15B40;
+  --heat-warm:     #F58220;
+  --heat-neutral:  #FFC20E;
+  --heat-cool:     #B2D34A;
+  --heat-cold:     #62BB46;
 
   /* Status */
-  --success:       #27AE60;
-  --danger:        #E74C3C;
+  --success:       #62BB46;
+  --danger:        #F15B40;
   --warning:       #F39C12;
   --info:          #3498DB;
 

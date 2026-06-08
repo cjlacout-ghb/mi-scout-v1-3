@@ -33,14 +33,14 @@ const ZONA_OFFSET: Record<ZonaStrike, { top: string; left: string }> = {
 };
 
 function heatColor(intensity: number): string {
-  // 0 = cold (blue) → 0.5 = neutral (green) → 1 = hot (red)
+  // 0 = cold (#62BB46) → 0.5 = neutral (#FFC20E) → 1 = hot (#F15B40)
   if (intensity < 0) return 'transparent';
   const stops = [
-    [0.0,  [52,  152, 219]],  // cold  — #3498DB (blue)
-    [0.25, [46,  163, 158]],  // cool  — #2EA39E (teal)
-    [0.5,  [39,  174, 96 ]],  // neutral — #27AE60 (green)
-    [0.75, [135, 125, 78 ]],  // warm  — #877D4E (olive)
-    [1.0,  [231, 76,  60 ]],  // hot   — #E74C3C (red)
+    [0.0,  [98,  187, 70 ]],  // cold  — #62BB46
+    [0.25, [178, 211, 74 ]],  // cool  — #B2D34A
+    [0.5,  [255, 194, 14 ]],  // neutral — #FFC20E
+    [0.75, [245, 130, 32 ]],  // warm  — #F58220
+    [1.0,  [241, 91,  64 ]],  // hot   — #F15B40
   ] as [number, number[]][];
 
   let lo = stops[0], hi = stops[stops.length - 1];

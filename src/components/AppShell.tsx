@@ -104,7 +104,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                           background: 'var(--bg-elevated)', opacity: 0.4 }} />
           ) : partidoInfo ? (
             <>
-              <div>{new Date(partidoInfo.fecha).toLocaleDateString('es-AR')}</div>
+              <div>{new Date(partidoInfo.fecha + 'T12:00:00').toLocaleDateString('es-AR')}</div>
               <div style={{ fontWeight: 700, fontSize: '0.8rem', 
                             color: 'var(--text-primary)', textTransform: 'uppercase', 
                             letterSpacing: '0.04em' }}>

@@ -11,11 +11,11 @@ import type { Bateador, ZonaStrike, TurnoAlBate } from '@/lib/types';
 function valueColor(val: number | null): string {
   if (val === null) return 'var(--text-secondary)';
   const stops = [
-    [0.0,  [39,  174, 96 ]],  // cold  — green
-    [0.25, [46,  173, 150]],  // cool  — teal
-    [0.5,  [52,  152, 219]],  // neutral — blue
-    [0.75, [155, 89,  182]],  // warm  — purple
-    [1.0,  [231, 76,  60 ]],  // hot   — red
+    [0.0,  [98,  187, 70 ]],  // cold  — #62BB46
+    [0.25, [178, 211, 74 ]],  // cool  — #B2D34A
+    [0.5,  [255, 194, 14 ]],  // neutral — #FFC20E
+    [0.75, [245, 130, 32 ]],  // warm  — #F58220
+    [1.0,  [241, 91,  64 ]],  // hot   — #F15B40
   ] as [number, number[]][];
 
   let lo = stops[0], hi = stops[stops.length - 1];
@@ -91,7 +91,7 @@ export default function StatsPage() {
           setCargandoAcumulado(false);
         });
     }
-  }, [modoAcumulado, bateadorSel]);
+  }, [modoAcumulado, bateadorSel?.id]);
 
   if (!estado.partido) {
     return (

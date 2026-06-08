@@ -13,6 +13,7 @@ export type Accion =
   | { type: 'AGREGAR_BATEADOR'; payload: Omit<Bateador, 'id'> }
   | { type: 'AGREGAR_BATEADORES_MASIVO'; payload: Array<Omit<Bateador, 'id'>> }
   | { type: 'EDITAR_BATEADOR'; payload: { id: string; rol: 'visitante' | 'local'; datos: Partial<Omit<Bateador, 'id'>> } }
+  | { type: 'ELIMINAR_BATEADOR'; payload: { id: string; rol: 'visitante' | 'local' } }
   | { type: 'REORDENAR_BATEADORES'; payload: { rol: 'visitante' | 'local'; bateadores: Bateador[] } }
   | { type: 'SUSTITUIR_BATEADOR'; payload: { salienteId: string; rol: 'visitante' | 'local'; entrante: Omit<Bateador, 'id' | 'orden'>; inning: number } }
   | { type: 'REINGRESAR_ABRIDOR'; payload: { id: string; rol: 'visitante' | 'local' } }
@@ -143,6 +144,17 @@ function reducer(estado: EstadoPartido, accion: Accion): EstadoPartido {
 
       if (isVisitante) return { ...estado, lineupVisitante: newLineup };
       return { ...estado, lineupLocal: newLineup };
+    }
+
+    case 'ELIMINAR_BATEADOR': {
+      const { id, rol } = accion.payload;
+      const isVisitante = rol === 'visitante';
+      const lineup = isVisitante ? estado.lineupVisitante : estado.lineupLocal;
+      const newLineup = lineup.filter((b) => b.id !== id);
+      return {
+        ...estado,
+        [isVisitante ? 'lineupVisitante' : 'lineupLocal']: newLineup
+      };
     }
 
     case 'REINGRESAR_ABRIDOR': {
@@ -401,6 +413,10 @@ async function syncApi(accion: Accion, nuevoEstado: EstadoPartido, oldEstado: Es
           activo: true,
         };
         await db.bateadores.put(nuevoB);
+        break;
+      }
+      case 'ELIMINAR_BATEADOR': {
+        await db.bateadores.delete(accion.payload.id);
         break;
       }
       case 'REINGRESAR_ABRIDOR': {

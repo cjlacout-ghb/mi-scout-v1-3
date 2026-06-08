@@ -152,7 +152,7 @@ export function generarReporteMD(bateador: import('./types').Bateador, stats: Es
     })
     .sort((a, b) => b[1].pitches - a[1].pitches);
   md += `Partido: ${partido.descripcion}  \n`;
-  md += `Fecha: ${new Date(partido.fecha).toLocaleDateString('es-AR')}\n\n`;
+  md += `Fecha: ${new Date(partido.fecha + 'T12:00:00').toLocaleDateString('es-AR')}\n\n`;
   md += `---\n\n`;
 
   md += `## Resumen\n\n`;

@@ -36,18 +36,12 @@ export async function getEstadoPartido(partidoId: string): Promise<EstadoPartido
   const bateadores = await db.bateadores.where('partidoId').equals(partidoId).sortBy('orden');
   const turnosAlBate = await db.turnos_al_bate.where('partidoId').equals(partidoId).toArray();
   
-  // Parche para sustitutos que se guardaron sin "rol"
-  let patched = true;
-  while (patched) {
-    patched = false;
-    for (const b of bateadores) {
-      if (!b.rol) {
-        const saliente = bateadores.find(x => x.reemplazadoPorId === b.id);
-        if (saliente && saliente.rol) {
-          b.rol = saliente.rol;
-          await db.bateadores.update(b.id, { rol: b.rol });
-          patched = true;
-        }
+  // Parche para sustitutos que se guardaron sin "rol" (solo en memoria)
+  for (const b of bateadores) {
+    if (!b.rol) {
+      const saliente = bateadores.find(x => x.reemplazadoPorId === b.id);
+      if (saliente && saliente.rol) {
+        b.rol = saliente.rol;
       }
     }
   }

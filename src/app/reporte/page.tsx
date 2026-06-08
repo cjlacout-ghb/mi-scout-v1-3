@@ -149,7 +149,7 @@ export default function ReportePage() {
   const generarEquipo = (equipo: string, lineup: Bateador[]) => {
     let md = `# Reporte de Scouting — Equipo ${equipo}\n\n`;
     md += `**Partido:** ${partido.descripcion}  \n`;
-    md += `**Fecha:** ${new Date(partido.fecha).toLocaleDateString('es-AR')}\n\n`;
+    md += `**Fecha:** ${new Date(partido.fecha + 'T12:00:00').toLocaleDateString('es-AR')}\n\n`;
     md += `---\n\n`;
 
     for (const b of lineup) {
