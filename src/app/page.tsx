@@ -474,6 +474,7 @@ export default function LineupPage() {
                     if (estado.partido?.finalizado) {
                       dispatch({ type: 'SET_EQUIPO_AL_BATE', payload: activeTab });
                       dispatch({ type: 'SELECCIONAR_JUGADOR', payload: b.id });
+                      router.push('/stats');
                       return;
                     }
                     if (!b.activo || idxActivo === undefined) return;
@@ -483,7 +484,7 @@ export default function LineupPage() {
                     if (estado.partido?.finalizado) {
                       dispatch({ type: 'SET_EQUIPO_AL_BATE', payload: activeTab });
                       dispatch({ type: 'SELECCIONAR_JUGADOR', payload: b.id });
-                      router.push('/tracking');
+                      router.push('/stats');
                       return;
                     }
                     if (!b.activo || idxActivo === undefined) return;
