@@ -202,6 +202,10 @@ export function generarReporteMD(bateador: import('./types').Bateador, stats: Es
     md += '\n\n';
   }
 
+  if (bateador.notas && bateador.notas.trim() !== '') {
+    md += `---\n\n## Notas sobre el jugador\n\n${bateador.notas.trim()}\n\n`;
+  }
+
   md += `---\n\nGenerado por MiScout v1.2\n`;
   return md;
 }

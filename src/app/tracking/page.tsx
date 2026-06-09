@@ -403,7 +403,7 @@ export default function TrackingPage() {
           onZonaClick={handleZonaClick} 
           marcadores={marcadores} 
           ladoBateo={bateadorActual?.ladoBateo} 
-          perspectiva={estado.perspectivaZona} 
+          perspectiva={estado.partido?.finalizado ? 'catcher' : estado.perspectivaZona} 
         />
         {!estado.partido?.finalizado && esperandoConfirmacion && (
           <div style={{ display: 'flex', justifyContent: 'center', gap: 12, marginTop: 16 }}>
