@@ -438,7 +438,18 @@ export default function TrackingPage() {
       </div>
 
       <div style={{ padding: '24px 16px 16px' }}>
-        <p className="text-xs text-secondary" style={{ marginBottom: 12 }}>Orden al bate</p>
+        <div style={{ display: 'flex', gap: 8, marginBottom: 12, alignItems: 'center' }}>
+          <div style={{ flex: 1 }}>
+            <p className="text-xs text-secondary" style={{ margin: 0 }}>Orden al bate</p>
+          </div>
+          {!estado.partido?.finalizado && (
+            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <p className="text-xs text-secondary" style={{ margin: 0, textAlign: 'right' }}>
+                Cambio inn
+              </p>
+            </div>
+          )}
+        </div>
         <div style={{ display: 'flex', alignItems: 'stretch', gap: 8 }}>
           <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4, flex: 1 }}>
             {(estado.partido?.finalizado ? (bateadorActual?.rol === 'visitante' ? estado.lineupVisitante : estado.lineupLocal) : bateadoresActivos).map((b, i) => (
