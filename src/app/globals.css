@@ -811,22 +811,21 @@ body {
 /* ─── Stat Cards ─────────────────────────────────────────────────────────────── */
 .stats-row {
   display: flex;
-  gap: 8px;
-  overflow-x: auto;
+  gap: 6px;
   padding: 0 16px 8px;
-  scrollbar-width: none;
+  width: 100%;
 }
 
 .stats-row::-webkit-scrollbar { display: none; }
 
 .stat-card {
-  flex-shrink: 0;
+  flex: 1;
+  min-width: 0;
   background: var(--bg-elevated);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 10px 14px;
+  padding: 10px 4px;
   text-align: center;
-  min-width: 60px;
 }
 
 .stat-card__value {
