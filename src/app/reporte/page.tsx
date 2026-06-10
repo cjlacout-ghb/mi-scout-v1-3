@@ -357,13 +357,13 @@ export default function ReportePage() {
           <div
             className="card"
             style={{
-              fontFamily: '"Courier New", Courier, monospace',
-              fontSize: '0.8rem',
+              fontFamily: 'Consolas, monospace',
+              fontSize: '0.9rem',
               lineHeight: 1.6,
               maxHeight: 400,
               overflowY: 'auto',
               whiteSpace: 'pre-wrap',
-              color: 'var(--text-secondary)',
+              color: 'var(--text-primary)',
               background: 'var(--bg-elevated)',
             }}
           >

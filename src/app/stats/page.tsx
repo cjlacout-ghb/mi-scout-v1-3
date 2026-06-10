@@ -292,7 +292,7 @@ export default function StatsPage() {
                     <th style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>Pitches</th>
                     <th style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>AB</th>
                     <th style={{ textAlign: 'center' }}>Hits</th>
-                    <th style={{ textAlign: 'center' }}>Outs</th>
+                    <th style={{ textAlign: 'center' }}>A/F</th>
                     <th style={{ textAlign: 'center' }}>K</th>
                     <th style={{ textAlign: 'center' }}>AVG</th>
                   </tr>

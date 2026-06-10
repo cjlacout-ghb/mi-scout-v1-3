@@ -77,7 +77,7 @@ En la sección de **Stats** (`/stats`), tendrás acceso a un panel detallado con
 ### Métricas Disponibles
 - Turnos al bate (AB), Hits (H), Promedio de Bateo (AVG).
 - Desglose de Hits (Dobles, Triples, HR).
-- Ponches (KS, KL) y Bases por Bolas (BB/HBP).
+- Asistencias y Flys (A/F), Ponches (KS, KL) y Bases por Bolas (BB/HBP).
 - **Rendimiento por Zona**: Efectividad del bateador según en qué cuadrante entró el lanzamiento, visualizado con un mapa de calor (heat map) que va desde verde (frío/bajo rendimiento) hasta rojo (caliente/alto rendimiento).
   *(Nota Importante de Diseño: Todas las estadísticas y zonas de strike en esta sección SIEMPRE se muestran desde la perspectiva del Catcher, sin importar la perspectiva elegida al momento del tracking).*
 - **Rendimiento por Tipo de Pitch**: Información sobre el desempeño del bateador frente a curvas, drops, cambios, risers, etc.
