@@ -357,8 +357,8 @@ export default function ReportePage() {
           <div
             className="card"
             style={{
-              fontFamily: 'Consolas, monospace',
-              fontSize: '0.9rem',
+              fontFamily: '"Courier New", Courier, monospace',
+              fontSize: '0.8rem',
               lineHeight: 1.6,
               maxHeight: 400,
               overflowY: 'auto',

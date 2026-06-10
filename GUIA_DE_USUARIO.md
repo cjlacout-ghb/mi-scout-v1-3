@@ -49,6 +49,13 @@ Una vez que el turno finaliza, debes seleccionar el resultado:
   - **Tipo de Hit**: Bunt, Single, Doble, Triple, Home Run, Infield Hit.
   - **Ubicación y Calidad de Contacto**.
 
+### Código de Colores de Resultados
+La aplicación utiliza un esquema de colores estandarizado para identificar rápidamente los resultados de los turnos en el historial, estadísticas y puntos de impacto en la zona de strike:
+- **Rojo**: HIT
+- **Verde**: OUT
+- **Azul**: Ponches (KS, KL)
+- **Gris**: Base por Bolas (BB) / Golpeado (HBP)
+
 ### Confirmación y Edición
 - Después de registrar un resultado, la app entra en modo de **confirmación** donde puedes:
   - **Confirmar**: Aceptar el registro y avanzar al siguiente bateador.
@@ -77,10 +84,10 @@ En la sección de **Stats** (`/stats`), tendrás acceso a un panel detallado con
 ### Métricas Disponibles
 - Turnos al bate (AB), Hits (H), Promedio de Bateo (AVG).
 - Desglose de Hits (Dobles, Triples, HR).
-- Asistencias y Flys (A/F), Ponches (KS, KL) y Bases por Bolas (BB/HBP).
+- Ponches (KS, KL) y Bases por Bolas (BB/HBP).
 - **Rendimiento por Zona**: Efectividad del bateador según en qué cuadrante entró el lanzamiento, visualizado con un mapa de calor (heat map) que va desde verde (frío/bajo rendimiento) hasta rojo (caliente/alto rendimiento).
   *(Nota Importante de Diseño: Todas las estadísticas y zonas de strike en esta sección SIEMPRE se muestran desde la perspectiva del Catcher, sin importar la perspectiva elegida al momento del tracking).*
-- **Rendimiento por Tipo de Pitch**: Información sobre el desempeño del bateador frente a curvas, drops, cambios, risers, etc.
+- **Tipo de pitch / K**: Información sobre el desempeño del bateador frente a curvas, drops, cambios, risers, etc., incluyendo la cantidad total de ponches (K) recibidos por tipo de lanzamiento.
 
 ## 5. Reportes
 La pantalla de **Reportes** (`/reporte`) permite generar informes consolidados del rendimiento y análisis avanzado para tomar decisiones estratégicas.
