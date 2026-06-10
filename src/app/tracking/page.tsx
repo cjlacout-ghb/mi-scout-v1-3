@@ -302,23 +302,23 @@ export default function TrackingPage() {
               <div style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--danger)' }}>{hits}</div>
             </div>
             <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '0.62rem', color: '#8892A4', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>O</div>
-              <div style={{ fontSize: '0.95rem', fontWeight: 800, color: '#8892A4' }}>{outs}</div>
+              <div style={{ fontSize: '0.62rem', color: 'var(--success)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>O</div>
+              <div style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--success)' }}>{outs}</div>
             </div>
             <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '0.62rem', color: 'var(--success)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>K</div>
-              <div style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--success)' }}>{ks}</div>
+              <div style={{ fontSize: '0.62rem', color: 'var(--info)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>K</div>
+              <div style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--info)' }}>{ks}</div>
             </div>
             <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '0.62rem', color: 'var(--info)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>BB/HBP</div>
-              <div style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--info)' }}>{bb}</div>
+              <div style={{ fontSize: '0.62rem', color: '#8892A4', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>BB/HBP</div>
+              <div style={{ fontSize: '0.95rem', fontWeight: 800, color: '#8892A4' }}>{bb}</div>
             </div>
             {ultimoTurno && (
               <div style={{ marginLeft: 'auto', textAlign: 'right' }}>
                 <div style={{ fontSize: '0.62rem', color: 'var(--text-secondary)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Último</div>
                 <div style={{
                   fontSize: '0.95rem', fontWeight: 800,
-                  color: ultimoTurno.resultado === 'HIT' ? 'var(--danger)' : ultimoTurno.resultado === 'OUT' || ultimoTurno.resultado.startsWith('K') ? 'var(--success)' : 'var(--info)',
+                  color: ultimoTurno.resultado === 'HIT' ? 'var(--danger)' : ultimoTurno.resultado === 'OUT' ? 'var(--success)' : ultimoTurno.resultado.startsWith('K') ? 'var(--info)' : 'var(--text-secondary)',
                 }}>
                   {ultimoTurno.resultado}
                 </div>
@@ -528,7 +528,7 @@ export default function TrackingPage() {
                 background: 'var(--bg-elevated)',
                 borderRadius: 8,
                 marginBottom: 6,
-                borderLeft: `3px solid ${t.resultado === 'HIT' ? 'var(--danger)' : t.resultado === 'OUT' || t.resultado.startsWith('K') ? 'var(--success)' : 'var(--info)'}`,
+                borderLeft: `3px solid ${t.resultado === 'HIT' ? 'var(--danger)' : t.resultado === 'OUT' ? 'var(--success)' : t.resultado.startsWith('K') ? 'var(--info)' : 'var(--text-secondary)'}`,
                 border: t.id === turnoEditando?.id ? '2px solid var(--warning)' : undefined,
                 boxShadow: t.id === turnoEditando?.id ? '0 0 8px rgba(243, 156, 18, 0.4)' : 'none',
               }}
@@ -540,7 +540,7 @@ export default function TrackingPage() {
               <span style={{
                 fontWeight: 800,
                 fontSize: '0.88rem',
-                color: t.resultado === 'HIT' ? 'var(--danger)' : t.resultado === 'OUT' || t.resultado.startsWith('K') ? 'var(--success)' : 'var(--info)',
+                color: t.resultado === 'HIT' ? 'var(--danger)' : t.resultado === 'OUT' ? 'var(--success)' : t.resultado.startsWith('K') ? 'var(--info)' : 'var(--text-secondary)',
                 marginRight: 4
               }}>
                 {t.resultado}

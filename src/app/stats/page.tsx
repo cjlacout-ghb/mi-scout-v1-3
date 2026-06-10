@@ -255,8 +255,8 @@ export default function StatsPage() {
               { label: 'AB', value: stats.turnosAlBate, color: '#FFFFFF' },
               { label: 'H',  value: stats.hits,  color: 'var(--danger)' },
               { label: 'A/F',value: stats.outs, color: 'var(--success)' },
-              { label: 'KS/KL', value: stats.strikeoutsSwinging + stats.strikeoutsLooking, color: 'var(--success)' },
-              { label: 'BB/HBP', value: stats.basesPorBolas, color: 'var(--info)' },
+              { label: 'KS/KL', value: stats.strikeoutsSwinging + stats.strikeoutsLooking, color: 'var(--info)' },
+              { label: 'BB/HBP', value: stats.basesPorBolas, color: 'var(--text-secondary)' },
               { label: 'AVG',value: avg, color: 'var(--accent)' },
             ].map(({ label, value, color }) => (
               <div className="stat-card" key={label}>
@@ -293,6 +293,7 @@ export default function StatsPage() {
                     <th style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>AB</th>
                     <th style={{ textAlign: 'center' }}>Hits</th>
                     <th style={{ textAlign: 'center' }}>Outs</th>
+                    <th style={{ textAlign: 'center' }}>K</th>
                     <th style={{ textAlign: 'center' }}>AVG</th>
                   </tr>
                 </thead>
@@ -312,8 +313,11 @@ export default function StatsPage() {
                         <td style={{ textAlign: 'center', color: d.hits > 0 ? 'var(--danger)' : 'var(--text-secondary)' }}>
                           {d.hits}
                         </td>
-                        <td style={{ textAlign: 'center', color: (d.outs + d.ks + d.kl) > 0 ? 'var(--success)' : 'var(--text-secondary)' }}>
-                          {d.outs + d.ks + d.kl}
+                        <td style={{ textAlign: 'center', color: d.outs > 0 ? 'var(--success)' : 'var(--text-secondary)' }}>
+                          {d.outs}
+                        </td>
+                        <td style={{ textAlign: 'center', color: (d.ks + d.kl) > 0 ? 'var(--info)' : 'var(--text-secondary)' }}>
+                          {d.ks + d.kl}
                         </td>
                         <td style={{ textAlign: 'center', color: valueColor(avgZonaVal), fontWeight: avgZonaVal !== null ? 600 : 'normal' }}>
                           {avgZona}
@@ -321,7 +325,7 @@ export default function StatsPage() {
                       </tr>
                       {z === 4 && (
                         <tr>
-                          <td colSpan={6} style={{ padding: 0, height: 2, background: 'var(--text-muted)' }} />
+                          <td colSpan={7} style={{ padding: 0, height: 2, background: 'var(--text-muted)' }} />
                         </tr>
                       )}
                       </React.Fragment>
@@ -334,7 +338,7 @@ export default function StatsPage() {
 
           {/* Tabla por tipo de pitch */}
           <div style={{ padding: '0 16px 16px' }}>
-            <p className="section-title" style={{ marginBottom: 8 }}>Por tipo de pitch</p>
+            <p className="section-title" style={{ marginBottom: 8 }}>Tipo de pitch / K</p>
             <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
               <table className="data-table">
                 <thead>
@@ -342,7 +346,7 @@ export default function StatsPage() {
                     <th>Pitch</th>
                     <th style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>Vistos</th>
                     <th style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>AB</th>
-                    <th style={{ textAlign: 'center' }}>K%</th>
+                    <th style={{ textAlign: 'center' }}>K</th>
                     <th style={{ textAlign: 'center' }}>AVG</th>
                   </tr>
                 </thead>
@@ -356,17 +360,14 @@ export default function StatsPage() {
                       const avgPitch = d.ab > 0
                         ? avgPitchVal!.toFixed(3).replace('0.', '.')
                         : '---';
-                      const kPctVal = d.pitches > 0 ? ((d.ks + d.kl) / d.pitches) : null;
-                      const kPct = d.pitches > 0
-                        ? Math.round(kPctVal! * 100) + '%'
-                        : '---';
+                      const ks = d.ks + d.kl;
                       return (
                         <tr key={p}>
                           <td style={{ textTransform: 'capitalize', fontWeight: 700 }}>{p}</td>
                           <td style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>{d.pitches}</td>
                           <td style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>{d.ab}</td>
-                          <td style={{ textAlign: 'center', color: valueColor(kPctVal), fontWeight: kPctVal !== null ? 600 : 'normal' }}>
-                            {kPct}
+                          <td style={{ textAlign: 'center', color: ks > 0 ? 'var(--info)' : 'var(--text-secondary)' }}>
+                            {ks > 0 ? ks : '0'}
                           </td>
                           <td style={{ textAlign: 'center', color: valueColor(avgPitchVal), fontWeight: avgPitchVal !== null ? 600 : 'normal' }}>
                             {avgPitch}
