@@ -156,15 +156,7 @@ export function generarReporteMD(bateador: import('./types').Bateador, stats: Es
   md += `---\n\n`;
 
   md += `## Resumen\n\n`;
-  const padC = (v: string | number, l: number) => {
-    const s = String(v);
-    const pL = Math.floor((l - s.length) / 2);
-    return ' '.repeat(Math.max(0, pL)) + s + ' '.repeat(Math.max(0, l - s.length - pL));
-  };
-
-  md += `| AB | H | 2B | 3B | HR | K | BB/HBP | AVG  |\n`;
-  md += `|----|---|----|----|----|---|--------|------|\n`;
-  md += `| ${padC(stats.turnosAlBate, 2)} | ${padC(stats.hits, 1)} | ${padC(stats.dobles, 2)} | ${padC(stats.triples, 2)} | ${padC(stats.homeRuns, 2)} | ${padC(stats.strikeoutsSwinging + stats.strikeoutsLooking, 1)} | ${padC(stats.basesPorBolas, 6)} | ${padC(avg, 4)} |\n\n`;
+  md += `AB:${stats.turnosAlBate} H:${stats.hits} 2B:${stats.dobles} 3B:${stats.triples} HR:${stats.homeRuns} K:${stats.strikeoutsSwinging + stats.strikeoutsLooking} BB:${stats.basesPorBolas} AVG:${avg}\n\n`;
 
   md += `---\n\n`;
 

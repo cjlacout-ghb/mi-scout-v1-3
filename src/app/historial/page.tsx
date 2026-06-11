@@ -17,10 +17,25 @@ export default function HistorialPage() {
 
   useEffect(() => {
     db.partidos.toArray()
-      .then(list => {
+      .then(async list => {
         const sorted = list
           .filter(p => p.finalizado === true || (p as any).finalizado === 1)
           .sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime());
+          
+        for (const p of sorted) {
+          const turnos = await db.turnos_al_bate.where('partidoId').equals(p.id).toArray();
+          if (turnos.length > 0) {
+            const maxInning = Math.max(...turnos.map(t => t.inning));
+            if (maxInning !== p.innings) {
+              p.innings = maxInning;
+              await db.partidos.update(p.id, { innings: maxInning });
+            }
+          } else if (p.innings === 7) {
+            p.innings = 0;
+            await db.partidos.update(p.id, { innings: 0 });
+          }
+        }
+        
         setPartidos(sorted);
         setCargando(false);
       })

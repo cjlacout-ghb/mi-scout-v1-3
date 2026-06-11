@@ -42,7 +42,7 @@ function reducer(estado: EstadoPartido, accion: Accion): EstadoPartido {
 
     case 'FINALIZAR_PARTIDO':
       if (estado.partido) {
-        return { ...estado, partido: { ...estado.partido, finalizado: true } };
+        return { ...estado, partido: { ...estado.partido, finalizado: true, innings: estado.inningActual } };
       }
       return estado;
 
@@ -346,7 +346,7 @@ async function syncApi(accion: Accion, nuevoEstado: EstadoPartido, oldEstado: Es
       case 'FINALIZAR_PARTIDO': {
         const activo = await db.partidos.filter(p => !p.finalizado).first();
         if (activo) {
-          await db.partidos.update(activo.id, { finalizado: true });
+          await db.partidos.update(activo.id, { finalizado: true, innings: nuevoEstado.inningActual });
         }
         break;
       }

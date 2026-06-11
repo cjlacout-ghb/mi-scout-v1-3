@@ -1,6 +1,6 @@
 {
-  "name": "Mi Scout",
-  "short_name": "Mi Scout",
+  "name": "MiScout",
+  "short_name": "MiScout",
   "description": "Softball pitch tracking & scouting app",
   "start_url": "/",
   "display": "standalone",
