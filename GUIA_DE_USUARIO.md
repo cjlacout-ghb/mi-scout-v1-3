@@ -1,24 +1,24 @@
-# Guía de Usuario - Mi Scout
+# Guía de Usuario - MiScout v1.2
 
-¡Bienvenido a **Mi Scout**! Esta es una herramienta diseñada para ayudarte a registrar, analizar y visualizar el rendimiento de jugadores de béisbol o sóftbol durante los partidos.
+¡Bienvenido a **MiScout**! Esta es una herramienta diseñada para ayudarte a registrar, analizar y visualizar el rendimiento de jugadores de sóftbol durante los partidos.
 
 Esta guía está pensada para guiarte paso a paso, desde cómo instalar la aplicación en tu celular hasta cómo generar reportes avanzados de rendimiento. No necesitas ser un experto en tecnología para usarla; la interfaz está diseñada para que puedas registrar cada jugada de forma rápida y sencilla mientras observas el partido.
 
 ---
 
-## 📱 1. Cómo instalar la aplicación en tu celular
+## 1. Cómo instalar la aplicación en tu celular
 
-Mi Scout es una aplicación web progresiva (PWA). Esto significa que no necesitas descargarla desde una tienda de aplicaciones tradicionales (como Google Play o App Store). Puedes instalarla directamente desde tu navegador para usarla como cualquier otra app, incluso sin conexión a internet.
+MiScout es una aplicación web progresiva (PWA). Esto significa que no necesitas descargarla desde una tienda de aplicaciones tradicionales (como Google Play o App Store). Puedes instalarla directamente desde tu navegador para usarla como cualquier otra app, incluso sin conexión a internet.
 
 **En iPhone/iPad (Safari):**
-1. Abre Mi Scout en Safari.
+1. Abre MiScout en Safari.
 2. Toca el botón de **Compartir** (el ícono de un cuadrado con una flecha apuntando hacia arriba, en la parte inferior de la pantalla).
 3. Desplázate hacia abajo y selecciona **"Agregar a inicio"** o "Add to Home Screen".
 4. Toca **Agregar** en la esquina superior derecha.
-5. ¡Listo! Verás el ícono de Mi Scout en la pantalla de tu celular.
+5. ¡Listo! Verás el ícono de MiScout en la pantalla de tu celular.
 
 **En Android (Chrome):**
-1. Abre Mi Scout en Google Chrome.
+1. Abre MiScout en Google Chrome.
 2. Toca el ícono de **Menú** (los tres puntos verticales en la esquina superior derecha).
 3. Selecciona **"Agregar a la pantalla principal"** o "Instalar aplicación".
 4. Confirma tocando **Agregar** o "Instalar".
@@ -26,7 +26,7 @@ Mi Scout es una aplicación web progresiva (PWA). Esto significa que no necesita
 
 ---
 
-## ⚾ 2. Inicio y Gestión de Partidos
+## 2. Inicio y Gestión de Partidos
 
 Al abrir la aplicación, verás la pantalla principal (Home). Aquí es donde comienzas a organizar la información del juego.
 
@@ -42,11 +42,11 @@ Al abrir la aplicación, verás la pantalla principal (Home). Aquí es donde com
 - **Eliminar:** Si agregaste a alguien por error, toca la **X roja** para borrarlo de la lista. (Esta opción desaparecerá una vez que el partido finalice, para proteger tus datos).
 
 ### Retomar un partido
-Si cerraste la aplicación por accidente o el partido se suspendió, ¡no te preocupes! Mi Scout guarda el progreso automáticamente. Al abrir la app, verás la opción de continuar el partido en curso exactamente donde lo dejaste.
+Si cerraste la aplicación por accidente o el partido se suspendió, ¡no te preocupes! MiScout guarda el progreso automáticamente. Al abrir la app, verás la opción de continuar el partido en curso exactamente donde lo dejaste.
 
 ---
 
-## 🎯 3. Tracking: Registrando el Partido en Vivo
+## 3. Tracking: Registrando el Partido en Vivo
 
 Una vez que tengas los equipos armados, presiona "Iniciar Partido". Llegarás a la pantalla de **Tracking**, que es el corazón de la aplicación.
 
@@ -78,7 +78,7 @@ Cada bateador tiene un cuadro de "Notas". Úsalo para escribir observaciones lib
 
 ---
 
-## 📊 4. Estadísticas (Stats) y Mapas de Calor
+## 4. Estadísticas (Stats) y Mapas de Calor
 
 Cuando quieras analizar cómo le está yendo a un jugador, ve a la pestaña de **Stats**. 
 *(Nota: Al seleccionar un jugador desde el historial, la app te traerá directamente a esta pantalla).*
@@ -94,7 +94,7 @@ Cuando quieras analizar cómo le está yendo a un jugador, ve a la pestaña de *
 
 ---
 
-## 📝 5. Historial y Reportes
+## 5. Historial y Reportes
 
 ### Historial de Partidos
 En la pestaña `/historial` se guardan todos los partidos que finalizaste. 
@@ -108,9 +108,15 @@ La pantalla `/reporte` sirve para generar un documento de texto detallado que pu
 
 ---
 
-### 🎨 Código de Colores Universal
+### Código de Colores Universal
 Para que te sea fácil leer los datos rápido, la app usa siempre los mismos colores:
 - **Rojo:** HIT (Peligro/Éxito ofensivo)
 - **Verde:** OUT (Éxito defensivo)
 - **Azul:** K (Ponches)
 - **Gris:** BB / HBP (Bases por bolas o golpeados)
+
+---
+
+© 2026 Cristian J. Lacout — Todos los derechos reservados.
+
+MiScout es software propietario. Queda expresamente prohibida su copia, redistribución, modificación o uso comercial sin autorización escrita del autor.

@@ -1,84 +1,122 @@
 # Guía de Usuario - MiScout v1.2
 
-Bienvenido a **MiScout**, la herramienta definitiva para el seguimiento y análisis de pitcheos y zonas de strike. Esta guía te ayudará a conocer todas las funcionalidades y sacar el máximo provecho de la aplicación durante los partidos.
+¡Bienvenido a **MiScout**! Esta es una herramienta diseñada para ayudarte a registrar, analizar y visualizar el rendimiento de jugadores de sóftbol durante los partidos.
+
+Esta guía está pensada para guiarte paso a paso, desde cómo instalar la aplicación en tu celular hasta cómo generar reportes avanzados de rendimiento. No necesitas ser un experto en tecnología para usarla; la interfaz está diseñada para que puedas registrar cada jugada de forma rápida y sencilla mientras observas el partido.
 
 ---
 
-## 1. Primeros Pasos
+## 1. Cómo instalar la aplicación en tu celular
+
+MiScout es una aplicación web progresiva (PWA). Esto significa que no necesitas descargarla desde una tienda de aplicaciones tradicionales (como Google Play o App Store). Puedes instalarla directamente desde tu navegador para usarla como cualquier otra app, incluso sin conexión a internet.
+
+**En iPhone/iPad (Safari):**
+1. Abre MiScout en Safari.
+2. Toca el botón de **Compartir** (el ícono de un cuadrado con una flecha apuntando hacia arriba, en la parte inferior de la pantalla).
+3. Desplázate hacia abajo y selecciona **"Agregar a inicio"** o "Add to Home Screen".
+4. Toca **Agregar** en la esquina superior derecha.
+5. ¡Listo! Verás el ícono de MiScout en la pantalla de tu celular.
+
+**En Android (Chrome):**
+1. Abre MiScout en Google Chrome.
+2. Toca el ícono de **Menú** (los tres puntos verticales en la esquina superior derecha).
+3. Selecciona **"Agregar a la pantalla principal"** o "Instalar aplicación".
+4. Confirma tocando **Agregar** o "Instalar".
+5. ¡Listo! La app aparecerá junto a tus otras aplicaciones.
+
+---
+
+## 2. Inicio y Gestión de Partidos
+
+Al abrir la aplicación, verás la pantalla principal (Home). Aquí es donde comienzas a organizar la información del juego.
 
 ### Iniciar un Nuevo Partido
-Al abrir la aplicación por primera vez, te encontrarás con la pantalla de inicio.
-1. Presiona el botón **Comenzar**.
-2. Ingresa el nombre del **Equipo Visitante** y del **Equipo Local**.
-3. (Opcional) Agrega una descripción del evento (ej. "Final del Torneo" o "Juego 3") y ajusta la fecha.
-4. Presiona **▶ Iniciar partido**.
+- **Datos iniciales:** Deberás ingresar la fecha, el nombre del equipo Visitante, el nombre del equipo Local y una breve descripción del partido (ej. "Final de Liga", "Amistoso").
+- **Carga de Lineup (Alineación):** Antes de comenzar a registrar los lanzamientos, necesitas decirle a la app quiénes van a jugar. Debes armar el lineup tanto para el equipo local como para el visitante.
+  - **Agregar 1 jugador:** Añade jugadores de a uno.
+  - **Line-up completo:** Si ya tienes la lista de los 9 jugadores, usa esta opción para cargar a todos rápidamente.
+- **Detalles del jugador:** Para cada jugador, deberás anotar su número de camiseta, apellido, nombre (opcional) y de qué lado batea (Derecho, Zurdo o Switch/Ambos lados).
+
+### Modificar el Lineup antes de empezar
+- **Editar:** Si te equivocaste en un número o nombre, toca el ícono del **lápiz** junto al jugador.
+- **Eliminar:** Si agregaste a alguien por error, toca la **X roja** para borrarlo de la lista. (Esta opción desaparecerá una vez que el partido finalice, para proteger tus datos).
+
+### Retomar un partido
+Si cerraste la aplicación por accidente o el partido se suspendió, ¡no te preocupes! MiScout guarda el progreso automáticamente. Al abrir la app, verás la opción de continuar el partido en curso exactamente donde lo dejaste.
 
 ---
 
-## 2. Gestión de Line-Ups (Alineaciones)
+## 3. Tracking: Registrando el Partido en Vivo
 
-Una vez iniciado el partido, accederás a la pantalla de **Line-Up**. Aquí gestionarás las alineaciones de ambos equipos. Notarás dos pestañas en la parte superior: **Visitante** y **Local**.
+Una vez que tengas los equipos armados, presiona "Iniciar Partido". Llegarás a la pantalla de **Tracking**, que es el corazón de la aplicación.
 
-### Carga Rápida (Masiva)
-Si tienes la alineación completa antes de comenzar el juego, esta es la forma más rápida de ingresarla:
-1. Asegúrate de estar en la pestaña del equipo correcto.
-2. Presiona **Carga rápida (Line-Up Completo)**.
-3. Se abrirá una planilla donde podrás ingresar rápidamente el número de camiseta, apellido y lado de bateo de los 9 (o más) jugadores.
-4. Usa el botón **+ Agregar fila** si necesitas incluir a más de 9 bateadores (ej. Jugador Extra / Flex).
-5. Presiona **Guardar Line-Up Completo**.
+### La Zona de Strike
+Verás un cuadrado dividido en zonas (1 a 4 internas y 5 a 8 perimetrales). 
+- *Tip de vista:* Puedes elegir si quieres ver la zona desde la perspectiva del Catcher o del Pitcher usando el botón superior.
 
-### Agregar Jugador Individual
-Si prefieres agregar jugadores uno por uno o a medida que avanza el juego:
-- Presiona **Agregar 1 jugador** y completa sus datos. El jugador se añadirá al final del orden al bate.
+### ¿Cómo registrar un lanzamiento (Pitch)?
+Registrar lo que ocurre en el campo toma solo tres pasos:
+1. **Toca la Zona:** Toca en la imagen de la zona de strike exactamente por dónde pasó la pelota.
+2. **Elige el Tipo de Pitch:** Selecciona si fue una recta (Drop), Curva, Cambio, etc.
+3. **Elige el Resultado (Solo si el turno termina):**
+   - Si el bateador hizo **OUT**, la app te preguntará cómo fue (ej. de aire, asistencia al primera base) y si el contacto fue fuerte o débil.
+   - Si fue **HIT**, elegirás qué tipo de hit (Sencillo, Doble, Home Run) y a qué zona del campo fue dirigido.
+   - Si fue ponche, elige **KS** (tirando - swinging) o **KL** (mirando - looking).
+   - Si caminó, elige **BB / HBP** (Base por bolas o Golpeado).
 
-### Editar o Sustituir
-- **Editar:** Presiona el ícono del lápiz (✎) a la derecha del nombre del jugador para corregir errores ortográficos o cambiar su número.
-- **Sustituir:** Si un jugador es reemplazado durante el juego, **NO** edites su nombre. En su lugar, selecciónalo, presiona **Sustitución del bateador actual** e ingresa los datos del nuevo jugador. El sistema guardará un registro de en qué inning ocurrió el cambio.
+### Confirmar y Corregir
+Después de marcar un resultado final (Out, Hit, K, etc.), el sistema te mostrará lo que registraste y te pedirá **Confirmar**. 
+- Si te equivocaste en la ubicación del pitch, puedes mover el punto en esta pantalla antes de confirmar.
+- Una vez confirmado, la app avanzará automáticamente al siguiente bateador.
 
----
+### Cambio de Inning y Sustituciones
+- **Cambio inn:** Cuando el equipo a la defensiva logra los 3 outs, toca el botón de "Cambio inn" (ícono de flechas ⇄ ubicado a la derecha del orden al bate) para que el equipo contrario pase a batear.
+- **Sustituciones:** Si entra un bateador emergente, toca el botón de "Sustitución" sobre la zona de strike. Podrás ingresar los datos del nuevo jugador, y el antiguo quedará guardado.
 
-## 3. Tracking (Seguimiento de Pitcheos)
-
-Para comenzar a registrar pitcheos, asegúrate de haber seleccionado a un bateador tocando su nombre en el Line-Up. Luego, navega a la pestaña inferior **Tracking**.
-
-### Interfaz Principal
-- **Inning Actual:** En el centro superior verás el Inning. Las flechas (▶ y ◀) te permiten avanzar o retroceder medias entradas (ej. de la Alta a la Baja).
-- **Estadísticas Rápidas:** Debajo del nombre del bateador verás un resumen de su actuación en el partido (Turnos, Hits, Ponches, Bases por Bolas).
-- **Zona de Strike:** El panel interactivo principal con las 8 zonas.
-
-### Registrar un Lanzamiento
-1. Toca la zona exacta en la cuadrícula donde cruzó el pitcheo.
-2. Se abrirá un menú para seleccionar el **Tipo de Pitcheo** (Recta, Curva, Cambio, etc.).
-3. Selecciona el **Resultado** (Hit, Out, Strike, Bola, etc.).
-4. Dependiendo del resultado, el sistema puede pedirte detalles adicionales:
-   - *Si fue Hit:* ¿Hacia dónde fue? (Left, Center, Right) y la calidad del contacto.
-   - *Si fue Out:* ¿Quién realizó el out o hacia dónde fue el batazo?
-5. Una vez guardado, el pitcheo aparecerá en el **Historial** debajo del mini-lineup.
-
-### Avanzar al Siguiente Bateador
-- Una vez que finaliza el turno al bate de un jugador (ya sea por Out, Hit, Base por Bolas o Ponche), el sistema te pedirá confirmar. Al confirmar, **avanzará automáticamente** al siguiente jugador en el orden al bate.
-
-### Fin de una Mitad de Inning (3 Outs)
-- Cuando el equipo a la defensiva consiga los 3 outs, debes presionar el botón **[ ▶ ]** junto al número del Inning en la parte superior.
-- Esto cambiará la mitad del inning (de Alta a Baja, o pasará al siguiente inning) y automáticamente cargará la alineación del otro equipo.
+### Notas
+Cada bateador tiene un cuadro de "Notas". Úsalo para escribir observaciones libres (ej. "Le cuesta batear las curvas bajas" o "Se para muy atrás en la caja").
 
 ---
 
-## 4. Estadísticas y Reportes
+## 4. Estadísticas (Stats) y Mapas de Calor
 
-### Panel de Stats
-Navega a la pestaña **Stats** para ver un análisis detallado de cualquier bateador del partido.
-- Usa el menú desplegable para seleccionar a un jugador.
-- Verás su línea estadística completa (AB, H, KS, KL, BB, OUT, AVG).
-- Un **Heat Map (Mapa de Calor)** visual te mostrará rápidamente en qué zonas el bateador ha sido más peligroso (colores cálidos) y en cuáles ha fallado (colores fríos).
-- Una tabla desglosará pitcheos, hits, outs y porcentaje de contacto zona por zona.
+Cuando quieras analizar cómo le está yendo a un jugador, ve a la pestaña de **Stats**. 
+*(Nota: Al seleccionar un jugador desde el historial, la app te traerá directamente a esta pantalla).*
 
-### Panel de Reporte
-Navega a la pestaña **Reporte** para generar documentos resumen.
-- **Reporte Individual:** Selecciona a un jugador y genera un reporte completo de su actuación, ideal para compartir con el cuerpo técnico.
-- **Reporte del Equipo:** Genera un consolidado de todos los bateadores de un equipo (Visitante o Local).
-- Todos los reportes pueden descargarse como archivos de texto (Markdown / .md) presionando el botón **Descargar .md**.
+- **Navegación:** Arriba verás botones con los números de camiseta. Toca uno para ver sus números. Puedes ordenarlos por "Orden al bate" o por mejor promedio ("AVG").
+- **Métricas:** Verás un resumen claro con sus Turnos al Bate (AB), Hits (H), Ponches (K) y Promedio (AVG).
+- **El Mapa de Calor (Heat Map):** Es la herramienta visual más poderosa. Te mostrará la zona de strike coloreada:
+  - Zonas **Verdes**: Zonas frías (al bateador le cuesta conectar hits ahí).
+  - Zonas **Rojas / Naranjas**: Zonas calientes (el bateador es peligroso si le lanzan ahí).
+  - *Regla de oro:* En esta pantalla, la zona de strike **siempre** se muestra desde la perspectiva del Catcher para evitar confusiones al leer los reportes.
+- **Tabla de Pitches:** Descubre contra qué lanzamientos (Curva, Drop) el bateador es más vulnerable o tiene más ponches (K).
+- **Modo Acumulado:** Si activas este botón, no solo verás lo que hizo el jugador hoy, sino la suma de **todos** los partidos que tiene registrados en la app. ¡Ideal para ver tendencias a largo plazo!
 
 ---
 
-*Desarrollado para proveer información clave en tiempo real. ¡Que tengas un gran partido!*
+## 5. Historial y Reportes
+
+### Historial de Partidos
+En la pestaña `/historial` se guardan todos los partidos que finalizaste. 
+- Puedes tocarlos para volver a ver sus estadísticas.
+- Puedes eliminarlos usando el botón de la cruz "✕" (te pedirá confirmación porque borra los datos para siempre).
+
+### Reportes
+La pantalla `/reporte` sirve para generar un documento de texto detallado que puedes descargar y compartir con entrenadores o jugadores.
+- **Tipos de Reportes:** Puedes generar un reporte de un jugador individual, o un reporte completo de todo el equipo. Además, puedes hacer que el reporte solo incluya el partido de hoy, o que sea un reporte "Acumulado" de toda la historia.
+- **Formato:** El reporte se descarga como un archivo `.md` (Markdown), que es texto plano fácil de leer en cualquier dispositivo, y resume todos los Hits, Zonas Calientes, Zonas Frías y Notas en un formato compacto diseñado para caber perfectamente en pantallas de celulares.
+
+---
+
+### Código de Colores Universal
+Para que te sea fácil leer los datos rápido, la app usa siempre los mismos colores:
+- **Rojo:** HIT (Peligro/Éxito ofensivo)
+- **Verde:** OUT (Éxito defensivo)
+- **Azul:** K (Ponches)
+- **Gris:** BB / HBP (Bases por bolas o golpeados)
+
+---
+
+© 2026 Cristian J. Lacout — Todos los derechos reservados.
+
+MiScout es software propietario. Queda expresamente prohibida su copia, redistribución, modificación o uso comercial sin autorización escrita del autor.
