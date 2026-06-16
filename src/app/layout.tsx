@@ -7,6 +7,13 @@ export const metadata: Metadata = {
   title: 'MiScout -Tracking de pitcheos',
   description: 'Aplicación de scouting y tracking de lanzamientos para softball. Análisis por bateador con heat map y reportes.',
   manifest: '/manifest.json',
+  icons: {
+    icon: '/favicon.ico',
+    apple: '/assets/icon-192.png',
+  },
+  formatDetection: {
+    telephone: false,
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',

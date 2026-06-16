@@ -3,6 +3,8 @@
   "short_name": "MiScout",
   "description": "Softball pitch tracking & scouting app",
   "start_url": "/",
+  "id": "/?source=pwa",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#0D0F14",
   "theme_color": "#0D0F14",

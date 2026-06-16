@@ -1,4 +1,4 @@
-# Guía de Usuario - MiScout v1.2
+# Guía de Usuario - MiScout v1.3
 
 ¡Bienvenido a **MiScout**! Esta es una herramienta diseñada para ayudarte a registrar, analizar y visualizar el rendimiento de jugadores de sóftbol durante los partidos.
 
