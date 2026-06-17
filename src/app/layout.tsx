@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { ScoutProvider } from '@/context/ScoutContext';
 import AppShell from '@/components/AppShell';
+import LicenseGuard from '@/components/LicenseGuard';
 
 export const metadata: Metadata = {
   title: 'MiScout -Tracking de pitcheos',
@@ -37,9 +38,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
       <body>
-        <ScoutProvider>
-          <AppShell>{children}</AppShell>
-        </ScoutProvider>
+        <LicenseGuard>
+          <ScoutProvider>
+            <AppShell>{children}</AppShell>
+          </ScoutProvider>
+        </LicenseGuard>
         <script
           dangerouslySetInnerHTML={{
             __html: `

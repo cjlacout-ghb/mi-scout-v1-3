@@ -26,7 +26,18 @@ MiScout es una aplicación web progresiva (PWA). Esto significa que no necesitas
 
 ---
 
-## 2. Inicio y Gestión de Partidos
+## 2. Activación de Licencia
+
+Antes de poder comenzar a usar MiScout, necesitarás activar tu licencia en el dispositivo. 
+
+- Al abrir la aplicación por primera vez, verás la pantalla de **Activar licencia**.
+- Deberás ingresar el código proporcionado (ej. `MISCOUT-v13-XXXX-XXXX`).
+- La licencia quedará vinculada exclusivamente a ese dispositivo para tu seguridad.
+- Una vez activada, serás redirigido a la pantalla principal.
+
+---
+
+## 3. Inicio y Gestión de Partidos
 
 Al abrir la aplicación, verás la pantalla principal (Home). Aquí es donde comienzas a organizar la información del juego.
 
@@ -46,7 +57,7 @@ Si cerraste la aplicación por accidente o el partido se suspendió, ¡no te pre
 
 ---
 
-## 3. Tracking: Registrando el Partido en Vivo
+## 4. Tracking: Registrando el Partido en Vivo
 
 Una vez que tengas los equipos armados, presiona "Iniciar Partido". Llegarás a la pantalla de **Tracking**, que es el corazón de la aplicación.
 
@@ -78,7 +89,7 @@ Cada bateador tiene un cuadro de "Notas". Úsalo para escribir observaciones lib
 
 ---
 
-## 4. Estadísticas (Stats) y Mapas de Calor
+## 5. Estadísticas (Stats) y Mapas de Calor
 
 Cuando quieras analizar cómo le está yendo a un jugador, ve a la pestaña de **Stats**. 
 *(Nota: Al seleccionar un jugador desde el historial, la app te traerá directamente a esta pantalla).*
@@ -94,7 +105,7 @@ Cuando quieras analizar cómo le está yendo a un jugador, ve a la pestaña de *
 
 ---
 
-## 5. Historial y Reportes
+## 6. Historial y Reportes
 
 ### Historial de Partidos
 En la pestaña `/historial` se guardan todos los partidos que finalizaste. 

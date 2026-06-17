@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useScout } from '@/context/ScoutContext';
 import ZonaStrikeComponent from '@/components/ZonaStrike';
 import { calcularEstadisticas } from '@/lib/storage';
@@ -42,11 +42,29 @@ export default function StatsPage() {
   const modoAcumulado = estado.modoAcumuladoGlobal ?? false;
   const setModoAcumulado = (val: boolean) => dispatch({ type: 'SET_MODO_ACUMULADO', payload: val });
   const [ordenarPorAvg, setOrdenarPorAvg] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent | TouchEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setDropdownOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('touchstart', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+    };
+  }, []);
   
   const [turnosAcumulados, setTurnosAcumulados] = useState<TurnoAlBate[]>([]);
   const [cargandoAcumulado, setCargandoAcumulado] = useState(false);
+  const [avgAcumuladoMap, setAvgAcumuladoMap] = useState<Map<string, number>>(new Map());
+  const [cargandoAvgAcumulado, setCargandoAvgAcumulado] = useState(false);
 
-  // AVG rápido por bateador (solo partido actual, para ordenar el selector)
+  // AVG rápido por bateador (solo partido actual)
   const avgMap = new Map<string, number>();
   for (const b of todos) {
     const bt = estado.turnosAlBate.filter(t => t.bateadorId === b.id);
@@ -55,13 +73,47 @@ export default function StatsPage() {
     avgMap.set(b.id, ab > 0 ? h / ab : -1);
   }
 
-  const todosOrdenados = (ordenarPorAvg && !modoAcumulado)
+  // Carga AVG acumulado de TODOS los bateadores cuando se activa el modo acumulado + ordenarPorAvg
+  useEffect(() => {
+    if (!modoAcumulado || !ordenarPorAvg || todos.length === 0) {
+      setAvgAcumuladoMap(new Map());
+      return;
+    }
+    setCargandoAvgAcumulado(true);
+    Promise.all(
+      todos.map(async (bateador) => {
+        const batters = await db.bateadores
+          .where('[apellido+numero+equipo]')
+          .equals([bateador.apellido, bateador.numero, bateador.equipo])
+          .toArray();
+        const ids = batters.map(b => b.id);
+        const turnos = ids.length > 0
+          ? await db.turnos_al_bate.where('bateadorId').anyOf(ids).toArray()
+          : [];
+        const ab = turnos.length;
+        const h  = turnos.filter(t => t.resultado === 'HIT').length;
+        return { id: bateador.id, avg: ab > 0 ? h / ab : -1 };
+      })
+    ).then(results => {
+      const map = new Map<string, number>();
+      results.forEach(r => map.set(r.id, r.avg));
+      setAvgAcumuladoMap(map);
+      setCargandoAvgAcumulado(false);
+    }).catch(err => {
+      console.error('Error cargando AVG acumulado:', err);
+      setCargandoAvgAcumulado(false);
+    });
+  }, [modoAcumulado, ordenarPorAvg, todos.length]);
+
+  const activeAvgMap = modoAcumulado ? avgAcumuladoMap : avgMap;
+
+  const todosOrdenados = ordenarPorAvg
     ? (() => {
         const equipos = [...new Set(todos.map(b => b.equipo))];
         return equipos.flatMap(eq =>
           todos
             .filter(b => b.equipo === eq)
-            .sort((a, b) => (avgMap.get(b.id) ?? -1) - (avgMap.get(a.id) ?? -1))
+            .sort((a, b) => (activeAvgMap.get(b.id) ?? -1) - (activeAvgMap.get(a.id) ?? -1))
         );
       })()
     : todos;
@@ -188,31 +240,112 @@ export default function StatsPage() {
               style={{ padding: '2px 8px', fontSize: '0.65rem', background: ordenarPorAvg ? 'var(--accent)' : 'transparent', color: ordenarPorAvg ? '#000' : 'var(--text-secondary)', border: ordenarPorAvg ? '1px solid var(--accent)' : 'none', fontWeight: ordenarPorAvg ? 'bold' : 'normal' }}
               onClick={() => setOrdenarPorAvg(true)}
             >
-              AVG ↓
+              AVG
             </button>
           </div>
         </div>
-        <select
-          className="input"
-          value={selId ?? bateadorSel?.id ?? ''}
-          onChange={(e) => {
-            const id = e.target.value || null;
-            dispatch({ type: 'SELECCIONAR_JUGADOR', payload: id });
-          }}
-          style={{ marginBottom: 12 }}
-        >
-          {todosOrdenados.map((b) => {
-            const avg = avgMap.get(b.id) ?? -1;
-            const avgStr = avg >= 0 ? avg.toFixed(3).replace('0.', '.') : '---';
-            const equipo = b.equipo ? b.equipo.replace(/\w\S*/g, txt => txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase()) : '';
-            const inicial = b.nombre ? `, ${b.nombre.charAt(0).toUpperCase()}` : '';
-            return (
-              <option key={b.id} value={b.id}>
-                {ordenarPorAvg ? `${avgStr} | ` : ''}#{b.numero} {b.apellido}{inicial} - {equipo}
-              </option>
-            );
-          })}
-        </select>
+        {/* Custom dropdown con AVG coloreado */}
+        <div ref={dropdownRef} style={{ position: 'relative', marginBottom: 12 }}>
+          {/* Trigger */}
+          <div
+            className="input"
+            onClick={() => setDropdownOpen(o => !o)}
+            style={{
+              display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+              cursor: 'pointer', userSelect: 'none',
+              border: dropdownOpen ? '1px solid var(--accent)' : undefined,
+              boxShadow: dropdownOpen ? '0 0 0 3px var(--accent-dim)' : undefined,
+            }}
+          >
+            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {(() => {
+                const b = bateadorSel;
+                if (!b) return 'Seleccionar bateador';
+                const avgVal = activeAvgMap.get(b.id) ?? -1;
+                const avgStr = avgVal >= 0 ? avgVal.toFixed(3).replace('0.', '.') : null;
+                const equipo = b.equipo ? b.equipo.replace(/\w\S*/g, txt => txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase()) : '';
+                const inicial = b.nombre ? `, ${b.nombre.charAt(0).toUpperCase()}` : '';
+                return (
+                  <span>
+                    {ordenarPorAvg && avgStr && (
+                      <span style={{ color: valueColor(avgVal), fontWeight: 700, marginRight: 6 }}>{avgStr}</span>
+                    )}
+                    #{b.numero} {b.apellido}{inicial} - {equipo}
+                  </span>
+                );
+              })()}
+            </span>
+            <span style={{ color: 'var(--text-secondary)', fontSize: '0.75rem', marginLeft: 6, flexShrink: 0 }}>
+              {dropdownOpen ? '▲' : '▼'}
+            </span>
+          </div>
+
+          {/* Lista desplegable */}
+          {dropdownOpen && (
+            <div style={{
+              position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0, zIndex: 999,
+              background: 'var(--bg-elevated)', border: '1px solid var(--accent)',
+              borderRadius: 8, overflow: 'hidden',
+              boxShadow: '0 8px 24px rgba(0,0,0,0.5)',
+              maxHeight: 260, overflowY: 'auto',
+            }}>
+              {cargandoAvgAcumulado && modoAcumulado && ordenarPorAvg ? (
+                <div style={{ padding: '14px', textAlign: 'center', color: 'var(--text-secondary)', fontSize: '0.8rem' }}>
+                  Cargando AVG acumulado...
+                </div>
+              ) : (
+                todosOrdenados.map((b, idx) => {
+                  const avgVal = activeAvgMap.get(b.id) ?? -1;
+                  const avgStr = avgVal >= 0 ? avgVal.toFixed(3).replace('0.', '.') : '---';
+                  const equipo = b.equipo ? b.equipo.replace(/\w\S*/g, txt => txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase()) : '';
+                  const inicial = b.nombre ? `, ${b.nombre.charAt(0).toUpperCase()}` : '';
+                  const isSelected = b.id === (selId ?? bateadorSel?.id);
+                  const prevEquipo = idx > 0 ? todosOrdenados[idx - 1].equipo : null;
+                  const showDivider = idx > 0 && b.equipo !== prevEquipo;
+                  return (
+                    <React.Fragment key={b.id}>
+                      {showDivider && (
+                        <div style={{ height: 1, background: 'var(--border)', margin: '0 8px' }} />
+                      )}
+                      <div
+                        onClick={() => {
+                          dispatch({ type: 'SELECCIONAR_JUGADOR', payload: b.id });
+                          setDropdownOpen(false);
+                        }}
+                        style={{
+                          display: 'flex', alignItems: 'center', gap: 8,
+                          padding: '10px 14px',
+                          cursor: 'pointer',
+                          background: isSelected ? 'var(--accent-dim)' : 'transparent',
+                          borderLeft: isSelected ? '3px solid var(--accent)' : '3px solid transparent',
+                          transition: 'background 0.15s',
+                        }}
+                        onMouseEnter={e => { if (!isSelected) (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.04)'; }}
+                        onMouseLeave={e => { if (!isSelected) (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
+                      >
+                        {ordenarPorAvg && (
+                          <span style={{
+                            fontWeight: 700,
+                            fontSize: '0.8rem',
+                            minWidth: 34,
+                            color: avgVal >= 0 ? valueColor(avgVal) : 'var(--text-secondary)',
+                            fontVariantNumeric: 'tabular-nums',
+                          }}>
+                            {avgStr}
+                          </span>
+                        )}
+                        <span style={{ fontSize: '0.85rem', color: isSelected ? 'var(--accent)' : 'var(--text-primary)' }}>
+                          #{b.numero} {b.apellido}{inicial}
+                          <span style={{ color: 'var(--text-secondary)', fontSize: '0.75rem' }}> — {equipo}</span>
+                        </span>
+                      </div>
+                    </React.Fragment>
+                  );
+                })
+              )}
+            </div>
+          )}
+        </div>
 
         {/* Toggle Acumulado */}
         <div style={{ display: 'flex', gap: 8, background: 'var(--bg-elevated)', padding: 4, borderRadius: 8 }}>

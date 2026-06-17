@@ -56,7 +56,7 @@ const IconHistorial = () => (
 const NAV_ITEMS = [
   { href: '/',          label: 'Line-Up',  Icon: IconLineup   },
   { href: '/tracking',  label: 'Tracking', Icon: IconTracking },
-  { href: '/stats',     label: 'Stats',    Icon: IconStats    },
+  { href: '/stats',     label: 'Heat Map', Icon: IconStats    },
   { href: '/reporte',   label: 'Reporte',  Icon: IconReporte  },
   { href: '/historial', label: 'Historial',Icon: IconHistorial},
 ];
