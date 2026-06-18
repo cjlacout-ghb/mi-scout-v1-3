@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import ModalConfirm from '@/components/ModalConfirm';
 
-const ADMIN_PASSWORD = 'MISCOUT-DEV-LACOUT-2026';
+const ADMIN_PASSWORD = 'MS@Admin#CJL@2026';
 
 type License = {
   code: string;
