@@ -10,6 +10,7 @@ type License = {
   version: string;
   max_activations: number;
   activations_used: number;
+  release_count: number;
   status: string;
   created_at: string;
   notes: string;
@@ -93,6 +94,41 @@ export default function AdminPage() {
       .from('licenses')
       .update({ status: 'revoked' })
       .eq('code', code);
+    loadData();
+  };
+
+  const handleReleaseActivation = async (activationId: string, licenseCode: string) => {
+    // Find the license to check release_count
+    const license = licenses.find((l) => l.code === licenseCode);
+    if (!license) return;
+
+    if ((license as any).release_count >= 1) {
+      alert('Esta licencia ya usó su único permiso de liberación. No se pueden liberar más activaciones.');
+      return;
+    }
+
+    const confirm = window.confirm(
+      'ATENCIÓN: Solo se permite liberar 1 activación por licencia.\n\n' +
+      '¿Confirmar liberación de esta activación?\n\n' +
+      'Esta acción no se puede deshacer.'
+    );
+    if (!confirm) return;
+
+    // Delete the activation
+    await supabase
+      .from('activations')
+      .delete()
+      .eq('id', activationId);
+
+    // Decrement activations_used and increment release_count
+    await supabase
+      .from('licenses')
+      .update({
+        activations_used: license.activations_used - 1,
+        release_count: (license as any).release_count + 1,
+      })
+      .eq('code', licenseCode);
+
     loadData();
   };
 
@@ -195,6 +231,7 @@ export default function AdminPage() {
                 <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>
                   {lic.notes || 'Sin notas'} · {lic.version} · 
                   Activaciones: {lic.activations_used}/{lic.max_activations} · 
+                  Liberaciones usadas: {lic.release_count}/1 · 
                   Estado: {lic.status}
                 </p>
               </div>
@@ -228,6 +265,24 @@ export default function AdminPage() {
                       <p>🔑 FP: {act.device_fingerprint.substring(0, 16)}...</p>
                       <p>📅 Activado: {new Date(act.activated_at).toLocaleString('es-AR')}</p>
                       <p>✅ Última verificación: {new Date(act.last_verified_at).toLocaleString('es-AR')}</p>
+                      {/* Only show Liberar if release_count < 1 */}
+                      {lic.release_count < 1 && (
+                        <button
+                          onClick={() => handleReleaseActivation(act.id, lic.code)}
+                          style={{
+                            marginTop: '0.5rem',
+                            background: '#f59e0b',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '6px',
+                            padding: '0.35rem 0.75rem',
+                            cursor: 'pointer',
+                            fontSize: '0.75rem',
+                          }}
+                        >
+                          Liberar activación
+                        </button>
+                      )}
                     </div>
                   );
                 })}
