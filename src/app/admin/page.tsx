@@ -73,7 +73,7 @@ export default function AdminPage() {
   const handleCreateLicense = async () => {
     setLoading(true);
     setMessage('');
-    const code = newCode.trim() || generateCode();
+    const code = (newCode.trim() || generateCode()).toUpperCase();
     const { error } = await supabase
       .from('licenses')
       .insert({ code, version: 'v1.3', notes: newNotes });
