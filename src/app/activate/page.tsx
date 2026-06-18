@@ -63,8 +63,8 @@ export default function ActivatePage() {
     }}>
       {/* Logo */}
       <div style={{ textAlign: 'center' }}>
-        <h1 style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--accent)' }}>
-          Mi<span style={{ color: 'var(--text-primary)' }}>Scout</span>
+        <h1 style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+          Mi<span style={{ color: 'var(--accent)' }}>Scout</span>
         </h1>
         <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>v1.3</p>
       </div>

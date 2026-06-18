@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { getDeviceFingerprint } from '@/lib/deviceFingerprint';
 
-const UNPROTECTED_ROUTES = ['/activate', '/admin'];
+const UNPROTECTED_ROUTES = ['/activate', '/admin', '/guia'];
 
 export default function LicenseGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();

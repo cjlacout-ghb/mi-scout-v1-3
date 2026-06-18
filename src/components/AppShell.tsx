@@ -96,7 +96,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           }}
         >
           <div>Mi<span>Scout</span></div>
-          <span style={{ fontSize: '0.7rem', color: '#ffffff', fontWeight: 400, letterSpacing: '0.5px' }}>v1.3</span>
+          <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', fontWeight: 400, letterSpacing: '0.5px' }}>v1.3</span>
         </div>
         <div className="app-header__info" style={{ textAlign: 'center' }}>
           {isLoading ? (
@@ -115,10 +115,8 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             <div style={{ fontStyle: 'italic' }}>Sin partido activo</div>
           )}
         </div>
-        <a 
-          href="/guia_usuario.md" 
-          target="_blank" 
-          rel="noopener noreferrer" 
+        <Link
+          href="/guia"
           title="Guía de Usuario"
           style={{
             display: 'flex',
@@ -134,7 +132,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
             <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
           </svg>
-        </a>
+        </Link>
       </header>
 
       {/* Contenido principal */}
