@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabaseClient';
+import ModalConfirm from '@/components/ModalConfirm';
 
 const ADMIN_PASSWORD = 'MISCOUT-DEV-LACOUT-2026';
 
@@ -13,6 +14,7 @@ type License = {
   release_count: number;
   status: string;
   created_at: string;
+  expires_at: string;
   notes: string;
 };
 
@@ -35,6 +37,8 @@ export default function AdminPage() {
   const [newNotes, setNewNotes] = useState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
+  const [confirmandoLiberacion, setConfirmandoLiberacion] = useState<{activationId: string, licenseCode: string} | null>(null);
+  const [confirmandoRevocacion, setConfirmandoRevocacion] = useState<string | null>(null);
 
   const handleLogin = () => {
     if (password === ADMIN_PASSWORD) {
@@ -75,9 +79,18 @@ export default function AdminPage() {
     setLoading(true);
     setMessage('');
     const code = (newCode.trim() || generateCode()).toUpperCase();
+
+    const expiresAt = new Date();
+    expiresAt.setFullYear(expiresAt.getFullYear() + 1);
+
     const { error } = await supabase
       .from('licenses')
-      .insert({ code, version: 'v1.3', notes: newNotes });
+      .insert({ 
+        code, 
+        version: 'v1.3', 
+        notes: newNotes,
+        expires_at: expiresAt.toISOString(),
+      });
     if (error) {
       setMessage('Error: ' + error.message);
     } else {
@@ -89,15 +102,21 @@ export default function AdminPage() {
     setLoading(false);
   };
 
-  const handleRevoke = async (code: string) => {
+  const handleRevoke = (code: string) => {
+    setConfirmandoRevocacion(code);
+  };
+
+  const ejecutarRevocacion = async () => {
+    if (!confirmandoRevocacion) return;
     await supabase
       .from('licenses')
       .update({ status: 'revoked' })
-      .eq('code', code);
+      .eq('code', confirmandoRevocacion);
+    setConfirmandoRevocacion(null);
     loadData();
   };
 
-  const handleReleaseActivation = async (activationId: string, licenseCode: string) => {
+  const handleReleaseActivation = (activationId: string, licenseCode: string) => {
     // Find the license to check release_count
     const license = licenses.find((l) => l.code === licenseCode);
     if (!license) return;
@@ -107,12 +126,17 @@ export default function AdminPage() {
       return;
     }
 
-    const confirm = window.confirm(
-      'ATENCIÓN: Solo se permite liberar 1 activación por licencia.\n\n' +
-      '¿Confirmar liberación de esta activación?\n\n' +
-      'Esta acción no se puede deshacer.'
-    );
-    if (!confirm) return;
+    setConfirmandoLiberacion({ activationId, licenseCode });
+  };
+
+  const ejecutarLiberacion = async () => {
+    if (!confirmandoLiberacion) return;
+    const { activationId, licenseCode } = confirmandoLiberacion;
+    const license = licenses.find((l) => l.code === licenseCode);
+    if (!license) {
+      setConfirmandoLiberacion(null);
+      return;
+    }
 
     // Delete the activation
     await supabase
@@ -129,6 +153,7 @@ export default function AdminPage() {
       })
       .eq('code', licenseCode);
 
+    setConfirmandoLiberacion(null);
     loadData();
   };
 
@@ -232,6 +257,7 @@ export default function AdminPage() {
                   {lic.notes || 'Sin notas'} · {lic.version} · 
                   Activaciones: {lic.activations_used}/{lic.max_activations} · 
                   Liberaciones usadas: {lic.release_count}/1 · 
+                  Vence: {lic.expires_at ? new Date(lic.expires_at).toLocaleDateString('es-AR') : 'Sin vencimiento'} · 
                   Estado: {lic.status}
                 </p>
               </div>
@@ -291,6 +317,22 @@ export default function AdminPage() {
           </div>
         );
       })}
+
+      {confirmandoLiberacion && (
+        <ModalConfirm
+          mensaje="ATENCIÓN: Solo se permite liberar 1 activación por licencia. ¿Confirmar liberación de esta activación? Esta acción no se puede deshacer."
+          onConfirmar={ejecutarLiberacion}
+          onCancelar={() => setConfirmandoLiberacion(null)}
+        />
+      )}
+
+      {confirmandoRevocacion && (
+        <ModalConfirm
+          mensaje={`¿Estás seguro de que deseas revocar la licencia ${confirmandoRevocacion}? Esta acción no se puede deshacer.`}
+          onConfirmar={ejecutarRevocacion}
+          onCancelar={() => setConfirmandoRevocacion(null)}
+        />
+      )}
     </div>
   );
 }

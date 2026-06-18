@@ -27,6 +27,14 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Check expiration
+    if (license.expires_at && new Date(license.expires_at) < new Date()) {
+      return NextResponse.json(
+        { valid: false, error: 'Tu licencia ha vencido. Contactá al administrador para renovarla.' },
+        { status: 403 }
+      );
+    }
+
     // 2. Check if this device is already activated
     const { data: existingActivation } = await supabase
       .from('activations')
