@@ -1,6 +1,6 @@
 # Guía de Usuario - MiScout v1.3
 
-¡Bienvenido a **MiScout**! Esta es una herramienta diseñada para ayudarte a registrar, analizar y visualizar el rendimiento de jugadores de sóftbol durante los partidos.
+¡Bienvenido a **MiScout**! Esta es una herramienta diseñada para ayudarte a registrar, analizar y visualizar el rendimiento de jugadores de softbol durante los partidos.
 
 Esta guía está pensada para guiarte paso a paso, desde cómo instalar la aplicación en tu celular hasta cómo generar reportes avanzados de rendimiento. No necesitas ser un experto en tecnología para usarla; la interfaz está diseñada para que puedas registrar cada jugada de forma rápida y sencilla mientras observas el partido.
 

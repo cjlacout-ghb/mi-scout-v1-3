@@ -46,7 +46,7 @@ export default function GuiaPage() {
       <div style={{ padding: '24px 20px', maxWidth: 680, margin: '0 auto' }}>
 
         <p style={{ color: 'var(--text-secondary)', lineHeight: 1.65, marginBottom: 32, fontSize: '0.9rem' }}>
-          Herramienta de tracking de pitcheos y zona de strike para sóftbol. Esta guía cubre todas las funciones disponibles.
+          Herramienta de tracking de pitcheos y zona de strike para softbol. Esta guía cubre todas las funciones disponibles.
         </p>
 
         {/* ── ÍNDICE ── */}
