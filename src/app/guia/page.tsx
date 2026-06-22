@@ -45,8 +45,11 @@ export default function GuiaPage() {
 
       <div style={{ padding: '24px 20px', maxWidth: 680, margin: '0 auto' }}>
 
+        <p style={{ color: 'var(--text-secondary)', lineHeight: 1.65, marginBottom: 8, fontSize: '0.9rem' }}>
+          Herramienta de tracking de pitcheos y zona de strike para softbol.
+        </p>
         <p style={{ color: 'var(--text-secondary)', lineHeight: 1.65, marginBottom: 32, fontSize: '0.9rem' }}>
-          Herramienta de tracking de pitcheos y zona de strike para softbol. Esta guía cubre todas las funciones disponibles.
+          Esta guía te lleva -paso a paso-, desde cómo instalar la aplicación en tu celular hasta cómo generar reportes avanzados de rendimiento. La interfaz está diseñada para que puedas registrar cada jugada de forma rápida y sencilla mientras observás el partido.
         </p>
 
         {/* ── ÍNDICE ── */}
@@ -59,13 +62,13 @@ export default function GuiaPage() {
         }}>
           <p style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>Contenido</p>
           {[
-            ['1', 'Instalar la aplicación'],
+            ['1', '¿Cómo instalar la aplicación?'],
             ['2', 'Activación de licencia'],
             ['3', 'Navegación'],
-            ['4', 'Line-Up y gestión del partido'],
+            ['4', 'Line-Up: gestión del partido'],
             ['5', 'Tracking: registrar en vivo'],
-            ['6', 'Heat Map y estadísticas'],
-            ['7', 'Reportes'],
+            ['6', 'Heat Map: estadísticas'],
+            ['7', 'Reporte: generación de informes'],
             ['8', 'Historial de partidos'],
             ['9', 'Código de colores'],
             ['10', 'Guardado automático'],
@@ -89,112 +92,129 @@ export default function GuiaPage() {
           ))}
         </div>
 
-        {/* ─────────────────────────────────────────── */}
-        <Section id="s1" num="1" title="Instalar la aplicación">
-          <P>MiScout es una PWA (Progressive Web App). No necesitás descargarla de ninguna tienda; instalala directamente desde el navegador.</P>
+        {/* ── S1 ── */}
+        <Section id="s1" num="1" title="¿Cómo instalar la aplicación en tu celular?">
+          <P>MiScout es una aplicación web progresiva (PWA). No necesitás descargarla desde ninguna tienda; podés instalarla directamente desde tu navegador para usarla como cualquier otra app.</P>
           <SubTitle>iPhone / iPad (Safari)</SubTitle>
           <ol style={olStyle}>
             <li>Abrí MiScout en Safari.</li>
-            <li>Tocá el botón de <strong>Compartir</strong> (cuadrado con flecha hacia arriba).</li>
-            <li>Seleccioná <strong>"Agregar a inicio"</strong>.</li>
-            <li>Confirmá tocando <strong>Agregar</strong>.</li>
+            <li>Tocá el botón de <strong>Compartir</strong> (cuadrado con flecha apuntando hacia arriba, en la parte inferior).</li>
+            <li>Desplazate hacia abajo y seleccioná <strong>"Agregar a inicio"</strong>.</li>
+            <li>Tocá <strong>Agregar</strong> en la esquina superior derecha.</li>
+            <li>¡Listo! Verás el ícono de MiScout en tu pantalla de inicio.</li>
           </ol>
           <SubTitle>Android (Chrome)</SubTitle>
           <ol style={olStyle}>
-            <li>Abrí MiScout en Chrome.</li>
-            <li>Tocá el menú de tres puntos (esquina superior derecha).</li>
+            <li>Abrí MiScout en Google Chrome.</li>
+            <li>Tocá el ícono de <strong>Menú</strong> (tres puntos verticales, esquina superior derecha).</li>
             <li>Seleccioná <strong>"Agregar a la pantalla principal"</strong> o "Instalar aplicación".</li>
             <li>Confirmá tocando <strong>Agregar</strong> o "Instalar".</li>
+            <li>¡Listo! La app aparecerá junto a tus otras aplicaciones.</li>
           </ol>
         </Section>
 
-        {/* ─────────────────────────────────────────── */}
-        <Section id="s2" num="2" title="Activación de licencia">
+        {/* ── S2 ── */}
+        <Section id="s2" num="2" title="Activación de Licencia">
           <P>La primera vez que abrís MiScout, la app verifica tu licencia antes de darte acceso.</P>
           <ul style={ulStyle}>
             <li>Verás la pantalla de <strong>Activar licencia</strong>.</li>
-            <li>Ingresá el código de activación (formato: <code style={codeStyle}>MISCOUT-v13-XXXX-XXXX</code>).</li>
-            <li>La licencia queda <strong>vinculada a ese dispositivo</strong> de forma permanente.</li>
-            <li>Necesitás conexión a internet <strong>solo en este paso inicial</strong>.</li>
+            <li>Ingresá el código de activación que te fue proporcionado (formato: <code style={codeStyle}>MISCOUT-v13-XXXX-XXXX</code>).</li>
+            <li>Al confirmar, la licencia quedará <strong>vinculada a ese dispositivo</strong> de forma permanente, por 1 año.</li>
+            <li>La app verifica la licencia con el servidor; necesitás conexión a internet <strong>solo en este paso inicial</strong>.</li>
+            <li>Una vez activada, serás redirigido a la pantalla principal.</li>
           </ul>
-          <Note>Podés abrir esta guía en cualquier momento tocando el <strong>ícono de libro</strong> en la esquina superior derecha del encabezado.</Note>
+          <Note>Podés acceder a esta guía en cualquier momento tocando el <strong>ícono de libro</strong> ubicado en la esquina superior derecha del encabezado.</Note>
         </Section>
 
-        {/* ─────────────────────────────────────────── */}
+        {/* ── S3 ── */}
         <Section id="s3" num="3" title="Navegación">
-          <P>La app tiene 5 secciones accesibles desde la barra inferior:</P>
+          <P>La app tiene <strong>5 secciones</strong> accesibles desde la barra de navegación inferior:</P>
           <Table
             headers={['Sección', 'Función']}
             rows={[
               ['Line-Up', 'Gestionar el partido y las alineaciones'],
               ['Tracking', 'Registrar lanzamientos en tiempo real'],
-              ['Heat Map', 'Estadísticas y mapa de calor por jugador'],
-              ['Reporte', 'Generar y descargar reportes en texto'],
+              ['Heat Map', 'Ver estadísticas y mapa de calor'],
+              ['Reporte', 'Generar y descargar reportes'],
               ['Historial', 'Consultar partidos finalizados'],
             ]}
           />
-          <P>En el encabezado siempre verás el partido activo. Si tocás el logo <strong>MiScout</strong> mientras hay un partido en curso, se te preguntará si querés volver al inicio (cerrando el partido sin eliminarlo).</P>
+          <P>En la parte superior de la app siempre verás el nombre del partido activo (ej. <code style={codeStyle}>AUS vs ARG</code>). Si tocás el logo <strong>MiScout</strong> en el encabezado mientras hay un partido activo, se te preguntará si querés volver al inicio (lo que cerrará el partido actual sin eliminarlo).</P>
         </Section>
 
-        {/* ─────────────────────────────────────────── */}
-        <Section id="s4" num="4" title="Line-Up: gestión del partido">
-          <SubTitle>Iniciar un nuevo partido</SubTitle>
-          <P>Tocá <strong>Comenzar</strong> en la pantalla principal. El formulario incluye:</P>
+        {/* ── S4 ── */}
+        <Section id="s4" num="4" title="Sección Line-Up: Inicio y Gestión de Partidos">
+          <P>La sección <strong>Line-Up</strong> es el punto de partida. Aquí configurás el partido y armás las alineaciones.</P>
+
+          <SubTitle>Iniciar un Nuevo Partido</SubTitle>
+          <P>Tocá <strong>Comenzar</strong> en la pantalla principal. Se abrirá un formulario con los siguientes campos:</P>
           <ul style={ulStyle}>
-            <li><strong>Equipo Visitante</strong> y <strong>Equipo Local</strong> *(obligatorios)*</li>
-            <li><strong>Evento</strong> — descripción opcional (ej. "Torneo X — Juego 1")</li>
-            <li><strong>Fecha</strong> — se completa sola, podés cambiarla</li>
-            <li><strong>Vista de zona de strike</strong> — elegís si marcás los pitches desde perspectiva <strong>Catcher</strong> o <strong>Pitcher</strong></li>
+            <li><strong>Equipo Visitante</strong> <em>(obligatorio)</em>: Nombre o sigla del equipo visitante (ej. <code style={codeStyle}>AUS</code>).</li>
+            <li><strong>Equipo Local</strong> <em>(obligatorio)</em>: Nombre o sigla del equipo local (ej. <code style={codeStyle}>ARG</code>).</li>
+            <li><strong>Evento</strong> <em>(opcional)</em>: Descripción del evento (ej. <code style={codeStyle}>Torneo X — Juego 1</code>).</li>
+            <li><strong>Fecha</strong>: Se completa automáticamente con la fecha de hoy; podés cambiarla tocando el campo.</li>
+            <li><strong>Vista de zona de strike</strong>: Elegís si vas a marcar los lanzamientos desde la perspectiva del <strong>Catcher</strong> o del <strong>Pitcher</strong>.</li>
           </ul>
 
-          <SubTitle>Cargar jugadores</SubTitle>
+          <SubTitle>Gestionar el Lineup</SubTitle>
+          <P>Una vez creado el partido, verás dos pestañas: <strong>Visitante</strong> y <strong>Local</strong>. Tenés dos formas de cargar jugadores:</P>
           <ul style={ulStyle}>
-            <li><strong>Agregar 1 jugador:</strong> Un jugador a la vez. Al guardar, la app te lleva directamente al Tracking.</li>
-            <li><strong>Line-up completo:</strong> Tabla para cargar hasta 9+ jugadores de una sola vez en orden al bate. Cada fila acepta: número, apellido, nombre y lado de bateo (D / Z / S). Podés agregar más filas con <em>"+ Agregar fila"</em>.</li>
+            <li><strong>Agregar 1 jugador</strong>: Formulario para cargar un jugador a la vez. Al guardar, la app te lleva directamente al Tracking.</li>
+            <li><strong>Line-up completo</strong>: Tabla para cargar los 9 (o más) jugadores de una sola vez en orden al bate. Si necesitás más filas, tocá <em>"+ Agregar fila"</em>.</li>
           </ul>
 
-          <SubTitle>Modificar el lineup (durante el partido)</SubTitle>
+          <SubTitle>Datos de cada jugador</SubTitle>
           <ul style={ulStyle}>
-            <li><strong>Editar</strong> — ícono de lápiz junto al jugador.</li>
-            <li><strong>Eliminar</strong> — botón ✕ rojo. Desaparece al finalizar el partido.</li>
+            <li><strong># Camiseta</strong> <em>(obligatorio)</em>: Hasta 3 dígitos.</li>
+            <li><strong>Apellido</strong> <em>(obligatorio)</em>.</li>
+            <li><strong>Nombre</strong> <em>(opcional)</em>.</li>
+            <li><strong>Lado de bateo</strong>: <strong>D</strong> (Derecho), <strong>Z</strong> (Zurdo) o <strong>S</strong> (Switch/Ambos lados).</li>
+          </ul>
+
+          <SubTitle>Modificar el Lineup (durante el partido)</SubTitle>
+          <ul style={ulStyle}>
+            <li><strong>Editar</strong>: Ícono del lápiz junto al jugador.</li>
+            <li><strong>Eliminar</strong>: Botón <strong>✕ rojo</strong>. Para proteger tus datos, esta opción desaparece una vez que el partido finaliza.</li>
           </ul>
 
           <SubTitle>Sustituciones</SubTitle>
-          <P>Botón <strong>"Sustitución del bateador actual"</strong> (visible mientras hay un bateador activo):</P>
+          <P>Si ingresa un bateador emergente, tocá el botón <strong>"Sustitución del bateador actual"</strong>:</P>
           <ul style={ulStyle}>
-            <li>El saliente queda tachado con la nota "↳ Reemplazado por #X APELLIDO (Inning Y)".</li>
+            <li>El saliente quedará tachado con la nota "↳ Reemplazado por #X APELLIDO (Inning Y)".</li>
             <li>Si el saliente era <strong>abridor</strong>, aparece el botón <strong>"Reingresar"</strong> para devolverlo al juego.</li>
           </ul>
 
           <SubTitle>Otras acciones</SubTitle>
           <ul style={ulStyle}>
-            <li>Tocar un jugador en partido <strong>finalizado</strong> → navega directo a sus Stats.</li>
+            <li>Tocar un jugador en partido <strong>finalizado</strong> → navega directo a su pantalla de Heat Map / Stats.</li>
             <li>Botón <strong>"Nuevo partido"</strong> (rojo) → descarta el partido actual (pide confirmación).</li>
           </ul>
         </Section>
 
-        {/* ─────────────────────────────────────────── */}
-        <Section id="s5" num="5" title="Tracking: registrar en vivo">
-          <SubTitle>Encabezado del bateador</SubTitle>
+        {/* ── S5 ── */}
+        <Section id="s5" num="5" title="Sección Tracking: Registrando el Partido en Vivo">
+          <P>La sección <strong>Tracking</strong> es el corazón de la app. Aquí registrás cada lanzamiento en tiempo real.</P>
+
+          <SubTitle>Encabezado del Bateador Actual</SubTitle>
           <ul style={ulStyle}>
-            <li>Número de camiseta, apellido, nombre y lado de bateo.</li>
-            <li>Inning actual con ▲ (alta) o ▼ (baja).</li>
-            <li>Botones <strong>+</strong> y <strong>−</strong> para ajustar la mitad del inning manualmente.</li>
-            <li>Stats rápidas: <strong>AB, H, O, K, BB/HBP</strong> y resultado del último turno.</li>
+            <li>El <strong>número</strong> de camiseta (en el cuadro dorado), apellido, nombre e inicial del lado de bateo.</li>
+            <li>El <strong>equipo</strong> al que pertenece.</li>
+            <li>El <strong>inning actual</strong>, con ▲ para alta o ▼ para baja.</li>
+            <li>Controles <strong>+</strong> y <strong>−</strong> para avanzar o retroceder la mitad del inning manualmente.</li>
+            <li>Stats rápidas: <strong>AB, H, O, K, BB/HBP</strong> y resultado del <strong>último turno</strong>.</li>
           </ul>
 
           <SubTitle>Modo "Este partido" vs. "Acumulado"</SubTitle>
-          <P>Un selector sobre la zona cambia qué datos se visualizan en los marcadores:</P>
           <ul style={ulStyle}>
-            <li><strong>Este partido</strong> — solo los lanzamientos del partido actual.</li>
-            <li><strong>Acumulado</strong> — todos los lanzamientos históricos del jugador. <em>(Solo disponible con el partido finalizado.)</em></li>
+            <li><strong>Este partido</strong>: Solo los lanzamientos del partido actual.</li>
+            <li><strong>Acumulado</strong>: Todos los lanzamientos históricos del jugador. <em>(Solo disponible con el partido finalizado.)</em></li>
           </ul>
 
-          <SubTitle>Cómo registrar un lanzamiento</SubTitle>
+          <SubTitle>¿Cómo registrar un lanzamiento?</SubTitle>
           <ol style={olStyle}>
-            <li><strong>Tocá la zona</strong> donde cruzó la pelota. Hay 8 sectores: zonas <strong>1–4</strong> (internas) y <strong>5–8</strong> (perimetrales/esquinas). Se registran las coordenadas exactas del punto.</li>
-            <li><strong>Elegí el tipo de pitch:</strong> Drop, Riser, Curva, Cambio, Screw u Otro.</li>
-            <li><strong>Elegí el resultado:</strong></li>
+            <li><strong>Tocá la Zona</strong> donde cruzó la pelota. 8 sectores: zonas <strong>1–4</strong> (internas) y <strong>5–8</strong> (perimetrales). Se registran las coordenadas exactas del punto tocado.</li>
+            <li><strong>Elegí el Tipo de Lanzamiento</strong> (panel desde abajo): Drop, Riser, Curva, Cambio, Screw u Otro.</li>
+            <li><strong>Elegí el Resultado del turno al bate:</strong></li>
           </ol>
 
           <Table
@@ -208,76 +228,90 @@ export default function GuiaPage() {
               ['HBP', 'Golpeado por el pitch — finaliza de inmediato'],
             ]}
           />
-          <P>En el panel podés tocar <strong>←</strong> para retroceder un paso, o <strong>✕</strong> para cancelar sin guardar.</P>
+          <Note>En el panel podés tocar <strong>←</strong> para retroceder un paso, o <strong>✕</strong> para cancelar sin guardar.</Note>
 
-          <SubTitle>Confirmar o editar</SubTitle>
+          <SubTitle>Confirmar y Corregir</SubTitle>
           <ul style={ulStyle}>
-            <li><strong>Confirmar</strong> — avanza al siguiente bateador.</li>
-            <li><strong>Editar</strong> — tocá un nuevo punto en la zona para corregir la ubicación antes de confirmar.</li>
+            <li><strong>Confirmar</strong>: Avanza al siguiente bateador y guarda el turno.</li>
+            <li><strong>Editar</strong>: Si te equivocaste en la ubicación del lanzamiento, tocá un nuevo punto en la zona antes de confirmar para corregirlo.</li>
           </ul>
 
-          <SubTitle>Cambio de equipo al bate</SubTitle>
-          <P>Tocá el botón <strong>⇄</strong> (derecha del carrusel de orden al bate) cuando el equipo defensor logra los 3 outs. La app muestra un aviso de confirmación del inning.</P>
+          <SubTitle>Cambio de Mitad de Inning</SubTitle>
+          <P>Cuando el equipo a la defensiva logra los 3 outs, tocá el botón <strong>⇄</strong> (derecha del carrusel de orden al bate) para cambiar el equipo que pasa a batear. La app mostrará un aviso de confirmación del inning. También podés ajustar el inning manualmente usando los botones <strong>+</strong> y <strong>−</strong>.</P>
 
-          <SubTitle>Seleccionar un bateador diferente</SubTitle>
-          <P>Tocá el número de camiseta en el <strong>carrusel de orden al bate</strong> para cambiar el bateador actual sin avanzar el orden.</P>
+          <SubTitle>Seleccionar un Bateador Diferente</SubTitle>
+          <P>En el carrusel de "Orden al bate" (debajo de la zona) verás los números de camiseta de todos los jugadores activos. Podés hacer click en cualquier jugador si querés trackear un bateador por fuera del orden al bate establecido.</P>
 
-          <SubTitle>Historial de turnos</SubTitle>
-          <P>Debajo de la zona de strike verás todos los turnos del jugador en este partido. Desde ahí podés:</P>
+          <SubTitle>Historial de Turnos del Bateador</SubTitle>
+          <P>Debajo de la zona verás todos los turnos del jugador en este partido (orden inverso). Desde ahí podés:</P>
           <ul style={ulStyle}>
-            <li><strong>✎ Editar</strong> un turno — cambia zona y/o datos del pitch.</li>
+            <li><strong>✎ Editar</strong> un turno: cambia zona y/o datos del lanzamiento.</li>
             <li><strong>✕ Eliminar</strong> un turno (con confirmación).</li>
           </ul>
 
-          <SubTitle>Notas del jugador</SubTitle>
-          <P>Campo de texto libre al final de la pantalla para observaciones (ej. "Le cuesta batear las curvas bajas"). Se guarda automáticamente.</P>
+          <SubTitle>Notas sobre el Jugador</SubTitle>
+          <P>Campo de texto libre al final de la pantalla para observaciones (ej. "Le cuesta batear los tiros bajos"). Se guarda automáticamente.</P>
 
-          <SubTitle>Finalizar el partido</SubTitle>
-          <P>Botón rojo <strong>"Finalizar partido"</strong> al pie de la pantalla. Una vez finalizado, el partido se archiva en el Historial y la zona pasa a modo solo lectura.</P>
+          <SubTitle>Finalizar el Partido</SubTitle>
+          <P>Botón rojo <strong>"Finalizar partido"</strong> al pie de la pantalla. Una vez finalizado:</P>
+          <ul style={ulStyle}>
+            <li>El partido se archiva en el <strong>Historial</strong>.</li>
+            <li>La zona de strike cambia a <strong>modo solo lectura</strong> (perspectiva fija desde el catcher).</li>
+            <li>Se habilitan las opciones de <strong>Modo Acumulado</strong>, <strong>Reporte</strong> y acceso completo al Historial.</li>
+          </ul>
         </Section>
 
-        {/* ─────────────────────────────────────────── */}
-        <Section id="s6" num="6" title="Heat Map: estadísticas">
-          <SubTitle>Selector de jugador</SubTitle>
+        {/* ── S6 ── */}
+        <Section id="s6" num="6" title="Sección Heat Map: Estadísticas y Mapa de Calor">
+          <P>La sección <strong>Heat Map</strong> te permite analizar el rendimiento de cualquier jugador.</P>
+
+          <SubTitle>Selector de Jugador</SubTitle>
+          <P>Menú desplegable con todos los jugadores de los equipos del partido seleccionado. Podés ordenar:</P>
           <ul style={ulStyle}>
-            <li>Menú desplegable con todos los jugadores de ambos equipos.</li>
-            <li>Ordenar por <strong>Orden al bate</strong> o por <strong>AVG</strong> (con color por temperatura).</li>
+            <li><strong>Orden al bate</strong>: en el orden del lineup del partido seleccionado.</li>
+            <li><strong>AVG</strong>: por promedio de bateo, con el número coloreado según su valor.</li>
           </ul>
 
           <SubTitle>Modo "Este partido" vs. "Acumulado"</SubTitle>
-          <P><em>Solo disponible con el partido finalizado.</em> El modo Acumulado suma todos los partidos históricos del jugador.</P>
+          <P><em>Solo disponible con el partido finalizado.</em></P>
+          <ul style={ulStyle}>
+            <li><strong>Este partido</strong>: Solo los datos del partido actual.</li>
+            <li><strong>Acumulado</strong>: Suma <strong>todos los partidos</strong> registrados para ese jugador.</li>
+          </ul>
 
-          <SubTitle>Métricas</SubTitle>
+          <SubTitle>Métricas del Jugador</SubTitle>
           <Table
             headers={['Stat', 'Descripción']}
             rows={[
               ['AB', 'Turnos al bate totales'],
               ['H', 'Hits'],
-              ['A/F', 'Outs (asistencia + fly)'],
+              ['A/F', 'Outs (Asistencia + Fly)'],
               ['KS/KL', 'Ponches (swinging + looking)'],
               ['BB/HBP', 'Bases por bolas y golpeados'],
               ['AVG', 'Promedio de bateo'],
             ]}
           />
 
-          <SubTitle>Mapa de calor</SubTitle>
-          <P>La zona de strike siempre se muestra desde la <strong>perspectiva del Catcher</strong> (independientemente de cómo se hizo el tracking). Cada sector se colorea según la peligrosidad del bateador:</P>
+          <SubTitle>Mapa de Calor</SubTitle>
+          <P>La zona de strike se muestra <strong>siempre desde la perspectiva del Catcher</strong> (independientemente de cómo se haya hecho el tracking):</P>
           <ul style={ulStyle}>
-            <li><span style={{ color: '#62BB46', fontWeight: 700 }}>Verde</span> — zona fría, no conecta hits ahí.</li>
-            <li><span style={{ color: '#FFC20E', fontWeight: 700 }}>Amarillo</span> / <span style={{ color: '#F58220', fontWeight: 700 }}>Naranja</span> / <span style={{ color: '#F15B40', fontWeight: 700 }}>Rojo</span> — zona caliente, bateador peligroso.</li>
+            <li><span style={{ color: '#62BB46', fontWeight: 700 }}>Verde / Azul</span>: Zona fría — el bateador no conecta hits ahí.</li>
+            <li><span style={{ color: '#FFC20E', fontWeight: 700 }}>Amarillo</span>: Zona neutra.</li>
+            <li><span style={{ color: '#F58220', fontWeight: 700 }}>Naranja</span> / <span style={{ color: '#F15B40', fontWeight: 700 }}>Rojo</span>: Zona caliente — el bateador es peligroso.</li>
           </ul>
+          <P>Una leyenda <strong>COLD → HOT</strong> debajo de la zona ayuda a interpretar la escala.</P>
 
-          <SubTitle>Desglose por zona</SubTitle>
-          <P>Tabla con 8 filas (una por zona): Pitches, AB, Hits, A/F, K y AVG coloreado. Las zonas internas (1–4) se separan visualmente de las perimetrales (5–8).</P>
+          <SubTitle>Desglose por Zona</SubTitle>
+          <P>Tabla con 8 filas: Pitcheos, AB, Hits, A/F, K y AVG coloreado. Las zonas internas (1–4) se separan visualmente de las perimetrales (5–8).</P>
 
-          <SubTitle>Tabla por tipo de pitch</SubTitle>
-          <P>Rendimiento del bateador según el tipo de lanzamiento que recibió: cuántos vio, cuántos terminaron en AB, ponches (K) y AVG. Solo aparecen los tipos de pitch que se registraron.</P>
+          <SubTitle>Tabla por Tipo de Lanzamiento</SubTitle>
+          <P>Rendimiento del bateador según el tipo de lanzamiento recibido (Drop, Riser, Curva, Cambio, Screw, Otro): cuántos vio, cuántos terminaron en AB, K y AVG. Solo aparecen los tipos que se registraron.</P>
         </Section>
 
-        {/* ─────────────────────────────────────────── */}
-        <Section id="s7" num="7" title="Reportes">
+        {/* ── S7 ── */}
+        <Section id="s7" num="7" title="Sección Reporte: Generación de Informes">
           <Note>Los reportes solo están disponibles cuando el partido está <strong>finalizado</strong>.</Note>
-          <P>Podés generar cuatro combinaciones:</P>
+          <P>Podés generar cuatro combinaciones de reportes:</P>
           <Table
             headers={['', 'Este partido', 'Acumulado']}
             rows={[
@@ -286,26 +320,27 @@ export default function GuiaPage() {
             ]}
           />
           <ul style={ulStyle}>
-            <li><strong>Jugador / Este partido:</strong> análisis de un jugador solo en este partido.</li>
-            <li><strong>Jugador / Acumulado:</strong> suma todos sus partidos históricos.</li>
-            <li><strong>Equipo / Este partido:</strong> resumen de todos los jugadores del equipo en este partido.</li>
-            <li><strong>Equipo / Acumulado:</strong> resumen histórico de todos los jugadores del equipo.</li>
+            <li><strong>Jugador / Este partido</strong>: análisis del jugador solo en este partido.</li>
+            <li><strong>Jugador / Acumulado</strong>: suma todos sus partidos históricos.</li>
+            <li><strong>Equipo / Este partido</strong>: resumen de todos los jugadores del equipo en este partido.</li>
+            <li><strong>Equipo / Acumulado</strong>: resumen histórico de todos los jugadores del equipo.</li>
           </ul>
-          <P>Antes de descargar verás una <strong>vista previa del contenido</strong>. Tocá <strong>"Descargar .md"</strong> para guardar el reporte como archivo Markdown legible en cualquier editor de texto.</P>
+          <P>Antes de descargar verás una <strong>vista previa del contenido</strong>. Tocá <strong>"Descargar .md"</strong> para guardar el reporte como archivo Markdown. El nombre del archivo se genera automáticamente (ej. <code style={codeStyle}>scout_smith_m.md</code> o <code style={codeStyle}>scout_equipo_acumulado.md</code>).</P>
         </Section>
 
-        {/* ─────────────────────────────────────────── */}
-        <Section id="s8" num="8" title="Historial de partidos">
-          <P>Guardado de todos los partidos finalizados. Cada tarjeta muestra fecha, equipos, evento e innings jugados.</P>
+        {/* ── S8 ── */}
+        <Section id="s8" num="8" title="Sección Historial de Partidos">
+          <P>La sección <strong>Historial</strong> guarda todos los partidos que has dado por finalizados. Cada tarjeta muestra: fecha, equipos, evento e innings jugados.</P>
           <ul style={ulStyle}>
-            <li><strong>Tocar la tarjeta</strong> → carga el partido y va al Heat Map.</li>
+            <li><strong>Tocar la tarjeta</strong> → carga el partido y va a su Heat Map.</li>
             <li><strong>Botón "Seleccionar jugador"</strong> (dorado) → carga el partido y va al Line-Up para elegir jugador.</li>
             <li><strong>✕ Eliminar</strong> → borra el partido y <em>todos sus datos permanentemente</em> (pide confirmación).</li>
           </ul>
         </Section>
 
-        {/* ─────────────────────────────────────────── */}
-        <Section id="s9" num="9" title="Código de colores">
+        {/* ── S9 ── */}
+        <Section id="s9" num="9" title="Código de Colores Universal">
+          <P>La app usa siempre los mismos colores para que puedas leer los datos a simple vista:</P>
           <Table
             headers={['Color', 'Significado']}
             rows={[
@@ -314,12 +349,13 @@ export default function GuiaPage() {
               ['🔵 Azul', 'BB / HBP (base por bolas o golpeado)'],
             ]}
           />
-          <P>En el mapa de calor la escala va de <span style={{ color: '#62BB46', fontWeight: 700 }}>verde frío</span> a <span style={{ color: '#F15B40', fontWeight: 700 }}>rojo caliente</span>. En las tablas de AVG el número también se colorea según el valor.</P>
+          <P>En el <strong>mapa de calor</strong>, la escala va de <span style={{ color: '#62BB46', fontWeight: 700 }}>verde frío</span> a <span style={{ color: '#F15B40', fontWeight: 700 }}>rojo caliente</span>, pasando por amarillo y naranja.</P>
+          <P>En las <strong>tablas de AVG</strong>, el color del número va de verde (promedio bajo) a rojo (promedio alto).</P>
         </Section>
 
-        {/* ─────────────────────────────────────────── */}
-        <Section id="s10" num="10" title="Guardado automático">
-          <P>MiScout guarda el progreso automáticamente en tu dispositivo, <strong>sin necesidad de conexión a internet durante el partido</strong>. Si cerrás la app o el teléfono se queda sin batería, al volver a abrirla el partido continuará exactamente donde lo dejaste.</P>
+        {/* ── S10 ── */}
+        <Section id="s10" num="10" title="Guardado Automático">
+          <P>MiScout guarda el progreso automáticamente en tu dispositivo <strong>sin necesidad de conexión a internet durante el partido</strong>. Si cerrás la app por accidente o el teléfono se queda sin batería, al volver a abrir la app el partido continuará exactamente donde lo dejaste.</P>
         </Section>
 
         {/* Footer */}
@@ -329,10 +365,12 @@ export default function GuiaPage() {
           borderTop: '1px solid var(--border)',
           textAlign: 'center',
         }}>
-          <p style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', lineHeight: 1.7 }}>
+          <p style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', lineHeight: 1.8 }}>
             © 2026 Cristian J. Lacout — Todos los derechos reservados.<br />
             MiScout es software propietario. Queda expresamente prohibida su copia,<br />
-            redistribución, modificación o uso comercial sin autorización escrita del autor.
+            redistribución, modificación o uso comercial sin autorización escrita del autor.<br /><br />
+            <em>Disclaimer: MiScout es una herramienta de análisis y seguimiento estadístico. Su uso no garantiza resultados deportivos, victorias ni mejoras de rendimiento específicas.</em><br /><br />
+            Versión 1.3 | Idioma: Español | Última actualización: Julio 2026
           </p>
         </div>
 
@@ -341,7 +379,7 @@ export default function GuiaPage() {
   );
 }
 
-// ─── Componentes internos de layout ───────────────────────────────────────────
+// ─── Componentes internos ─────────────────────────────────────────────────────
 
 function Section({ id, num, title, children }: { id: string; num: string; title: string; children: React.ReactNode }) {
   return (
@@ -357,7 +395,7 @@ function Section({ id, num, title, children }: { id: string; num: string; title:
           margin: 0, letterSpacing: '-0.01em',
         }}>{title}</h2>
       </div>
-      <div style={{ paddingLeft: 0 }}>{children}</div>
+      <div>{children}</div>
     </section>
   );
 }

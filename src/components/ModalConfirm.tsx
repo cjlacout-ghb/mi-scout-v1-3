@@ -6,9 +6,10 @@ interface Props {
   mensaje: string;
   onConfirmar: () => void;
   onCancelar: () => void;
+  soloAviso?: boolean;
 }
 
-export default function ModalConfirm({ mensaje, onConfirmar, onCancelar }: Props) {
+export default function ModalConfirm({ mensaje, onConfirmar, onCancelar, soloAviso }: Props) {
   return (
     <div
       onClick={onCancelar}
@@ -73,19 +74,21 @@ export default function ModalConfirm({ mensaje, onConfirmar, onCancelar }: Props
 
         {/* Botones */}
         <div style={{ display: 'flex', gap: 12 }}>
+          {!soloAviso && (
+            <button
+              className="btn btn-ghost"
+              onClick={onCancelar}
+              style={{ flex: 1, padding: '14px 16px', borderRadius: 12, fontSize: '0.9rem' }}
+            >
+              Cancelar
+            </button>
+          )}
           <button
-            className="btn btn-ghost"
-            onClick={onCancelar}
-            style={{ flex: 1, padding: '14px 16px', borderRadius: 12, fontSize: '0.9rem' }}
-          >
-            Cancelar
-          </button>
-          <button
-            className="btn btn-danger"
+            className={soloAviso ? "btn btn-primary" : "btn btn-danger"}
             onClick={onConfirmar}
             style={{ flex: 1, padding: '14px 16px', borderRadius: 12, fontSize: '0.9rem' }}
           >
-            Confirmar
+            {soloAviso ? "Entendido" : "Confirmar"}
           </button>
         </div>
       </div>

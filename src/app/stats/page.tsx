@@ -422,7 +422,7 @@ export default function StatsPage() {
                 <thead>
                   <tr>
                     <th>Zona</th>
-                    <th style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>Pitches</th>
+                    <th style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>Pitcheos</th>
                     <th style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>AB</th>
                     <th style={{ textAlign: 'center' }}>Hits</th>
                     <th style={{ textAlign: 'center' }}>A/F</th>

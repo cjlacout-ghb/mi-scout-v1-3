@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
+import ModalConfirm from './ModalConfirm';
 
 export interface FormBateador {
   numero: string;
@@ -26,11 +28,16 @@ export default function ModalBateador({
   onClose: () => void;
 }) {
   const [form, setForm] = useState<FormBateador>(inicial ?? FORM_VACIO);
+  const [mostrarAlerta, setMostrarAlerta] = useState(false);
+  
   const set = (k: keyof FormBateador) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm((p) => ({ ...p, [k]: e.target.value }));
 
   const guardar = () => {
-    if (!form.apellido.trim() || !form.numero.trim()) return;
+    if (!form.apellido.trim() || !form.numero.trim()) {
+      setMostrarAlerta(true);
+      return;
+    }
     onGuardar({
       numero: form.numero.trim(),
       apellido: form.apellido.trim().toUpperCase(),
@@ -98,6 +105,16 @@ export default function ModalBateador({
           <button className="btn btn-primary btn-full" onClick={guardar}>Guardar</button>
         </div>
       </div>
+      
+      {mostrarAlerta && createPortal(
+        <ModalConfirm
+          mensaje="Por favor, completa los campos obligatorios (# Camiseta y Apellido) para continuar."
+          onConfirmar={() => setMostrarAlerta(false)}
+          onCancelar={() => setMostrarAlerta(false)}
+          soloAviso={true}
+        />,
+        document.body
+      )}
     </div>
   );
 }
