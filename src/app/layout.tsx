@@ -5,11 +5,11 @@ import AppShell from '@/components/AppShell';
 import LicenseGuard from '@/components/LicenseGuard';
 
 export const metadata: Metadata = {
-  title: 'MiScout -Tracking de pitcheos',
+  title: 'MiScout | Tracking de pitcheos',
   description: 'Aplicación de scouting y tracking de lanzamientos para softball. Análisis por bateador con heat map y reportes.',
   manifest: '/manifest.json',
   icons: {
-    icon: '/favicon.ico',
+    icon: '/assets/icon-192.png',
     apple: '/assets/icon-192.png',
   },
   formatDetection: {
