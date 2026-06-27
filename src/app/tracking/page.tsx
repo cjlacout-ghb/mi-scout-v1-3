@@ -532,7 +532,7 @@ export default function TrackingPage() {
                 background: 'var(--bg-elevated)',
                 borderRadius: 8,
                 marginBottom: 6,
-                borderLeft: `3px solid ${t.resultado === 'HIT' ? 'var(--danger)' : t.resultado === 'OUT' ? 'var(--success)' : t.resultado === 'ERROR' ? 'var(--warning)' : t.resultado.startsWith('K') ? 'var(--info)' : 'var(--text-secondary)'}`,
+                borderLeft: `3px solid ${t.resultado === 'HIT' ? 'var(--danger)' : t.resultado === 'OUT' ? 'var(--success)' : t.resultado === 'ERROR' ? 'var(--text-secondary)' : t.resultado.startsWith('K') ? 'var(--info)' : 'var(--text-secondary)'}`,
                 border: t.id === turnoEditando?.id ? '2px solid var(--warning)' : undefined,
                 boxShadow: t.id === turnoEditando?.id ? '0 0 8px rgba(243, 156, 18, 0.4)' : 'none',
               }}
@@ -544,7 +544,7 @@ export default function TrackingPage() {
               <span style={{
                 fontWeight: 800,
                 fontSize: '0.88rem',
-                color: t.resultado === 'HIT' ? 'var(--danger)' : t.resultado === 'OUT' ? 'var(--success)' : t.resultado === 'ERROR' ? 'var(--warning)' : t.resultado.startsWith('K') ? 'var(--info)' : 'var(--text-secondary)',
+                color: t.resultado === 'HIT' ? 'var(--danger)' : t.resultado === 'OUT' ? 'var(--success)' : t.resultado === 'ERROR' ? 'var(--text-secondary)' : t.resultado.startsWith('K') ? 'var(--info)' : 'var(--text-secondary)',
                 marginRight: 4
               }}>
                 {t.resultado}

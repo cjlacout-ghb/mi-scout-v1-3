@@ -224,7 +224,7 @@ export default function ModalPitch({ zona, onConfirmar, onCancelar }: Props) {
               style={{ flexDirection: 'row', justifyContent: 'center', gap: 14 }}
               onClick={() => elegirResultado('ERROR')}
             >
-              <span style={{ fontSize: '1.3rem', fontWeight: 900, color: 'var(--warning)' }}>ERROR</span>
+              <span style={{ fontSize: '1.3rem', fontWeight: 900, color: 'var(--text-secondary)' }}>ERROR</span>
             </button>
           </div>
         );
