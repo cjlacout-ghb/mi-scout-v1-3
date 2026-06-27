@@ -68,7 +68,9 @@ export default function StatsPage() {
   const avgMap = new Map<string, number>();
   for (const b of todos) {
     const bt = estado.turnosAlBate.filter(t => t.bateadorId === b.id);
-    const ab = bt.length;
+    const bbHbp = bt.filter(t => t.resultado === 'BB' || t.resultado === 'HBP').length;
+    const sac = bt.filter(t => t.resultado === 'OUT' && (t.detalleOut?.tipo === 'sac fly' || t.detalleOut?.tipo === 'sac bunt')).length;
+    const ab = bt.length - bbHbp - sac;
     const h  = bt.filter(t => t.resultado === 'HIT').length;
     avgMap.set(b.id, ab > 0 ? h / ab : -1);
   }
@@ -90,7 +92,9 @@ export default function StatsPage() {
         const turnos = ids.length > 0
           ? await db.turnos_al_bate.where('bateadorId').anyOf(ids).toArray()
           : [];
-        const ab = turnos.length;
+        const bbHbp = turnos.filter(t => t.resultado === 'BB' || t.resultado === 'HBP').length;
+        const sac = turnos.filter(t => t.resultado === 'OUT' && (t.detalleOut?.tipo === 'sac fly' || t.detalleOut?.tipo === 'sac bunt')).length;
+        const ab = turnos.length - bbHbp - sac;
         const h  = turnos.filter(t => t.resultado === 'HIT').length;
         return { id: bateador.id, avg: ab > 0 ? h / ab : -1 };
       })

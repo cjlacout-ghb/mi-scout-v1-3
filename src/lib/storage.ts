@@ -84,12 +84,16 @@ export function calcularEstadisticas(
         if (t.detalleHit?.tipo === 'triple') triples++;
         if (t.detalleHit?.tipo === 'homerun') homeRuns++;
         break;
-      case 'OUT':
+      case 'OUT': {
+        const esSacrificio = t.detalleOut?.tipo === 'sac fly' || t.detalleOut?.tipo === 'sac bunt';
         outs++;
         porZona[z].outs++;
         porZona[z].contacto++;
-        porPitch[p].ab++;
+        if (!esSacrificio) {
+          porPitch[p].ab++;
+        }
         break;
+      }
       case 'KS':
         ks++;
         porZona[z].ks++;
@@ -110,7 +114,8 @@ export function calcularEstadisticas(
     }
   }
 
-  const ab = misTurnos.length;
+  const sacCount = misTurnos.filter(t => t.resultado === 'OUT' && (t.detalleOut?.tipo === 'sac fly' || t.detalleOut?.tipo === 'sac bunt')).length;
+  const ab = misTurnos.length - bb - sacCount;
   const promedio = ab > 0 ? hits / ab : 0;
 
   return {
