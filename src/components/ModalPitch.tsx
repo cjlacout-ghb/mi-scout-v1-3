@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import type {
   ZonaStrike, TipoPitch, ResultadoAtBat, TipoOut, TipoHit,
-  CalidadContacto, NumeroDefensor, DetalleOut, DetalleHit, DetalleError,
+  CalidadContacto, NumeroDefensor, DetalleOut, DetalleHit,
 } from '@/lib/types';
 
 // ─── Pasos del flujo ──────────────────────────────────────────────────────────
@@ -31,7 +31,6 @@ interface RegistroPitchCompleto {
   resultado: ResultadoAtBat;
   detalleOut?: DetalleOut;
   detalleHit?: DetalleHit;
-  detalleError?: DetalleError;
 }
 
 interface Props {
@@ -133,7 +132,7 @@ export default function ModalPitch({ zona, onConfirmar, onCancelar }: Props) {
       resultado.detalleHit = { tipo: final.tipoHit, ubicacion: final.numeroDefensor, calidad: c };
     }
     if (final.resultado === 'ERROR' && final.numeroDefensor) {
-      resultado.detalleError = { defensor: final.numeroDefensor, calidad: c };
+      resultado.detalleOut = { tipo: 'error', defensor: final.numeroDefensor, calidad: c };
     }
     onConfirmar(resultado);
   };

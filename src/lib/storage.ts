@@ -195,13 +195,14 @@ export function generarReporteMD(bateador: import('./types').Bateador, stats: Es
     md += `- Tipo de pitch: ${t.tipoPitch.charAt(0).toUpperCase() + t.tipoPitch.slice(1)}\n`;
     md += `- Resultado: ${t.resultado}`;
     if (t.detalleOut) {
-      md += ` → ${t.detalleOut.tipo.charAt(0).toUpperCase() + t.detalleOut.tipo.slice(1)} al ${t.detalleOut.defensor} (${t.detalleOut.calidad.toUpperCase()})`;
+      if (t.resultado === 'ERROR') {
+        md += ` → Error al ${t.detalleOut.defensor} (${t.detalleOut.calidad.toUpperCase()})`;
+      } else {
+        md += ` → ${t.detalleOut.tipo.charAt(0).toUpperCase() + t.detalleOut.tipo.slice(1)} al ${t.detalleOut.defensor} (${t.detalleOut.calidad.toUpperCase()})`;
+      }
     }
     if (t.detalleHit) {
       md += ` → ${t.detalleHit.tipo.charAt(0).toUpperCase() + t.detalleHit.tipo.slice(1)} al ${t.detalleHit.ubicacion} (${t.detalleHit.calidad.toUpperCase()})`;
-    }
-    if (t.detalleError) {
-      md += ` → Error al ${t.detalleError.defensor} (${t.detalleError.calidad.toUpperCase()})`;
     }
     md += '\n\n';
   }

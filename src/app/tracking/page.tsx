@@ -549,8 +549,7 @@ export default function TrackingPage() {
               }}>
                 {t.resultado}
                 {t.detalleHit && ` (${t.detalleHit.tipo}) al ${t.detalleHit.ubicacion} (${t.detalleHit.calidad})`}
-                {t.detalleOut && ` (${t.detalleOut.tipo}) al ${t.detalleOut.defensor} (${t.detalleOut.calidad})`}
-                {t.detalleError && ` (Error) al ${t.detalleError.defensor} (${t.detalleError.calidad})`}
+                {t.detalleOut && (t.resultado === 'ERROR' ? ` al ${t.detalleOut.defensor} (${t.detalleOut.calidad})` : ` (${t.detalleOut.tipo}) al ${t.detalleOut.defensor} (${t.detalleOut.calidad})`)}
               </span>
               {!estado.partido?.finalizado && (
                 <div style={{ display: 'flex', gap: 8, opacity: 0.7 }}>

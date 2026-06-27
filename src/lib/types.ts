@@ -11,7 +11,7 @@ export type ResultadoAtBat =
   | 'HIT'
   | 'ERROR';  // Llegó a base por error defensivo
 
-export type TipoOut = 'asistencia' | 'sac bunt' | 'sac fly' | 'fly' | 'linea';
+export type TipoOut = 'asistencia' | 'sac bunt' | 'sac fly' | 'fly' | 'linea' | 'error';
 export type TipoHit = 'bunt' | 'single' | 'doble' | 'triple' | 'homerun' | 'infield hit';
 export type CalidadContacto = 'soft' | 'hard';
 
@@ -33,11 +33,6 @@ export interface DetalleHit {
   calidad: CalidadContacto;
 }
 
-export interface DetalleError {
-  defensor: NumeroDefensor;
-  calidad: CalidadContacto;
-}
-
 export interface Coordenadas {
   x: number; // 0.0 a 1.0 (porcentaje de ancho)
   y: number; // 0.0 a 1.0 (porcentaje de alto)
@@ -54,7 +49,6 @@ export interface TurnoAlBate {
   resultado: ResultadoAtBat;
   detalleOut?: DetalleOut;
   detalleHit?: DetalleHit;
-  detalleError?: DetalleError;
   timestamp: string;
 }
 

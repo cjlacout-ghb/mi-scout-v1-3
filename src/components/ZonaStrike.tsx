@@ -271,7 +271,7 @@ export default function ZonaStrikeComponent({ onZonaClick, marcadores = [], heat
                 ...(m.resultado && colorResultado !== 'var(--text-primary)' ? { background: colorResultado } : {})
               }}
             >
-              {m.calidad === 'hard' && (m.resultado === 'HIT' || m.resultado === 'OUT') && (
+              {m.calidad === 'hard' && (m.resultado === 'HIT' || m.resultado === 'OUT' || m.resultado === 'ERROR') && (
                 <div
                   style={{
                     position: 'absolute',
