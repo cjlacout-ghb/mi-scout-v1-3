@@ -124,7 +124,7 @@ export default function HistorialPage() {
             onMouseLeave={(e) => { if (cargandoId !== p.id) { e.currentTarget.style.borderColor = ''; e.currentTarget.style.boxShadow = ''; } }}
           >
             <p className="text-xs text-secondary" style={{ marginBottom: 4 }}>
-              {new Date(p.fecha + 'T12:00:00').toLocaleDateString('es-AR')} · {p.innings} innings
+              {new Date(p.fecha + 'T12:00:00').toLocaleDateString('es-AR')} · {p.innings} inning{p.innings !== 1 ? 's' : ''}
             </p>
             <p style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--text-primary)', marginBottom: 2 }}>
               {p.visitante} vs {p.local}
