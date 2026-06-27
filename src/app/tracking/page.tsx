@@ -452,40 +452,43 @@ export default function TrackingPage() {
         </div>
         <div style={{ display: 'flex', alignItems: 'stretch', gap: 8 }}>
           <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4, flex: 1 }}>
-            {(estado.partido?.finalizado ? (bateadorActual?.rol === 'visitante' ? estado.lineupVisitante : estado.lineupLocal) : bateadoresActivos).map((b, i) => (
-              <button
-                key={b.id}
-                onClick={() => {
-                  setEsperandoConfirmacion(false);
-                  setTurnoEditando(null);
-                  if (estado.partido?.finalizado) {
-                    dispatch({ type: 'SELECCIONAR_JUGADOR', payload: b.id });
-                  } else {
-                    dispatch({ type: 'SET_BATEADOR_ACTUAL', payload: { rol: equipoAlBate, indice: i } });
-                  }
-                }}
-                style={{
-                  flexShrink: 0,
-                  padding: '6px 10px',
-                  borderRadius: 8,
-                  background: b.id === bateadorActual?.id ? 'var(--accent-dim)' : 'var(--bg-elevated)',
-                  border: `1px solid ${b.id === bateadorActual?.id ? 'var(--accent)' : 'var(--border)'}`,
-                  color: b.id === bateadorActual?.id ? 'var(--accent)' : 'var(--text-secondary)',
-                  fontSize: '0.75rem',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  gap: 1,
-                  opacity: b.activo ? 1 : 0.5,
-                  textDecoration: b.activo ? 'none' : 'line-through',
-                }}
-              >
-                <span style={{ fontSize: '0.6rem' }}>{b.orden}.</span>
-                <span>{b.numero}</span>
-              </button>
-            ))}
+            {(estado.partido?.finalizado ? (bateadorActual?.rol === 'visitante' ? estado.lineupVisitante : estado.lineupLocal) : bateadoresActivos).map((b, i) => {
+              const isSelected = b.id === bateadorActual?.id;
+              return (
+                <button
+                  key={b.id}
+                  onClick={() => {
+                    setEsperandoConfirmacion(false);
+                    setTurnoEditando(null);
+                    if (estado.partido?.finalizado) {
+                      dispatch({ type: 'SELECCIONAR_JUGADOR', payload: b.id });
+                    } else {
+                      dispatch({ type: 'SET_BATEADOR_ACTUAL', payload: { rol: equipoAlBate, indice: i } });
+                    }
+                  }}
+                  style={{
+                    flexShrink: 0,
+                    padding: '6px 10px',
+                    borderRadius: 8,
+                    background: isSelected ? 'var(--accent-dim)' : 'var(--bg-elevated)',
+                    border: `1px solid ${isSelected ? 'var(--accent)' : 'var(--border)'}`,
+                    color: isSelected ? 'var(--accent)' : 'var(--text-secondary)',
+                    fontSize: '0.75rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: 1,
+                    opacity: b.activo ? 1 : 0.5,
+                    textDecoration: b.activo ? 'none' : 'line-through',
+                  }}
+                >
+                  <span style={{ fontSize: '0.6rem' }}>{b.orden}.</span>
+                  <span>{b.numero}</span>
+                </button>
+              );
+            })}
           </div>
           
           {!estado.partido?.finalizado && (

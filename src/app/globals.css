@@ -466,9 +466,11 @@ body {
   transform: scale(0.96);
 }
 
-.option-btn:hover {
-  border-color: var(--accent);
-  background: var(--bg-hover);
+@media (hover: hover) {
+  .option-btn:hover {
+    border-color: var(--accent);
+    background: var(--bg-hover);
+  }
 }
 
 .option-btn.selected {
@@ -518,10 +520,12 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
-.number-btn:hover {
-  border-color: var(--accent);
-  background: var(--accent-dim);
-  color: var(--accent);
+@media (hover: hover) {
+  .number-btn:hover {
+    border-color: var(--accent);
+    background: var(--accent-dim);
+    color: var(--accent);
+  }
 }
 
 .number-btn:active {
