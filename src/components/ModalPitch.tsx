@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import type {
   ZonaStrike, TipoPitch, ResultadoAtBat, TipoOut, TipoHit,
-  CalidadContacto, NumeroDefensor, DetalleOut, DetalleHit,
+  CalidadContacto, NumeroDefensor, DetalleOut, DetalleHit, DetalleError,
 } from '@/lib/types';
 
 // ─── Pasos del flujo ──────────────────────────────────────────────────────────
@@ -31,6 +31,7 @@ interface RegistroPitchCompleto {
   resultado: ResultadoAtBat;
   detalleOut?: DetalleOut;
   detalleHit?: DetalleHit;
+  detalleError?: DetalleError;
 }
 
 interface Props {
@@ -92,6 +93,7 @@ export default function ModalPitch({ zona, onConfirmar, onCancelar }: Props) {
     setEstado((p) => ({ ...p, resultado: r }));
     if (r === 'OUT') setPaso('detalle_out');
     else if (r === 'HIT') setPaso('detalle_hit');
+    else if (r === 'ERROR') setPaso('numero_defensor');
     else {
       // BB/HBP, KS, KL → finalizar
       onConfirmar({
@@ -130,6 +132,9 @@ export default function ModalPitch({ zona, onConfirmar, onCancelar }: Props) {
     if (final.resultado === 'HIT' && final.tipoHit && final.numeroDefensor) {
       resultado.detalleHit = { tipo: final.tipoHit, ubicacion: final.numeroDefensor, calidad: c };
     }
+    if (final.resultado === 'ERROR' && final.numeroDefensor) {
+      resultado.detalleError = { defensor: final.numeroDefensor, calidad: c };
+    }
     onConfirmar(resultado);
   };
 
@@ -138,7 +143,7 @@ export default function ModalPitch({ zona, onConfirmar, onCancelar }: Props) {
       case 'resultado':     setPaso('tipo_pitch');       break;
       case 'detalle_out':
       case 'detalle_hit':   setPaso('resultado');         break;
-      case 'numero_defensor': setPaso(estado.resultado === 'OUT' ? 'detalle_out' : 'detalle_hit'); break;
+      case 'numero_defensor': setPaso(estado.resultado === 'OUT' ? 'detalle_out' : estado.resultado === 'ERROR' ? 'resultado' : 'detalle_hit'); break;
       case 'calidad':       setPaso('numero_defensor');  break;
       default: onCancelar();
     }
@@ -213,6 +218,14 @@ export default function ModalPitch({ zona, onConfirmar, onCancelar }: Props) {
                 <span style={{ fontSize: '1.3rem', fontWeight: 900, color: 'var(--info)' }}>HBP</span>
               </button>
             </div>
+            {/* ERROR */}
+            <button
+              className="option-btn"
+              style={{ flexDirection: 'row', justifyContent: 'center', gap: 14 }}
+              onClick={() => elegirResultado('ERROR')}
+            >
+              <span style={{ fontSize: '1.3rem', fontWeight: 900, color: 'var(--warning)' }}>ERROR</span>
+            </button>
           </div>
         );
 
@@ -280,7 +293,7 @@ export default function ModalPitch({ zona, onConfirmar, onCancelar }: Props) {
     resultado:       'Resultado al bate',
     detalle_out:     'Tipo de out',
     detalle_hit:     'Tipo de hit',
-    numero_defensor: estado.resultado === 'HIT' ? 'Ubicación del bateo' : `Defensor (${estado.tipoOut})`,
+    numero_defensor: estado.resultado === 'HIT' ? 'Ubicación del bateo' : estado.resultado === 'ERROR' ? 'Dirección del bateo' : `Defensor (${estado.tipoOut})`,
     calidad:         'Calidad del contacto',
   };
 

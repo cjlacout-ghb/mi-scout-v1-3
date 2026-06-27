@@ -84,6 +84,10 @@ export function calcularEstadisticas(
         if (t.detalleHit?.tipo === 'triple') triples++;
         if (t.detalleHit?.tipo === 'homerun') homeRuns++;
         break;
+      case 'ERROR':
+        porZona[z].contacto++;
+        porPitch[p].ab++;
+        break;
       case 'OUT': {
         const esSacrificio = t.detalleOut?.tipo === 'sac fly' || t.detalleOut?.tipo === 'sac bunt';
         outs++;
@@ -195,6 +199,9 @@ export function generarReporteMD(bateador: import('./types').Bateador, stats: Es
     }
     if (t.detalleHit) {
       md += ` → ${t.detalleHit.tipo.charAt(0).toUpperCase() + t.detalleHit.tipo.slice(1)} al ${t.detalleHit.ubicacion} (${t.detalleHit.calidad.toUpperCase()})`;
+    }
+    if (t.detalleError) {
+      md += ` → Error al ${t.detalleError.defensor} (${t.detalleError.calidad.toUpperCase()})`;
     }
     md += '\n\n';
   }

@@ -209,7 +209,8 @@ export default function StatsPage() {
       const ks   = zt.filter(t => t.resultado === 'KS').length;
       const kl   = zt.filter(t => t.resultado === 'KL').length;
       const bb   = zt.filter(t => t.resultado === 'BB' || t.resultado === 'HBP').length;
-      data[z as ZonaStrike] = { pitches: zt.length, hits, outs, contacto: hits + outs, ks, kl, bb, ab: hits + outs + ks + kl };
+      const err  = zt.filter(t => t.resultado === 'ERROR').length;
+      data[z as ZonaStrike] = { pitches: zt.length, hits, outs, contacto: hits + outs + err, ks, kl, bb, ab: hits + outs + ks + kl + err };
     }
     return data;
   })();

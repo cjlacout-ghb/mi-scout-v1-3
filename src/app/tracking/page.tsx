@@ -154,6 +154,7 @@ export default function TrackingPage() {
     const tipo = (
       t.resultado === 'HIT'   ? 'contact' :
       t.resultado === 'OUT'   ? 'contact' :
+      t.resultado === 'ERROR' ? 'contact' :
       (t.resultado === 'BB' || t.resultado === 'HBP') ? 'ball'    : 'strike'
     ) as 'strike' | 'ball' | 'contact';
     const calidad = t.detalleOut?.calidad || t.detalleHit?.calidad;
@@ -531,7 +532,7 @@ export default function TrackingPage() {
                 background: 'var(--bg-elevated)',
                 borderRadius: 8,
                 marginBottom: 6,
-                borderLeft: `3px solid ${t.resultado === 'HIT' ? 'var(--danger)' : t.resultado === 'OUT' ? 'var(--success)' : t.resultado.startsWith('K') ? 'var(--info)' : 'var(--text-secondary)'}`,
+                borderLeft: `3px solid ${t.resultado === 'HIT' ? 'var(--danger)' : t.resultado === 'OUT' ? 'var(--success)' : t.resultado === 'ERROR' ? 'var(--warning)' : t.resultado.startsWith('K') ? 'var(--info)' : 'var(--text-secondary)'}`,
                 border: t.id === turnoEditando?.id ? '2px solid var(--warning)' : undefined,
                 boxShadow: t.id === turnoEditando?.id ? '0 0 8px rgba(243, 156, 18, 0.4)' : 'none',
               }}
@@ -543,12 +544,13 @@ export default function TrackingPage() {
               <span style={{
                 fontWeight: 800,
                 fontSize: '0.88rem',
-                color: t.resultado === 'HIT' ? 'var(--danger)' : t.resultado === 'OUT' ? 'var(--success)' : t.resultado.startsWith('K') ? 'var(--info)' : 'var(--text-secondary)',
+                color: t.resultado === 'HIT' ? 'var(--danger)' : t.resultado === 'OUT' ? 'var(--success)' : t.resultado === 'ERROR' ? 'var(--warning)' : t.resultado.startsWith('K') ? 'var(--info)' : 'var(--text-secondary)',
                 marginRight: 4
               }}>
                 {t.resultado}
                 {t.detalleHit && ` (${t.detalleHit.tipo}) al ${t.detalleHit.ubicacion} (${t.detalleHit.calidad})`}
                 {t.detalleOut && ` (${t.detalleOut.tipo}) al ${t.detalleOut.defensor} (${t.detalleOut.calidad})`}
+                {t.detalleError && ` (Error) al ${t.detalleError.defensor} (${t.detalleError.calidad})`}
               </span>
               {!estado.partido?.finalizado && (
                 <div style={{ display: 'flex', gap: 8, opacity: 0.7 }}>
