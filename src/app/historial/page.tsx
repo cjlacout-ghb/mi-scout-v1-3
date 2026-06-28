@@ -48,8 +48,9 @@ export default function HistorialPage() {
       const estado = await getEstadoPartido(id);
       if (estado && estado.partido) {
         estado.partido.finalizado = true;
+        try { sessionStorage.setItem('miscout_ver_partido', id); } catch {}
         dispatch({ type: 'CARGAR_ESTADO', payload: estado });
-        router.push('/stats');
+        setTimeout(() => router.push('/stats'), 0);
       }
     } catch (err) {
       console.error('Error cargando partido:', err);
@@ -64,8 +65,9 @@ export default function HistorialPage() {
       const estado = await getEstadoPartido(id);
       if (estado && estado.partido) {
         estado.partido.finalizado = true;
+        try { sessionStorage.setItem('miscout_ver_partido', id); } catch {}
         dispatch({ type: 'CARGAR_ESTADO', payload: estado });
-        router.push('/');
+        setTimeout(() => router.push('/'), 0);
       }
     } catch (err) {
       console.error('Error cargando partido:', err);

@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useReducer, useEffect, useCallback } from 'react';
 import type { EstadoPartido, Bateador, TurnoAlBate, Partido } from '@/lib/types';
 import { estadoInicial, generarId } from '@/lib/storage';
-import { db, getPartidoActivo } from '@/lib/dbClient';
+import { db, getPartidoActivo, getEstadoPartido } from '@/lib/dbClient';
 
 // ─── Acciones ─────────────────────────────────────────────────────────────────
 export type Accion =
@@ -508,19 +508,41 @@ export function ScoutProvider({ children }: { children: React.ReactNode }) {
 
   // Fetch initial state from IndexedDB
   useEffect(() => {
-    getPartidoActivo()
-      .then(activoEstado => {
+    const loadInitial = async () => {
+      try {
+        // Check if there's a partido to load from history navigation (survives mobile PWA reloads)
+        let verPartidoId: string | null = null;
+        try { verPartidoId = sessionStorage.getItem('miscout_ver_partido'); } catch {}
+
+        if (verPartidoId) {
+          try { sessionStorage.removeItem('miscout_ver_partido'); } catch {}
+          try {
+            const savedEstado = await getEstadoPartido(verPartidoId);
+            if (savedEstado && savedEstado.partido) {
+              savedEstado.partido.finalizado = true;
+              dispatch({ type: 'CARGAR_ESTADO', payload: savedEstado });
+              setMounted(true);
+              setIsLoading(false);
+              return;
+            }
+          } catch (err) {
+            console.error('Error loading partido from history:', err);
+          }
+        }
+
+        // Default: load active (non-finalized) partido
+        const activoEstado = await getPartidoActivo();
         if (activoEstado && activoEstado.partido) {
           dispatch({ type: 'CARGAR_ESTADO', payload: activoEstado });
         }
-        setMounted(true);
-        setIsLoading(false);
-      })
-      .catch(err => {
+      } catch (err) {
         console.error('Error fetching initial state from IndexedDB', err);
-        setMounted(true);
-        setIsLoading(false);
-      });
+      }
+      setMounted(true);
+      setIsLoading(false);
+    };
+
+    loadInitial();
   }, []);
 
   const equipoAlBate = estado.mitadInning === 'alta' ? 'visitante' : 'local';
