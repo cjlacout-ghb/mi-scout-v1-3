@@ -33,7 +33,8 @@ export async function getEstadoPartido(partidoId: string): Promise<EstadoPartido
   const partido = await db.partidos.get(partidoId);
   if (!partido) throw new Error('Partido no encontrado');
   
-  const bateadores = await db.bateadores.where('partidoId').equals(partidoId).sortBy('orden');
+  const bateadoresArr = await db.bateadores.where('partidoId').equals(partidoId).toArray();
+  const bateadores = bateadoresArr.sort((a, b) => (a.orden ?? 0) - (b.orden ?? 0));
   const turnosAlBate = await db.turnos_al_bate.where('partidoId').equals(partidoId).toArray();
   
   // Parche para sustitutos que se guardaron sin "rol" (solo en memoria)

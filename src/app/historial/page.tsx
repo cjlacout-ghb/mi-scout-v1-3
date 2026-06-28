@@ -114,7 +114,7 @@ export default function HistorialPage() {
             className="card"
             onClick={() => cargarPartido(p.id)}
             style={{
-              padding: '12px 16px',
+              padding: '12px 140px 12px 16px',
               position: 'relative',
               cursor: 'pointer',
               transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
