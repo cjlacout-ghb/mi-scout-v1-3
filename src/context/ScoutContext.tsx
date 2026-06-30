@@ -481,8 +481,10 @@ export function ScoutProvider({ children }: { children: React.ReactNode }) {
     estadoRef.current = estado;
   }, [estado]);
 
+  const syncQueue = React.useRef<Promise<void>>(Promise.resolve());
+
   // Custom dispatch to handle API sync side-effects and inject IDs
-  const dispatch = useCallback(async (accion: Accion) => {
+  const dispatch = useCallback((accion: Accion) => {
     const currentState = estadoRef.current;
     
     // Inject IDs for creates so we know them synchronously for API and Reducer
@@ -500,9 +502,16 @@ export function ScoutProvider({ children }: { children: React.ReactNode }) {
     // 2. Compute new state for some actions
     const nuevoEstado = reducer(currentState, accion);
 
-    // 3. Sync to DB in background
+    // 3. Update ref synchronously so subsequent dispatches in the same render cycle see the new state
+    estadoRef.current = nuevoEstado;
+
+    // 4. Sync to DB in background (serialized to avoid race conditions)
     if (accion.type !== 'CARGAR_ESTADO') {
-      syncApi(accion, nuevoEstado, currentState);
+      syncQueue.current = syncQueue.current.then(async () => {
+        await syncApi(accion, nuevoEstado, currentState);
+      }).catch(err => {
+        console.error('Error syncing to IndexedDB in queue:', err);
+      });
     }
   }, []);
 
@@ -510,16 +519,28 @@ export function ScoutProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const loadInitial = async () => {
       try {
-        // Check if there's a partido to load from history navigation (survives mobile PWA reloads)
+        // Check if there's a partido to load from history navigation (survives mobile PWA reloads via URL query params)
         let verPartidoId: string | null = null;
-        try { verPartidoId = sessionStorage.getItem('miscout_ver_partido'); } catch {}
+        let verJugadorId: string | null = null;
+        let verEquipo: string | null = null;
+
+        if (typeof window !== 'undefined') {
+          const params = new URLSearchParams(window.location.search);
+          verPartidoId = params.get('verPartido');
+          verJugadorId = params.get('verJugador');
+          verEquipo = params.get('verEquipo');
+        }
 
         if (verPartidoId) {
-          try { sessionStorage.removeItem('miscout_ver_partido'); } catch {}
           try {
             const savedEstado = await getEstadoPartido(verPartidoId);
             if (savedEstado && savedEstado.partido) {
               savedEstado.partido.finalizado = true;
+              // Restore mitadInning from equipo tab
+              if (verEquipo === 'visitante') savedEstado.mitadInning = 'alta';
+              else if (verEquipo === 'local') savedEstado.mitadInning = 'baja';
+              // Restore selected player
+              if (verJugadorId) savedEstado.jugadorSeleccionadoId = verJugadorId;
               dispatch({ type: 'CARGAR_ESTADO', payload: savedEstado });
               setMounted(true);
               setIsLoading(false);

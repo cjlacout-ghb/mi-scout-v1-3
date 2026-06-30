@@ -28,11 +28,9 @@ export default function HistorialPage() {
             const maxInning = Math.max(...turnos.map(t => t.inning));
             if (maxInning !== p.innings) {
               p.innings = maxInning;
-              await db.partidos.update(p.id, { innings: maxInning });
             }
           } else if (p.innings === 7) {
             p.innings = 0;
-            await db.partidos.update(p.id, { innings: 0 });
           }
         }
         
@@ -48,9 +46,8 @@ export default function HistorialPage() {
       const estado = await getEstadoPartido(id);
       if (estado && estado.partido) {
         estado.partido.finalizado = true;
-        try { sessionStorage.setItem('miscout_ver_partido', id); } catch {}
         dispatch({ type: 'CARGAR_ESTADO', payload: estado });
-        setTimeout(() => router.push('/stats'), 0);
+        router.push(`/stats?verPartido=${id}`);
       }
     } catch (err) {
       console.error('Error cargando partido:', err);
@@ -65,9 +62,8 @@ export default function HistorialPage() {
       const estado = await getEstadoPartido(id);
       if (estado && estado.partido) {
         estado.partido.finalizado = true;
-        try { sessionStorage.setItem('miscout_ver_partido', id); } catch {}
         dispatch({ type: 'CARGAR_ESTADO', payload: estado });
-        setTimeout(() => router.push('/'), 0);
+        router.push(`/?verPartido=${id}`);
       }
     } catch (err) {
       console.error('Error cargando partido:', err);
