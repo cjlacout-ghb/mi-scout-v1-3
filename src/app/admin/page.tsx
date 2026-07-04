@@ -16,6 +16,7 @@ type License = {
   created_at: string;
   expires_at: string;
   notes: string;
+  plan: 'full' | 'promo';
 };
 
 type Activation = {
@@ -35,6 +36,7 @@ export default function AdminPage() {
   const [activations, setActivations] = useState<Activation[]>([]);
   const [newCode, setNewCode] = useState('');
   const [newNotes, setNewNotes] = useState('');
+  const [newPlan, setNewPlan] = useState<'full' | 'promo'>('full');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [confirmandoLiberacion, setConfirmandoLiberacion] = useState<{activationId: string, licenseCode: string} | null>(null);
@@ -81,7 +83,11 @@ export default function AdminPage() {
     const code = (newCode.trim() || generateCode()).toUpperCase();
 
     const expiresAt = new Date();
-    expiresAt.setFullYear(expiresAt.getFullYear() + 1);
+    if (newPlan === 'promo') {
+      expiresAt.setMonth(expiresAt.getMonth() + 1);
+    } else {
+      expiresAt.setFullYear(expiresAt.getFullYear() + 1);
+    }
 
     const { error } = await supabase
       .from('licenses')
@@ -90,6 +96,8 @@ export default function AdminPage() {
         version: 'v1.3', 
         notes: newNotes,
         expires_at: expiresAt.toISOString(),
+        plan: newPlan,
+        release_count: newPlan === 'promo' ? 1 : 0,
       });
     if (error) {
       setMessage('Error: ' + error.message);
@@ -227,6 +235,18 @@ export default function AdminPage() {
               color: 'var(--text-primary)',
             }}
           />
+          <select
+            value={newPlan}
+            onChange={(e) => setNewPlan(e.target.value as 'full' | 'promo')}
+            style={{
+              padding: '0.75rem', borderRadius: '8px',
+              border: '1px solid var(--border)', background: 'var(--bg-base)',
+              color: 'var(--text-primary)',
+            }}
+          >
+            <option value="full">Pack Profesional — USD 96 · 1 año</option>
+            <option value="promo">Pack Lanzamiento — Gratis · 1 mes</option>
+          </select>
           <button
             onClick={handleCreateLicense}
             disabled={loading}
@@ -255,6 +275,7 @@ export default function AdminPage() {
                 <p style={{ fontWeight: 700, fontSize: '1rem' }}>{lic.code}</p>
                 <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>
                   {lic.notes || 'Sin notas'} · {lic.version} · 
+                  Plan: {lic.plan === 'promo' ? '🟡 Lanzamiento' : '🟢 Profesional'} · 
                   Activaciones: {lic.activations_used}/{lic.max_activations} · 
                   Liberaciones usadas: {lic.release_count}/1 · 
                   Vence: {lic.expires_at ? new Date(lic.expires_at).toLocaleDateString('es-AR') : 'Sin vencimiento'} · 
