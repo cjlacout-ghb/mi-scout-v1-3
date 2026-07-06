@@ -401,7 +401,7 @@ export default function LineupPage() {
               Mi<span style={{ color: 'var(--accent)' }}>Scout</span>
             </h1>
             <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', lineHeight: 1.5, maxWidth: 300, margin: '0 auto' }}>
-              Tracking de pitcheos y zona de strike.
+              Tracking de pitcheos y zona de strike
             </p>
           </div>
           
