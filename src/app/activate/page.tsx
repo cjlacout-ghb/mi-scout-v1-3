@@ -84,7 +84,7 @@ export default function ActivatePage() {
           Activar licencia
         </h2>
         <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', lineHeight: 1.5 }}>
-          Ingresá tu código de activación para acceder a MiScout.
+          Ingresá tu código de activación para acceder a <span style={{ color: '#FFFFFF', fontWeight: 700 }}>Mi</span><span style={{ color: '#F5A623', fontWeight: 700 }}>Scout</span>.
           Esta licencia quedará vinculada a este dispositivo.
         </p>
 
