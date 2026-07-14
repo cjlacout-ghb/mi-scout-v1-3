@@ -18,47 +18,65 @@ export default function LicenseGuard({ children }: { children: React.ReactNode }
       return;
     }
 
+    const GRACE_PERIOD_MS = 3 * 24 * 60 * 60 * 1000; // 3 days in milliseconds
+
     const validateLicense = async () => {
+      const savedCode    = localStorage.getItem('miscout_license');
+      const savedFp      = localStorage.getItem('miscout_device_fp');
+      const lastVerified = localStorage.getItem('miscout_last_verified');
+
+      if (!savedCode || !savedFp) {
+        router.push('/activate');
+        return;
+      }
+
+      // elapsedMs is safe to compute here — only reads a string, never throws
+      const lastVerifiedMs = lastVerified ? Date.parse(lastVerified) : NaN;
+      const elapsedMs      = isNaN(lastVerifiedMs) ? Infinity : Date.now() - lastVerifiedMs;
+
       try {
-        const savedCode = localStorage.getItem('miscout_license');
-        const savedFp = localStorage.getItem('miscout_device_fp');
-
-        if (!savedCode || !savedFp) {
-          router.push('/activate');
-          return;
-        }
-
-        // Verify fingerprint matches current device
+        // getDeviceFingerprint() is inside try/catch — crypto.subtle failures
+        // are handled the same way as network failures (see catch block below)
         const currentFp = await getDeviceFingerprint();
-        if (currentFp !== savedFp) {
-          // Fingerprint mismatch — re-validate against server
+
+        // Grace period: allow offline access for up to 3 days since last
+        // successful server check-in, to support users without connectivity
+        // (e.g., at a game/tournament). Beyond 3 days, force re-validation.
+        const needsServerCheck = elapsedMs >= GRACE_PERIOD_MS || currentFp !== savedFp;
+
+        if (needsServerCheck) {
           const res = await fetch('/api/license/validate', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              code: savedCode,
-              deviceFingerprint: currentFp,
-            }),
+            body: JSON.stringify({ code: savedCode, deviceFingerprint: currentFp }),
           });
           const data = await res.json();
-          if (!data.valid) {
+
+          if (data.valid) {
+            localStorage.setItem('miscout_device_fp',     currentFp);
+            localStorage.setItem('miscout_last_verified', new Date().toISOString());
+            setChecking(false);
+          } else {
             localStorage.removeItem('miscout_license');
             localStorage.removeItem('miscout_device_fp');
+            localStorage.removeItem('miscout_last_verified');
             router.push('/activate');
-            return;
           }
-          // Update saved fingerprint
-          localStorage.setItem('miscout_device_fp', currentFp);
+        } else {
+          // Fast path: fingerprint matches and last check-in is recent — no server call
+          setChecking(false);
         }
 
-        setChecking(false);
       } catch {
-        // On network error, allow access if license exists locally
-        const savedCode = localStorage.getItem('miscout_license');
-        if (!savedCode) {
-          router.push('/activate');
-        } else {
+        // Catches ALL async failures: getDeviceFingerprint(), fetch(), or res.json()
+        // Apply the same grace period logic regardless of failure cause
+        if (elapsedMs < GRACE_PERIOD_MS) {
+          // Still within grace window — allow access, but do NOT update
+          // miscout_last_verified so the clock keeps ticking toward expiry
           setChecking(false);
+        } else {
+          // Grace period expired and we cannot complete validation — block access
+          router.push('/activate');
         }
       }
     };

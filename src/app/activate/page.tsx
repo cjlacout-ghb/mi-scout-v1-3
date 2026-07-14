@@ -37,8 +37,9 @@ export default function ActivatePage() {
 
       if (data.valid) {
         // Save activation locally in IndexedDB
-        localStorage.setItem('miscout_license', code.trim().toUpperCase());
-        localStorage.setItem('miscout_device_fp', deviceFingerprint);
+        localStorage.setItem('miscout_license',       code.trim().toUpperCase());
+        localStorage.setItem('miscout_device_fp',     deviceFingerprint);
+        localStorage.setItem('miscout_last_verified', new Date().toISOString());
         router.push('/');
       } else {
         setError(data.error || 'Código inválido. Verificá e intentá de nuevo.');
