@@ -300,7 +300,7 @@ MiScout guarda el progreso automáticamente en tu dispositivo (sin necesidad de 
 
 ---
 
-© 2026 Cristian J. Lacout — Todos los derechos reservados.
+© 2026 MiScout — Todos los derechos reservados.
 
 MiScout es software propietario. Queda expresamente prohibida su copia, redistribución, modificación o uso comercial sin autorización escrita del autor.
 Disclaimer: MiScout es una herramienta de análisis y seguimiento estadístico. Su uso no garantiza resultados deportivos, victorias ni mejoras de rendimiento específicas.

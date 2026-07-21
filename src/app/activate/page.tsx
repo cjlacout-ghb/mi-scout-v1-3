@@ -129,7 +129,7 @@ export default function ActivatePage() {
         maxWidth: '340px',
         lineHeight: 1.6,
       }}>
-        © 2026 Cristian J. Lacout — Todos los derechos reservados.
+        © 2026 <span style={{ color: '#FFFFFF', fontWeight: 700 }}>Mi</span><span style={{ color: '#F5A623', fontWeight: 700 }}>Scout</span> — Todos los derechos reservados.
         El uso no autorizado de esta licencia puede resultar en la 
         suspensión permanente del acceso sin reembolso.
       </p>

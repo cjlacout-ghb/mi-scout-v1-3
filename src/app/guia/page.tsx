@@ -366,7 +366,7 @@ export default function GuiaPage() {
           textAlign: 'center',
         }}>
           <p style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', lineHeight: 1.8 }}>
-            © 2026 Cristian J. Lacout — Todos los derechos reservados.<br />
+            © 2026 <span style={{ color: '#FFFFFF', fontWeight: 700 }}>Mi</span><span style={{ color: '#F5A623', fontWeight: 700 }}>Scout</span> — Todos los derechos reservados.<br />
             MiScout es software propietario. Queda expresamente prohibida su copia,<br />
             redistribución, modificación o uso comercial sin autorización escrita del autor.<br /><br />
             <em>Disclaimer: MiScout es una herramienta de análisis y seguimiento estadístico. Su uso no garantiza resultados deportivos, victorias ni mejoras de rendimiento específicas.</em><br /><br />

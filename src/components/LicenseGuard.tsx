@@ -18,7 +18,7 @@ export default function LicenseGuard({ children }: { children: React.ReactNode }
       return;
     }
 
-    const GRACE_PERIOD_MS = 3 * 24 * 60 * 60 * 1000; // 3 days in milliseconds
+    const GRACE_PERIOD_MS = 10 * 24 * 60 * 60 * 1000; // 10 days in milliseconds
 
     const validateLicense = async () => {
       const savedCode    = localStorage.getItem('miscout_license');
@@ -39,9 +39,9 @@ export default function LicenseGuard({ children }: { children: React.ReactNode }
         // are handled the same way as network failures (see catch block below)
         const currentFp = await getDeviceFingerprint();
 
-        // Grace period: allow offline access for up to 3 days since last
+        // Grace period: allow offline access for up to 10 days since last
         // successful server check-in, to support users without connectivity
-        // (e.g., at a game/tournament). Beyond 3 days, force re-validation.
+        // (e.g., at a game/tournament). Beyond 10 days, force re-validation.
         const needsServerCheck = elapsedMs >= GRACE_PERIOD_MS || currentFp !== savedFp;
 
         if (needsServerCheck) {

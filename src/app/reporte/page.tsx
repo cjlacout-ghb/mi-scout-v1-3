@@ -160,6 +160,15 @@ export default function ReportePage() {
         .map((z) => `Zona ${z} (${stats.porZona[z].hits} H)`)
         .join(', ');
       if (calientes) md += `**Zonas calientes:** ${calientes}\n\n`;
+
+      const frias = ([1,2,3,4,5,6,7,8] as const)
+        .filter((z) => {
+          const d = stats.porZona[z];
+          return (d.hits + d.outs + d.ks + d.kl) > 0 && d.hits === 0;
+        })
+        .map((z) => `Zona ${z}`)
+        .join(', ');
+      if (frias) md += `**Zonas frías:** ${frias}\n\n`;
       md += `---\n\n`;
     }
 
@@ -200,6 +209,15 @@ export default function ReportePage() {
           .map((z) => `Zona ${z} (${stats.porZona[z].hits} H)`)
           .join(', ');
         if (calientes) md += `**Zonas calientes:** ${calientes}\n\n`;
+        
+        const frias = ([1,2,3,4,5,6,7,8] as const)
+          .filter((z) => {
+            const d = stats.porZona[z];
+            return (d.hits + d.outs + d.ks + d.kl) > 0 && d.hits === 0;
+          })
+          .map((z) => `Zona ${z}`)
+          .join(', ');
+        if (frias) md += `**Zonas frías:** ${frias}\n\n`;
         md += `---\n\n`;
       }
 
