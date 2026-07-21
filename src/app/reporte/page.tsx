@@ -40,15 +40,14 @@ export default function ReportePage() {
     if (selId && partido) {
       const b = todos.find(x => x.id === selId);
       if (b) {
-        // Evitamos regenerar si el modo actual ya coincide con el global
-        if (modoAcumuladoGlobal && modo !== 'acumulado') {
+        if (modoAcumuladoGlobal) {
           generarAcumulado(b);
-        } else if (!modoAcumuladoGlobal && modo !== 'individual') {
+        } else {
           generarIndividual(b);
         }
       }
     }
-  }, [selId, modoAcumuladoGlobal, partido]);
+  }, [selId, partido]);
 
   if (!partido) {
     return (
