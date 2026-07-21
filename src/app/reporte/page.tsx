@@ -148,12 +148,8 @@ export default function ReportePage() {
       const stats = calcularEstadisticas(b.id, estado.turnosAlBate);
       if (stats.turnosAlBate === 0) continue;
       md += `## #${b.numero} ${b.apellido}${b.nombre ? `, ${b.nombre}` : ''}\n\n`;
-      const avg = stats.promedio.toFixed(3).replace('0.', '.');
-      const turnoList = estado.turnosAlBate.filter(t => t.bateadorId === b.id);
-      const asistencia = turnoList.filter(t => t.detalleOut?.tipo === 'asistencia').length;
-      const fly = turnoList.filter(t => t.detalleOut?.tipo === 'fly').length;
-      const afCount = asistencia + fly;
-      md += `AB:${stats.turnosAlBate} H:${stats.hits} AVG:${avg} K:${stats.strikeoutsSwinging + stats.strikeoutsLooking} BB:${stats.basesPorBolas} AF:${afCount}\n\n`;
+      const avg = stats.turnosAlBate > 0 ? stats.promedio.toFixed(3).replace('0.', '.') : '.000';
+      md += `AB:${stats.turnosAlBate} H:${stats.hits} 2B:${stats.dobles} 3B:${stats.triples} HR:${stats.homeRuns} K:${stats.strikeoutsSwinging + stats.strikeoutsLooking} BB:${stats.basesPorBolas} AVG:${avg}\n\n`;
       // Zonas calientes
       const calientes = ([1,2,3,4,5,6,7,8] as const)
         .filter((z) => stats.porZona[z].hits > 0)
@@ -197,12 +193,8 @@ export default function ReportePage() {
         
         if (stats.turnosAlBate === 0) continue;
         md += `## #${b.numero} ${b.apellido}${b.nombre ? `, ${b.nombre}` : ''}\n\n`;
-        const avg = stats.promedio.toFixed(3).replace('0.', '.');
-        const turnoList = turnosHomogeneos;
-        const asistencia = turnoList.filter(t => t.detalleOut?.tipo === 'asistencia').length;
-        const fly = turnoList.filter(t => t.detalleOut?.tipo === 'fly').length;
-        const afCount = asistencia + fly;
-        md += `AB:${stats.turnosAlBate} H:${stats.hits} AVG:${avg} K:${stats.strikeoutsSwinging + stats.strikeoutsLooking} BB:${stats.basesPorBolas} AF:${afCount}\n\n`;
+        const avg = stats.turnosAlBate > 0 ? stats.promedio.toFixed(3).replace('0.', '.') : '.000';
+        md += `AB:${stats.turnosAlBate} H:${stats.hits} 2B:${stats.dobles} 3B:${stats.triples} HR:${stats.homeRuns} K:${stats.strikeoutsSwinging + stats.strikeoutsLooking} BB:${stats.basesPorBolas} AVG:${avg}\n\n`;
         
         const calientes = ([1,2,3,4,5,6,7,8] as const)
           .filter((z) => stats.porZona[z].hits > 0)
@@ -277,7 +269,7 @@ export default function ReportePage() {
           </select>
           <div style={{ display: 'flex', gap: 8, background: 'var(--bg-elevated)', padding: 4, borderRadius: 8 }}>
             <button
-              className={`btn btn-sm ${modo !== 'acumulado' ? 'btn-primary' : ''}`}
+              className={`btn btn-sm ${modo === 'individual' ? 'btn-primary' : ''}`}
               disabled={!selId || cargando || !partido.finalizado}
               onClick={() => {
                 const b = todos.find((x) => x.id === selId);
@@ -285,8 +277,8 @@ export default function ReportePage() {
               }}
               style={{
                 flex: 1,
-                background: (!selId || cargando || !partido.finalizado) ? 'transparent' : (modo !== 'acumulado' ? '' : 'transparent'),
-                color: (!selId || cargando || !partido.finalizado) ? 'var(--text-secondary)' : (modo !== 'acumulado' ? '' : 'var(--text-secondary)'),
+                background: (!selId || cargando || !partido.finalizado) ? 'transparent' : (modo === 'individual' ? '' : 'transparent'),
+                color: (!selId || cargando || !partido.finalizado) ? 'var(--text-secondary)' : (modo === 'individual' ? '' : 'var(--text-secondary)'),
                 opacity: (!selId || cargando || !partido.finalizado) ? 0.5 : 1
               }}
             >
@@ -325,7 +317,7 @@ export default function ReportePage() {
           </select>
           <div style={{ display: 'flex', gap: 8, background: 'var(--bg-elevated)', padding: 4, borderRadius: 8 }}>
             <button
-              className={`btn btn-sm ${modo !== 'equipo_acumulado' ? 'btn-primary' : ''}`}
+              className={`btn btn-sm ${modo === 'equipo' ? 'btn-primary' : ''}`}
               disabled={!selEquipo || cargando || !partido.finalizado}
               onClick={() => {
                 if (selEquipo === 'visitante') generarEquipo(partido.visitante, estado.lineupVisitante);
@@ -333,8 +325,8 @@ export default function ReportePage() {
               }}
               style={{
                 flex: 1,
-                background: (!selEquipo || cargando || !partido.finalizado) ? 'transparent' : (modo !== 'equipo_acumulado' ? '' : 'transparent'),
-                color: (!selEquipo || cargando || !partido.finalizado) ? 'var(--text-secondary)' : (modo !== 'equipo_acumulado' ? '' : 'var(--text-secondary)'),
+                background: (!selEquipo || cargando || !partido.finalizado) ? 'transparent' : (modo === 'equipo' ? '' : 'transparent'),
+                color: (!selEquipo || cargando || !partido.finalizado) ? 'var(--text-secondary)' : (modo === 'equipo' ? '' : 'var(--text-secondary)'),
                 opacity: (!selEquipo || cargando || !partido.finalizado) ? 0.5 : 1
               }}
             >
