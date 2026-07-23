@@ -629,7 +629,6 @@ body {
   position: absolute;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  z-index: 0;
   transition: background 0.15s;
   display: flex;
   align-items: center;
@@ -637,7 +636,7 @@ body {
   border-radius: 2px;
 }
 
-.zona-esquina:hover  { background: var(--accent-dim); z-index: 5; }
+.zona-esquina:hover  { background: var(--accent-dim); }
 .zona-esquina:active { background: rgba(245, 166, 35, 0.25); }
 
 /* Cada esquina: 20% x 20% del total */
