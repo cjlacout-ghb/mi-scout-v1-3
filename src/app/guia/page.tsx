@@ -98,19 +98,21 @@ export default function GuiaPage() {
           <SubTitle>iPhone / iPad (Safari)</SubTitle>
           <ol style={olStyle}>
             <li>Abrí MiScout en Safari.</li>
-            <li>Tocá el botón de <strong>Compartir</strong> (cuadrado con flecha apuntando hacia arriba, en la parte inferior).</li>
-            <li>Desplazate hacia abajo y seleccioná <strong>"Agregar a inicio"</strong>.</li>
-            <li>Tocá <strong>Agregar</strong> en la esquina superior derecha.</li>
-            <li>¡Listo! Verás el ícono de MiScout en tu pantalla de inicio.</li>
+            <li>Tocá «Compartir» (tres puntos, esquina inferior derecha).</li>
+            <li>Seleccioná «Añadir marcador». Podés cambiar el nombre.</li>
+            <li>Tocá «Guardar» (esquina superior derecha).</li>
+            <li>¡Listo! El ícono aparece en tu pantalla de inicio.</li>
           </ol>
+          <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: 4 }}>(*) puede variar según la versión del sistema operativo.</p>
           <SubTitle>Android (Chrome)</SubTitle>
           <ol style={olStyle}>
             <li>Abrí MiScout en Google Chrome.</li>
-            <li>Tocá el ícono de <strong>Menú</strong> (tres puntos verticales, esquina superior derecha).</li>
-            <li>Seleccioná <strong>"Agregar a la pantalla principal"</strong> o "Instalar aplicación".</li>
-            <li>Confirmá tocando <strong>Agregar</strong> o "Instalar".</li>
-            <li>¡Listo! La app aparecerá junto a tus otras aplicaciones.</li>
+            <li>Tocá «Guardar» (tres puntos, esquina superior derecha).</li>
+            <li>Seleccioná «Agregar a la pantalla de inicio». Podés cambiar el nombre.</li>
+            <li>Confirmá tocando «Agregar» o «Instalar».</li>
+            <li>¡Listo! El ícono aparece junto a tus otras apps.</li>
           </ol>
+          <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: 4 }}>(*) puede variar según la versión del sistema operativo.</p>
         </Section>
 
         {/* ── S2 ── */}
