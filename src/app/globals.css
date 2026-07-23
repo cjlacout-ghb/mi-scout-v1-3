@@ -720,6 +720,28 @@ body {
   transform: translate(-50%, -50%) scale(1);
 }
 
+/* Fix clipping en zonas perimetrales */
+.zona-esquina.es7 .zone-tooltip,
+.zona-esquina.es5 .zone-tooltip {
+  left: 8px;
+  transform: translate(0, -50%) scale(0.8);
+}
+.zona-esquina.es7:hover .zone-tooltip,
+.zona-esquina.es5:hover .zone-tooltip {
+  transform: translate(0, -50%) scale(1);
+}
+
+.zona-esquina.es8 .zone-tooltip,
+.zona-esquina.es6 .zone-tooltip {
+  left: auto;
+  right: 8px;
+  transform: translate(0, -50%) scale(0.8);
+}
+.zona-esquina.es8:hover .zone-tooltip,
+.zona-esquina.es6:hover .zone-tooltip {
+  transform: translate(0, -50%) scale(1);
+}
+
 /* ─── Lineup Table ───────────────────────────────────────────────────────────── */
 .lineup-table {
   width: 100%;
