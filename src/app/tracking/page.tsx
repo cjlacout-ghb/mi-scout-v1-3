@@ -6,6 +6,7 @@ import ZonaStrikeComponent from '@/components/ZonaStrike';
 import ModalPitch from '@/components/ModalPitch';
 import ModalConfirm from '@/components/ModalConfirm';
 import ModalBateador, { type FormBateador } from '@/components/ModalBateador';
+import HeatMapModal from '@/components/HeatMapModal';
 import type { ZonaStrike, TurnoAlBate, Coordenadas } from '@/lib/types';
 import { db } from '@/lib/dbClient';
 
@@ -20,6 +21,7 @@ export default function TrackingPage() {
   const [showAgregarBateador, setShowAgregarBateador] = useState(false);
   const [showFinPartido, setShowFinPartido] = useState(false);
   const [notas, setNotas] = useState('');
+  const [mostrarHeatMap, setMostrarHeatMap] = useState(false);
   
   const modoAcumulado = estado.modoAcumuladoGlobal ?? false;
   const setModoAcumulado = (val: boolean) => dispatch({ type: 'SET_MODO_ACUMULADO', payload: val });
@@ -80,8 +82,9 @@ export default function TrackingPage() {
   const promptRef = useRef<{ rol: string, index: number } | null>(null);
 
   useEffect(() => {
-    // Si estamos en medio de un partido, y faltan bateadores por cargar
-    if (estado.partido && bateadoresActivos.length > 0 && bateadoresActivos.length < 9) {
+    // Si estamos en medio de un partido activo (no finalizado), y faltan bateadores por cargar
+    // NO mostrar el modal si estamos viendo un jugador específico (jugadorSeleccionadoId)
+    if (estado.partido && !estado.partido.finalizado && !estado.jugadorSeleccionadoId && bateadoresActivos.length > 0 && bateadoresActivos.length < 9) {
       const idx = equipoAlBate === 'visitante' ? estado.indiceVisitante : estado.indiceLocal;
       if (idx >= bateadoresActivos.length && !showAgregarBateador) {
         // Evitar múltiples aperturas del mismo modal en el mismo índice
@@ -291,31 +294,48 @@ export default function TrackingPage() {
           </div>
         </div>
 
-        {/* Stats rápidas */}
-        {ab > 0 && (
-          <div style={{ display: 'flex', gap: 12, marginTop: 10, paddingTop: 10, borderTop: '1px solid var(--border)' }}>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '0.62rem', color: '#FFFFFF', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>AB</div>
-              <div style={{ fontSize: '0.95rem', fontWeight: 800, color: '#FFFFFF' }}>{ab}</div>
-            </div>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '0.62rem', color: 'var(--danger)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>H</div>
-              <div style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--danger)' }}>{hits}</div>
-            </div>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '0.62rem', color: 'var(--success)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>O</div>
-              <div style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--success)' }}>{outs}</div>
-            </div>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '0.62rem', color: 'var(--info)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>K</div>
-              <div style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--info)' }}>{ks}</div>
-            </div>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '0.62rem', color: '#8892A4', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>BB/HBP</div>
-              <div style={{ fontSize: '0.95rem', fontWeight: 800, color: '#8892A4' }}>{bb}</div>
-            </div>
-            {ultimoTurno && (
-              <div style={{ marginLeft: 'auto', textAlign: 'right' }}>
+        {/* Stats rápidas y botón Heatmap */}
+        {bateadorActual && (
+          <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginTop: 10, paddingTop: 10, borderTop: '1px solid var(--border)', minHeight: 36 }}>
+            {ab > 0 && (
+              <>
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ fontSize: '0.62rem', color: '#FFFFFF', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>AB</div>
+                  <div style={{ fontSize: '0.95rem', fontWeight: 800, color: '#FFFFFF' }}>{ab}</div>
+                </div>
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ fontSize: '0.62rem', color: 'var(--danger)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>H</div>
+                  <div style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--danger)' }}>{hits}</div>
+                </div>
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ fontSize: '0.62rem', color: 'var(--success)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>O</div>
+                  <div style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--success)' }}>{outs}</div>
+                </div>
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ fontSize: '0.62rem', color: 'var(--info)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>K</div>
+                  <div style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--info)' }}>{ks}</div>
+                </div>
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ fontSize: '0.62rem', color: '#8892A4', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>BB/HBP</div>
+                  <div style={{ fontSize: '0.95rem', fontWeight: 800, color: '#8892A4' }}>{bb}</div>
+                </div>
+              </>
+            )}
+            
+            <button
+              onClick={() => setMostrarHeatMap(true)}
+              style={{
+                background: 'none', border: 'none', cursor: 'pointer',
+                fontSize: '1.1rem', padding: '0 6px', lineHeight: 1,
+                marginLeft: ultimoTurno ? 'auto' : (ab === 0 ? 'auto' : 0),
+              }}
+              aria-label="Ver heat map acumulado"
+            >
+              🔥
+            </button>
+            
+            {ab > 0 && ultimoTurno && (
+              <div style={{ textAlign: 'right' }}>
                 <div style={{ fontSize: '0.62rem', color: 'var(--text-secondary)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Último</div>
                 <div style={{
                   fontSize: '0.95rem', fontWeight: 800,
@@ -668,6 +688,16 @@ export default function TrackingPage() {
             });
           }}
           onClose={() => setShowAgregarBateador(false)}
+        />
+      )}
+      {mostrarHeatMap && bateadorActual && (
+        <HeatMapModal
+          apellido={bateadorActual.apellido}
+          numero={bateadorActual.numero}
+          equipo={bateadorActual.equipo}
+          nombre={bateadorActual.nombre}
+          ladoBateo={bateadorActual.ladoBateo}
+          onClose={() => setMostrarHeatMap(false)}
         />
       )}
     </div>

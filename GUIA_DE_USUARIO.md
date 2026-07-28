@@ -181,7 +181,7 @@ Una vez que finalizó el partido, tocá **"Finalizar partido"** (botón rojo). S
 
 ---
 
-## 6. Sección Heat Map: Estadísticas y Mapa de Calor
+## 6. Sección Heat Map: estadísticas y exportación
 
 La sección **Heat Map** te permite analizar el rendimiento de cualquier jugador.
 
@@ -233,7 +233,23 @@ Las zonas internas (1-4) se separan visualmente de las perimetrales (5-8).
 
 Una tabla adicional muestra el rendimiento del bateador **según el tipo de lanzamiento** (Drop, Riser, Curva, Cambio, Screw, Otro), incluyendo: cuántos vio, cuántos terminaron en AB, cuántos K logró el pitcher y el AVG contra ese lanzamiento. Solo aparecen los tipos de lanzamiento que realmente se registraron.
 
+### Heat Map en vivo (on-the-fly)
+
+No hace falta esperar a que el partido finalice para consultar el mapa de calor. Podés ir a la sección **Heat Map** en cualquier momento durante el partido y ver el estado actualizado de las estadísticas del bateador seleccionado, con los datos que se hayan registrado hasta ese momento.
+
+> **Nota:** El modo **Acumulado** sigue estando disponible solo una vez que el partido está finalizado. Durante el juego en curso, el Heat Map muestra únicamente los datos de **este partido**.
+
+### Exportar el Heat Map como imagen (PNG)
+
+Podés guardar el mapa de calor del bateador seleccionado como una imagen PNG directamente en tu dispositivo.
+
+- Tocá el botón **"Exportar PNG"** debajo del mapa de calor.
+- La imagen captura la zona de strike con el coloreado actual, incluyendo los tooltips de estadísticas por zona.
+- El archivo se descarga automáticamente con el nombre del jugador (ej. `heatmap_smith.png`).
+- Útil para compartir el análisis con entrenadores o jugadores sin necesidad de acceder a la app.
+
 ---
+
 
 ## 7. Sección Reporte: Generación de Informes
 

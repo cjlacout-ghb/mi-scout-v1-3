@@ -2,8 +2,9 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useScout } from '@/context/ScoutContext';
+import { toPng } from 'html-to-image';
 import ZonaStrikeComponent from '@/components/ZonaStrike';
-import { calcularEstadisticas } from '@/lib/storage';
+import { calcularEstadisticas, obtenerTurnosAcumulados, calcularHeatMap } from '@/lib/storage';
 import type { Bateador, ZonaStrike, TurnoAlBate } from '@/lib/types';
 
 
@@ -44,6 +45,7 @@ export default function StatsPage() {
   const [ordenarPorAvg, setOrdenarPorAvg] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const contenidoRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent | TouchEvent) {
@@ -130,14 +132,7 @@ export default function StatsPage() {
   useEffect(() => {
     if (modoAcumulado && bateadorSel) {
       setCargandoAcumulado(true);
-      db.bateadores
-        .where('[apellido+numero+equipo]')
-        .equals([bateadorSel.apellido, bateadorSel.numero, bateadorSel.equipo])
-        .toArray()
-        .then(batters => {
-          const ids = batters.map(b => b.id);
-          return db.turnos_al_bate.where('bateadorId').anyOf(ids).toArray();
-        })
+      obtenerTurnosAcumulados(bateadorSel.apellido, bateadorSel.numero, bateadorSel.equipo, bateadorSel.nombre)
         .then(turnos => {
           setTurnosAcumulados(turnos);
           setCargandoAcumulado(false);
@@ -167,14 +162,6 @@ export default function StatsPage() {
     ? calcularEstadisticas(bateadorSel.id, turnosParaStats)
     : null;
 
-  // Derivar zona real desde coordenadas canónicas (catcher) cuando existen,
-  // porque el campo t.zona pudo haberse capturado incorrectamente por overlap CSS.
-  // Layout catcher: inner zone ocupa 20%-80% en ambos ejes.
-  //   Zona 3: top-left inner   (x<0.5, y<0.5, dentro de inner)
-  //   Zona 4: top-right inner  (x>=0.5, y<0.5, dentro de inner)
-  //   Zona 1: bottom-left inner (x<0.5, y>=0.5, dentro de inner)
-  //   Zona 2: bottom-right inner(x>=0.5, y>=0.5, dentro de inner)
-  //   Zona 7/8/5/6: corners (fuera de inner)
   function zonaDesdeCoords(x: number, y: number): ZonaStrike {
     const inner = x >= 0.2 && x <= 0.8 && y >= 0.2 && y <= 0.8;
     const left = x < 0.5;
@@ -215,24 +202,52 @@ export default function StatsPage() {
     return data;
   })();
 
-  // Heat map: intensidad = hits / ab (0 = frío, 1 = caliente, -1 = sin datos)
-  const heatMap: Partial<Record<ZonaStrike, number>> = {};
-  for (let z = 1; z <= 8; z++) {
-    const d = zonasDir[z as ZonaStrike];
-    heatMap[z as ZonaStrike] = d.ab > 0 ? d.hits / d.ab : -1;
-  }
+  const heatMap = calcularHeatMap(turnosBateador);
 
   const avg = stats && stats.turnosAlBate > 0
     ? stats.promedio.toFixed(3).replace('0.', '.')
     : '---';
 
+  const nombreArchivo = () => {
+    const inicial = bateadorSel?.nombre ? bateadorSel.nombre.charAt(0).toUpperCase() : '';
+    const fecha = new Date().toLocaleDateString('es-AR').split('/').join('-');
+    const equipoStr = bateadorSel?.equipo || '';
+    return `${bateadorSel?.apellido}-${inicial}_${equipoStr}_${fecha}.png`;
+  };
+
+  const compartirODescargar = async () => {
+    if (!contenidoRef.current) return;
+    try {
+      const dataUrl = await toPng(contenidoRef.current, { backgroundColor: '#161A22', pixelRatio: 2 });
+      const blob = await (await fetch(dataUrl)).blob();
+      const archivo = new File([blob], nombreArchivo(), { type: 'image/png' });
+
+      if (navigator.canShare && navigator.canShare({ files: [archivo] })) {
+        await navigator.share({ files: [archivo] });
+      } else {
+        const link = document.createElement('a');
+        link.href = dataUrl;
+        link.download = nombreArchivo();
+        link.click();
+      }
+    } catch (err) {
+      console.error('Error al exportar heatmap:', err);
+    }
+  };
+
   return (
     <div style={{ paddingBottom: 16 }}>
-      {/* Selector de bateador */}
       <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--border)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
           <label className="label" style={{ margin: 0 }}>Bateador</label>
           <div style={{ display: 'flex', gap: 4, background: 'var(--bg-elevated)', padding: 3, borderRadius: 6 }}>
+            <button
+              className="btn btn-sm"
+              style={{ padding: '2px 8px', fontSize: '0.65rem', background: 'transparent', color: 'var(--text-primary)', border: 'none', fontWeight: 'normal' }}
+              onClick={compartirODescargar}
+            >
+              Exportar
+            </button>
             <button
               className="btn btn-sm"
               style={{ padding: '2px 8px', fontSize: '0.65rem', background: !ordenarPorAvg ? 'var(--accent)' : 'transparent', color: !ordenarPorAvg ? '#000' : 'var(--text-secondary)', border: !ordenarPorAvg ? '1px solid var(--accent)' : 'none', fontWeight: !ordenarPorAvg ? 'bold' : 'normal' }}
@@ -249,9 +264,7 @@ export default function StatsPage() {
             </button>
           </div>
         </div>
-        {/* Custom dropdown con AVG coloreado */}
         <div ref={dropdownRef} style={{ position: 'relative', marginBottom: 12 }}>
-          {/* Trigger */}
           <div
             className="input"
             onClick={() => setDropdownOpen(o => !o)}
@@ -285,7 +298,6 @@ export default function StatsPage() {
             </span>
           </div>
 
-          {/* Lista desplegable */}
           {dropdownOpen && (
             <div style={{
               position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0, zIndex: 999,
@@ -352,7 +364,6 @@ export default function StatsPage() {
           )}
         </div>
 
-        {/* Toggle Acumulado */}
         <div style={{ display: 'flex', gap: 8, background: 'var(--bg-elevated)', padding: 4, borderRadius: 8 }}>
           <button
             className={`btn btn-sm ${!modoAcumulado ? 'btn-primary' : ''}`}
@@ -386,8 +397,17 @@ export default function StatsPage() {
       )}
 
       {!cargandoAcumulado && bateadorSel && stats && (
-        <>
-          {/* Stats cards */}
+        <div ref={contenidoRef} style={{ background: 'var(--bg-surface)', padding: '16px 0' }}>
+          
+          <div style={{ padding: '0 16px' }}>
+            <div style={{ fontWeight: 800, fontSize: '1rem', textTransform: 'uppercase', marginBottom: 4 }}>
+              {bateadorSel.apellido}{bateadorSel.nombre ? `, ${bateadorSel.nombre}` : ''} — <span style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>{bateadorSel.equipo}</span>
+            </div>
+            <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+              {modoAcumulado ? 'Acumulado' : 'Este partido'}
+            </div>
+          </div>
+
           <div className="stats-row" style={{ paddingTop: 12 }}>
             {[
               { label: 'AB', value: stats.turnosAlBate, color: '#FFFFFF' },
@@ -404,14 +424,12 @@ export default function StatsPage() {
             ))}
           </div>
 
-          {/* Leyenda heat map */}
           <div className="heatmap-legend">
             <span className="heatmap-legend__label">COLD</span>
             <div className="heatmap-legend__bar" />
             <span className="heatmap-legend__label">HOT</span>
           </div>
 
-          {/* Zona heat map */}
           <ZonaStrikeComponent
             onZonaClick={() => {}}
             heatMap={heatMap}
@@ -419,7 +437,6 @@ export default function StatsPage() {
             ladoBateo={bateadorSel.ladoBateo}
           />
 
-          {/* Tabla por zona */}
           <div style={{ padding: '4px 16px 16px' }}>
             <p className="section-title" style={{ marginBottom: 8 }}>Desglose por zona</p>
             <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
@@ -474,7 +491,6 @@ export default function StatsPage() {
             </div>
           </div>
 
-          {/* Tabla por tipo de pitch */}
           <div style={{ padding: '0 16px 16px' }}>
             <p className="section-title" style={{ marginBottom: 8 }}>Tipo de pitch / K</p>
             <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
@@ -517,8 +533,7 @@ export default function StatsPage() {
               </table>
             </div>
           </div>
-
-        </>
+        </div>
       )}
     </div>
   );

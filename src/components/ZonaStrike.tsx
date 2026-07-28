@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import type { ZonaStrike, Coordenadas } from '@/lib/types';
 
 interface Props {
@@ -138,15 +139,15 @@ export default function ZonaStrikeComponent({ onZonaClick, marcadores = [], heat
               {zoneStats && zoneStats[logicalZone] && zoneStats[logicalZone]!.pitches > 0 && (
                 <div className="zone-tooltip" style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontWeight: 400 }}>
                   <div style={{ display: 'flex', gap: '6px', alignItems: 'center', justifyContent: 'center' }}>
-                    <span style={{ color: '#FFFFFF' }}>{zoneStats[logicalZone]!.hits + zoneStats[logicalZone]!.outs + zoneStats[logicalZone]!.ks + zoneStats[logicalZone]!.kl} AB</span>
+                    <span style={{ color: 'var(--text-primary)' }}>{zoneStats[logicalZone]!.hits + zoneStats[logicalZone]!.outs + zoneStats[logicalZone]!.ks + zoneStats[logicalZone]!.kl} AB</span>
                     <span style={{ color: 'var(--text-muted)' }}>|</span>
                     <span style={{ color: 'var(--danger)' }}>{zoneStats[logicalZone]!.hits} H</span>
                     <span style={{ color: 'var(--text-muted)' }}>|</span>
-                    <span style={{ color: 'var(--success)' }}>{zoneStats[logicalZone]!.outs} A/F</span>
+                    <span style={{ color: 'var(--success)' }}>{zoneStats[logicalZone]!.outs} O</span>
                     <span style={{ color: 'var(--text-muted)' }}>|</span>
                     <span style={{ color: 'var(--info)' }}>{zoneStats[logicalZone]!.ks + zoneStats[logicalZone]!.kl} K</span>
                     <span style={{ color: 'var(--text-muted)' }}>|</span>
-                    <span style={{ color: 'var(--text-secondary)' }}>{zoneStats[logicalZone]!.bb} BB/HBP</span>
+                    <span style={{ color: '#03A9F4' }}>{zoneStats[logicalZone]!.bb} BB/HBP</span>
                   </div>
                   <div style={{ color: 'var(--accent)', fontSize: '0.75rem', textAlign: 'center' }}>
                     {((zoneStats[logicalZone]!.hits + zoneStats[logicalZone]!.outs + zoneStats[logicalZone]!.ks + zoneStats[logicalZone]!.kl) > 0)
@@ -213,15 +214,15 @@ export default function ZonaStrikeComponent({ onZonaClick, marcadores = [], heat
                 {zoneStats && zoneStats[logicalZone] && zoneStats[logicalZone]!.pitches > 0 && (
                   <div className="zone-tooltip" style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontWeight: 400 }}>
                     <div style={{ display: 'flex', gap: '6px', alignItems: 'center', justifyContent: 'center' }}>
-                      <span style={{ color: '#FFFFFF' }}>{zoneStats[logicalZone]!.hits + zoneStats[logicalZone]!.outs + zoneStats[logicalZone]!.ks + zoneStats[logicalZone]!.kl} AB</span>
+                      <span style={{ color: 'var(--text-primary)' }}>{zoneStats[logicalZone]!.hits + zoneStats[logicalZone]!.outs + zoneStats[logicalZone]!.ks + zoneStats[logicalZone]!.kl} AB</span>
                       <span style={{ color: 'var(--text-muted)' }}>|</span>
                       <span style={{ color: 'var(--danger)' }}>{zoneStats[logicalZone]!.hits} H</span>
                       <span style={{ color: 'var(--text-muted)' }}>|</span>
-                      <span style={{ color: 'var(--success)' }}>{zoneStats[logicalZone]!.outs} A/F</span>
+                      <span style={{ color: 'var(--success)' }}>{zoneStats[logicalZone]!.outs} O</span>
                       <span style={{ color: 'var(--text-muted)' }}>|</span>
                       <span style={{ color: 'var(--info)' }}>{zoneStats[logicalZone]!.ks + zoneStats[logicalZone]!.kl} K</span>
                       <span style={{ color: 'var(--text-muted)' }}>|</span>
-                      <span style={{ color: 'var(--text-secondary)' }}>{zoneStats[logicalZone]!.bb} BB/HBP</span>
+                      <span style={{ color: '#03A9F4' }}>{zoneStats[logicalZone]!.bb} BB/HBP</span>
                     </div>
                     <div style={{ color: 'var(--accent)', fontSize: '0.75rem', textAlign: 'center' }}>
                       {((zoneStats[logicalZone]!.hits + zoneStats[logicalZone]!.outs + zoneStats[logicalZone]!.ks + zoneStats[logicalZone]!.kl) > 0)

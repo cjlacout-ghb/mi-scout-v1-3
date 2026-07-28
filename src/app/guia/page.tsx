@@ -264,7 +264,7 @@ export default function GuiaPage() {
         </Section>
 
         {/* ── S6 ── */}
-        <Section id="s6" num="6" title="Sección Heat Map: Estadísticas y Mapa de Calor">
+        <Section id="s6" num="6" title="Heat Map: estadísticas y exportación">
           <P>La sección <strong>Heat Map</strong> te permite analizar el rendimiento de cualquier jugador.</P>
 
           <SubTitle>Selector de Jugador</SubTitle>

@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useReducer, useEffect, useCallback } from 'react';
 import type { EstadoPartido, Bateador, TurnoAlBate, Partido } from '@/lib/types';
-import { estadoInicial, generarId } from '@/lib/storage';
+import { estadoInicial, generarId, normalizarCamposBateador } from '@/lib/storage';
 import { db, getPartidoActivo, getEstadoPartido } from '@/lib/dbClient';
 
 // ─── Acciones ─────────────────────────────────────────────────────────────────
@@ -375,17 +375,20 @@ async function syncApi(accion: Accion, nuevoEstado: EstadoPartido, oldEstado: Es
       case 'AGREGAR_BATEADOR': {
         const _id = (accion as any)._id;
         const b = { ...accion.payload, id: _id, partidoId: nuevoEstado.partido?.id || '' };
-        await db.bateadores.put(b);
+        const bNormalizado = normalizarCamposBateador(b); // <-- nombre/apellido/equipo ya en MAYÚSCULAS, sin espacios extra
+        await db.bateadores.put(bNormalizado);
         break;
       }
       case 'AGREGAR_BATEADORES_MASIVO': {
         const _ids = (accion as any)._ids;
         const bs = accion.payload.map((b, i) => ({ ...b, id: _ids[i], partidoId: nuevoEstado.partido?.id || '' }));
-        await db.bateadores.bulkPut(bs);
+        const bsNormalizados = bs.map(normalizarCamposBateador); // <-- mismo tratamiento para carga masiva
+        await db.bateadores.bulkPut(bsNormalizados);
         break;
       }
       case 'EDITAR_BATEADOR': {
-        await db.bateadores.update(accion.payload.id, accion.payload.datos);
+        const datosNormalizados = normalizarCamposBateador(accion.payload.datos); // <-- respeta campos parciales
+        await db.bateadores.update(accion.payload.id, datosNormalizados);
         break;
       }
       case 'REORDENAR_BATEADORES': {
@@ -412,7 +415,8 @@ async function syncApi(accion: Accion, nuevoEstado: EstadoPartido, oldEstado: Es
           rol: accion.payload.rol,
           activo: true,
         };
-        await db.bateadores.put(nuevoB);
+        const nuevoBNormalizado = normalizarCamposBateador(nuevoB); // <-- mismo fix aplicado al sustituto
+        await db.bateadores.put(nuevoBNormalizado);
         break;
       }
       case 'ELIMINAR_BATEADOR': {

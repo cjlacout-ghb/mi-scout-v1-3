@@ -99,7 +99,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', fontWeight: 400, letterSpacing: '0.5px' }}>v1.3</span>
         </div>
         <div className="app-header__info" style={{ textAlign: 'center' }}>
-          {isLoading ? (
+          {pathname.startsWith('/admin') ? null : isLoading ? (
             <div style={{ width: 160, height: 32, borderRadius: 4, 
                           background: 'var(--bg-elevated)', opacity: 0.4 }} />
           ) : partidoInfo ? (

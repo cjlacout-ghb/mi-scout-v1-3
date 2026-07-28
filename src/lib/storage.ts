@@ -1,5 +1,6 @@
 'use client';
 
+import { db } from '@/lib/dbClient';
 import type { EstadoPartido, Bateador, TurnoAlBate, Partido, TipoPitch } from './types';
 
 export const estadoInicial: EstadoPartido = {
@@ -20,6 +21,33 @@ export const estadoInicial: EstadoPartido = {
 export function generarId(): string {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 9);
 }
+
+function normalizarNombre(nombre: string | undefined | null): string {
+  if (!nombre) return '';
+  return nombre
+    .trim()
+    .toUpperCase()
+    .replace(/\s+/g, ' ');
+}
+
+export function normalizarCamposBateador<T extends Record<string, any>>(
+  obj: T
+): T {
+  const copia = { ...obj };
+
+  if ('nombre' in copia) {
+    (copia as any).nombre = normalizarNombre(copia.nombre);
+  }
+  if ('apellido' in copia) {
+    (copia as any).apellido = normalizarNombre(copia.apellido);
+  }
+  if ('equipo' in copia) {
+    (copia as any).equipo = normalizarNombre(copia.equipo);
+  }
+
+  return copia;
+}
+
 // ─── Helpers de estadísticas ───────────────────────────────────────────────────
 import type { EstadisticasBateador, ZonaStrike } from './types';
 
@@ -137,6 +165,44 @@ export function calcularEstadisticas(
     porZona,
     porPitch,
   };
+}
+
+export async function obtenerTurnosAcumulados(
+  apellido: string,
+  numero: string,
+  equipo: string,
+  nombre?: string
+): Promise<TurnoAlBate[]> {
+  let batters = await db.bateadores
+    .where('[apellido+numero+equipo]')
+    .equals([apellido, numero, equipo])
+    .toArray();
+    
+  if (nombre) {
+    const nombreNormalizado = normalizarNombre(nombre);
+    batters = batters.filter(
+      (b) => normalizarNombre(b.nombre) === nombreNormalizado
+    );
+  }
+  
+  const ids = batters.map((b) => b.id);
+  return db.turnos_al_bate.where('bateadorId').anyOf(ids).toArray();
+}
+
+export function calcularHeatMap(turnos: TurnoAlBate[]): Partial<Record<ZonaStrike, number>> {
+  const heatMap: Partial<Record<ZonaStrike, number>> = {};
+  for (let z = 1; z <= 8; z++) {
+    const zona = z as ZonaStrike;
+    const zt = turnos.filter((t) => zonaReal(t) === zona);
+    const hits = zt.filter((t) => t.resultado === 'HIT').length;
+    const outs = zt.filter((t) => t.resultado === 'OUT').length;
+    const ks = zt.filter((t) => t.resultado === 'KS').length;
+    const kl = zt.filter((t) => t.resultado === 'KL').length;
+    const err = zt.filter((t) => t.resultado === 'ERROR').length;
+    const ab = hits + outs + ks + kl + err;
+    heatMap[zona] = ab > 0 ? hits / ab : -1;
+  }
+  return heatMap;
 }
 
 // ─── Generador de reporte MD ───────────────────────────────────────────────────
