@@ -82,12 +82,6 @@ export default function AdminPage() {
     setMessage('');
     const code = (newCode.trim() || generateCode()).toUpperCase();
 
-    const expiresAt = new Date();
-    if (newPlan === 'promo') {
-      expiresAt.setMonth(expiresAt.getMonth() + 1);
-    } else {
-      expiresAt.setFullYear(expiresAt.getFullYear() + 1);
-    }
 
     const { error } = await supabase
       .from('licenses')
@@ -95,7 +89,7 @@ export default function AdminPage() {
         code, 
         version: 'v1.3', 
         notes: newNotes,
-        expires_at: expiresAt.toISOString(),
+        expires_at: null,
         plan: newPlan,
         release_count: newPlan === 'promo' ? 1 : 0,
       });
@@ -278,7 +272,7 @@ export default function AdminPage() {
                   Plan: {lic.plan === 'promo' ? '🟡 Lanzamiento' : '🟢 Profesional'} · 
                   Activaciones: {lic.activations_used}/{lic.max_activations} · 
                   Liberaciones usadas: {lic.release_count}/1 · 
-                  Vence: {lic.expires_at ? new Date(lic.expires_at).toLocaleDateString('es-AR') : 'Sin vencimiento'} · 
+                  Vence: {lic.expires_at ? new Date(lic.expires_at).toLocaleDateString('es-AR') : lic.activations_used === 0 ? 'Sin activar aún' : 'Sin vencimiento'} · 
                   Estado: {lic.status}
                 </p>
               </div>

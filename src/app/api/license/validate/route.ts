@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabaseClient';
+import { calculateExpiresAt, type PlanKey } from '@/lib/planConfig';
 
 export async function POST(req: NextRequest) {
   try {
@@ -61,7 +62,19 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 4. Register new activation
+    // 4. If this is the first activation (expires_at is null), set expiry now
+    //    based on the license plan. Subsequent activations leave it untouched.
+    if (!license.expires_at) {
+      const newExpiresAt = calculateExpiresAt(license.plan as PlanKey);
+      await supabase
+        .from('licenses')
+        .update({ expires_at: newExpiresAt })
+        .eq('code', code.toUpperCase());
+      // Use the newly computed expiry for this request's expiration check
+      license.expires_at = newExpiresAt;
+    }
+
+    // 5. Register new activation
     const { error: activationError } = await supabase
       .from('activations')
       .insert({
@@ -77,7 +90,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 5. Increment activations_used
+    // 6. Increment activations_used
     await supabase
       .from('licenses')
       .update({ activations_used: license.activations_used + 1 })
