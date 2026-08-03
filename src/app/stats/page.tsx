@@ -401,7 +401,7 @@ export default function StatsPage() {
           
           <div style={{ padding: '0 16px' }}>
             <div style={{ fontWeight: 800, fontSize: '1rem', textTransform: 'uppercase', marginBottom: 4 }}>
-              {bateadorSel.apellido}{bateadorSel.nombre ? `, ${bateadorSel.nombre}` : ''} — <span style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>{bateadorSel.equipo}</span>
+              <span style={{ marginRight: 8 }}>{bateadorSel.numero}</span>{bateadorSel.apellido}{bateadorSel.nombre ? `, ${bateadorSel.nombre}` : ''} - <span style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>{bateadorSel.equipo.slice(0, 3).toUpperCase()}</span>
             </div>
             <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
               {modoAcumulado ? 'Acumulado' : 'Este partido'}

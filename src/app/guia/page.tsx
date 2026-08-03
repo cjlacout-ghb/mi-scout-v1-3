@@ -372,7 +372,7 @@ export default function GuiaPage() {
             MiScout es software propietario. Queda expresamente prohibida su copia,<br />
             redistribución, modificación o uso comercial sin autorización escrita del autor.<br /><br />
             <em>Disclaimer: MiScout es una herramienta de análisis y seguimiento estadístico. Su uso no garantiza resultados deportivos, victorias ni mejoras de rendimiento específicas.</em><br /><br />
-            Versión 1.3 | Idioma: Español | Última actualización: Julio 2026
+            Meta info: Versión 1.3.6 | Idioma: Español | Última actualización: Agosto 2026
           </p>
         </div>
 

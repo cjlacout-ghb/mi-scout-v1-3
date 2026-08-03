@@ -406,19 +406,15 @@ export default function TrackingPage() {
           textAlign: 'center',
           fontSize: '0.72rem',
           letterSpacing: '0.08em',
-          color: estado.partido?.finalizado ? 'var(--text-secondary)' : (turnoEditando ? 'var(--warning)' : 'var(--accent)'),
+          color: estado.partido?.finalizado ? 'var(--text-secondary)' : 'var(--accent)',
           textTransform: 'uppercase',
           position: 'relative',
           top: 10,
-          marginBottom: 4,
-          padding: turnoEditando ? '4px' : '0',
-          background: turnoEditando ? 'rgba(243, 156, 18, 0.1)' : 'transparent',
-          borderRadius: 4,
-          fontWeight: turnoEditando ? 800 : 'normal'
+          marginBottom: 4
         }}>
           {estado.partido?.finalizado 
             ? 'PARTIDO FINALIZADO - MODO SOLO LECTURA' 
-            : (esperandoConfirmacion ? 'Confirmar resultado' : turnoEditando ? 'REUBICÁ EL LANZAMIENTO' : 'MARCA EL LANZAMIENTO EN LA ZONA')}
+            : (esperandoConfirmacion ? 'CONFIRMA EL RESULTADO' : turnoEditando ? 'REUBICA EL LANZAMIENTO' : 'MARCA EL LANZAMIENTO')}
         </p>
         <ZonaStrikeComponent 
           onZonaClick={handleZonaClick} 
@@ -542,7 +538,7 @@ export default function TrackingPage() {
       {/* ── Historial de turnos del bateador actual ── */}
       {turnosBateador.length > 0 && (
         <div style={{ padding: '24px 16px 16px' }}>
-          <p className="text-xs text-secondary" style={{ marginBottom: 12 }}>Historial de este partido</p>
+          <p className="text-xs text-secondary" style={{ marginBottom: 12 }}>Turnos de este partido</p>
           {[...turnosBateador].reverse().map((t, i) => (
             <div
               key={t.id}
@@ -602,8 +598,8 @@ export default function TrackingPage() {
       {/* ── Notas del jugador ── */}
       {bateadorActual && (
         <div style={{ padding: '24px 16px', marginBottom: 24 }}>
-          <p className="text-xs text-secondary" style={{ marginBottom: 12, textTransform: 'uppercase', fontWeight: 600 }}>
-            Notas sobre el jugador
+          <p className="text-xs text-secondary" style={{ marginBottom: 12, fontWeight: 600 }}>
+            Notas
           </p>
           <textarea
             className="input"

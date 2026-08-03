@@ -321,4 +321,4 @@ MiScout guarda el progreso automáticamente en tu dispositivo (sin necesidad de 
 MiScout es software propietario. Queda expresamente prohibida su copia, redistribución, modificación o uso comercial sin autorización escrita del autor.
 Disclaimer: MiScout es una herramienta de análisis y seguimiento estadístico. Su uso no garantiza resultados deportivos, victorias ni mejoras de rendimiento específicas.
 
-Meta info: Versión 1.3 | Idioma: Español | Última actualización: Julio 2026
+Meta info: Versión 1.3.6 | Idioma: Español | Última actualización: Agosto 2026
