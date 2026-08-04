@@ -12,6 +12,7 @@ export default function HistorialPage() {
   const [cargando, setCargando] = useState(true);
   const [cargandoId, setCargandoId] = useState<string | null>(null);
   const [confirmandoEliminar, setConfirmandoEliminar] = useState<string | null>(null);
+  const [confirmandoContinuar, setConfirmandoContinuar] = useState<string | null>(null);
   const router = useRouter();
   const { dispatch } = useScout();
 
@@ -71,6 +72,41 @@ export default function HistorialPage() {
     setCargandoId(null);
   };
 
+  // ─── PASO 2: Reabrir un partido finalizado para continuar el tracking ──────
+  const reabrirPartido = async (id: string) => {
+    setCargandoId(id);
+    try {
+      // 1. Buscar todos los partidos activos (excluyendo el que se va a reabrir)
+      const activos = await db.partidos.filter(p => !p.finalizado).toArray();
+      const otrosActivos = activos.filter(p => p.id !== id);
+
+      // 2. Finalizar los otros partidos activos para garantizar unicidad
+      for (const p of otrosActivos) {
+        await db.partidos.update(p.id, { finalizado: true });
+      }
+
+      // 3. Marcar el partido objetivo como activo nuevamente
+      await db.partidos.update(id, { finalizado: false });
+
+      // 4. Reconstruir el estado completo desde Dexie (partido + bateadores + turnos)
+      const estado = await getEstadoPartido(id);
+
+      if (estado && estado.partido) {
+        // 5. Asegurar que el estado tenga finalizado: false explícito
+        estado.partido.finalizado = false;
+
+        // 6. Hidratar ScoutContext en memoria con el partido reabierto
+        dispatch({ type: 'CARGAR_ESTADO', payload: estado });
+
+        // 7. Navegar a tracking (no a stats)
+        router.push('/tracking');
+      }
+    } catch (err) {
+      console.error('Error reabriendo partido:', err);
+    }
+    setCargandoId(null);
+  };
+
   const pedirEliminar = (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
     setConfirmandoEliminar(id);
@@ -112,7 +148,7 @@ export default function HistorialPage() {
             className="card"
             onClick={() => cargarPartido(p.id)}
             style={{
-              padding: '12px 140px 12px 16px',
+              padding: '12px 156px 12px 16px',
               position: 'relative',
               cursor: 'pointer',
               transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
@@ -135,21 +171,67 @@ export default function HistorialPage() {
                 Cargando...
               </span>
             )}
-                        {cargandoId !== p.id && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  pedirEliminar(e, p.id);
-                }}
+
+            {/* ─── Botones de acción (columna derecha) ─── */}
+            {cargandoId !== p.id && (
+              <div
                 style={{
-                  position: 'absolute', top: '50%', right: 12, transform: 'translateY(-50%)',
-                  background: 'none', border: 'none', color: 'var(--danger)',
-                  cursor: 'pointer', fontSize: '1.2rem', opacity: 0.7
+                  position: 'absolute',
+                  top: '50%',
+                  right: 12,
+                  transform: 'translateY(-50%)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: 6,
                 }}
+                onClick={(e) => e.stopPropagation()}
               >
-                ✕
-              </button>
+                {/* Botón "Continuar partido" — PASO 4 */}
+                <button
+                  title="Continuar partido"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setConfirmandoContinuar(p.id);
+                  }}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: 'var(--text-secondary)',
+                    cursor: 'pointer',
+                    fontSize: '1.2rem',
+                    opacity: 0.85,
+                    lineHeight: 1,
+                    padding: '2px 4px',
+                  }}
+                >
+                  ▶
+                </button>
+
+                {/* Botón "Eliminar partido" */}
+                <button
+                  title="Eliminar partido"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    pedirEliminar(e, p.id);
+                  }}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: 'var(--danger)',
+                    cursor: 'pointer',
+                    fontSize: '1.2rem',
+                    opacity: 0.7,
+                    lineHeight: 1,
+                    padding: '2px 4px',
+                  }}
+                >
+                  ✕
+                </button>
+              </div>
             )}
+
+            {/* Botón "Ver estadísticas" — PASO 1: label actualizado */}
             {cargandoId !== p.id && (
               <button
                 onClick={(e) => {
@@ -159,20 +241,35 @@ export default function HistorialPage() {
                 className="btn btn-primary"
                 style={{
                   position: 'absolute', top: '50%', right: 44, transform: 'translateY(-50%)',
-                  padding: '6px 10px', fontSize: '0.75rem', lineHeight: 1.2, textAlign: 'center'
+                  padding: '8px 12px', fontSize: '0.8rem', lineHeight: 1.2, textAlign: 'center'
                 }}
               >
-                Seleccionar<br/>jugador
+                Ver<br/>estadísticas
               </button>
             )}
           </div>
         ))}
       </div>
+
+      {/* Modal: Eliminar partido */}
       {confirmandoEliminar && (
         <ModalConfirm
           mensaje="¿Seguro que querés eliminar este partido y todos sus datos? Esta acción no se puede deshacer."
           onConfirmar={confirmarEliminar}
           onCancelar={() => setConfirmandoEliminar(null)}
+        />
+      )}
+
+      {/* Modal: Continuar partido — PASO 3A */}
+      {confirmandoContinuar && (
+        <ModalConfirm
+          mensaje="¿Continuar este partido? Si tienes otro partido activo, se dará por finalizado."
+          onConfirmar={() => {
+            const id = confirmandoContinuar;
+            setConfirmandoContinuar(null);
+            reabrirPartido(id);
+          }}
+          onCancelar={() => setConfirmandoContinuar(null)}
         />
       )}
     </div>

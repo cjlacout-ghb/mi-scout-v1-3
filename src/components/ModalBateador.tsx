@@ -34,7 +34,7 @@ export default function ModalBateador({
     setForm((p) => ({ ...p, [k]: e.target.value }));
 
   const guardar = () => {
-    if (!form.apellido.trim() || !form.numero.trim()) {
+    if (!form.apellido.trim() || !form.numero.trim() || !form.nombre.trim()) {
       setMostrarAlerta(true);
       return;
     }
@@ -84,7 +84,7 @@ export default function ModalBateador({
             <input className="input" placeholder="HORT" value={form.apellido} onChange={set('apellido')} maxLength={40} autoCapitalize="characters" />
           </div>
           <div className="form-group">
-            <label className="label">Nombre</label>
+            <label className="label">Nombre *</label>
             <input className="input" placeholder="LOCHLAN" value={form.nombre} onChange={set('nombre')} maxLength={40} autoCapitalize="characters" />
           </div>
           <div className="form-group">
@@ -108,7 +108,7 @@ export default function ModalBateador({
       
       {mostrarAlerta && createPortal(
         <ModalConfirm
-          mensaje="Por favor, completa los campos obligatorios (# Camiseta y Apellido) para continuar."
+          mensaje="Por favor, completa los campos obligatorios (# Camiseta, Apellido y Nombre) para continuar."
           onConfirmar={() => setMostrarAlerta(false)}
           onCancelar={() => setMostrarAlerta(false)}
           soloAviso={true}

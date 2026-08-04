@@ -149,7 +149,7 @@ function ModalSustitucion({
     setForm((p) => ({ ...p, [k]: e.target.value }));
 
   const confirmar = () => {
-    if (!form.apellido.trim() || !form.numero.trim()) return;
+    if (!form.apellido.trim() || !form.numero.trim() || !form.nombre.trim()) return;
     dispatch({
       type: 'SUSTITUIR_BATEADOR',
       payload: {
@@ -189,7 +189,7 @@ function ModalSustitucion({
             <input className="input" placeholder="APELLIDO" value={form.apellido} onChange={set('apellido')} maxLength={40} autoCapitalize="characters" />
           </div>
           <div className="form-group">
-            <label className="label">Nombre</label>
+            <label className="label">Nombre *</label>
             <input className="input" placeholder="NOMBRE" value={form.nombre} onChange={set('nombre')} maxLength={40} autoCapitalize="characters" />
           </div>
           <div className="form-group">
