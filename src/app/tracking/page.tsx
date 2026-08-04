@@ -648,7 +648,7 @@ export default function TrackingPage() {
       )}
       {showFinPartido && (
         <ModalConfirm
-          mensaje="¿Finalizar el partido? Esta acción no se puede deshacer."
+          mensaje="¿Estás seguro de finalizar el partido?"
           onConfirmar={() => {
             setShowFinPartido(false);
             dispatch({ type: 'FINALIZAR_PARTIDO' });
