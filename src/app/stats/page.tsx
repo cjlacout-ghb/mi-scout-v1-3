@@ -193,11 +193,12 @@ export default function StatsPage() {
       const zt = turnosBateador.filter(t => zonaReal(t) === z);
       const hits = zt.filter(t => t.resultado === 'HIT').length;
       const outs = zt.filter(t => t.resultado === 'OUT').length;
+      const sacOuts = zt.filter(t => t.resultado === 'OUT' && (t.detalleOut?.tipo === 'sac fly' || t.detalleOut?.tipo === 'sac bunt')).length;
       const ks   = zt.filter(t => t.resultado === 'KS').length;
       const kl   = zt.filter(t => t.resultado === 'KL').length;
       const bb   = zt.filter(t => t.resultado === 'BB' || t.resultado === 'HBP').length;
       const err  = zt.filter(t => t.resultado === 'ERROR').length;
-      data[z as ZonaStrike] = { pitches: zt.length, hits, outs, contacto: hits + outs + err, ks, kl, bb, ab: hits + outs + ks + kl + err };
+      data[z as ZonaStrike] = { pitches: zt.length, hits, outs, contacto: hits + outs + err, ks, kl, bb, ab: hits + (outs - sacOuts) + ks + kl + err };
     }
     return data;
   })();

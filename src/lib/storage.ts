@@ -195,7 +195,7 @@ export function calcularHeatMap(turnos: TurnoAlBate[]): Partial<Record<ZonaStrik
     const zona = z as ZonaStrike;
     const zt = turnos.filter((t) => zonaReal(t) === zona);
     const hits = zt.filter((t) => t.resultado === 'HIT').length;
-    const outs = zt.filter((t) => t.resultado === 'OUT').length;
+    const outs = zt.filter((t) => t.resultado === 'OUT' && t.detalleOut?.tipo !== 'sac fly' && t.detalleOut?.tipo !== 'sac bunt').length;
     const ks = zt.filter((t) => t.resultado === 'KS').length;
     const kl = zt.filter((t) => t.resultado === 'KL').length;
     const err = zt.filter((t) => t.resultado === 'ERROR').length;

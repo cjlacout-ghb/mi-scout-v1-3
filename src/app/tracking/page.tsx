@@ -237,11 +237,12 @@ export default function TrackingPage() {
   };
 
   // Contar stats rápidas del bateador actual
-  const ab = turnosVista.length;
   const hits = turnosVista.filter((t) => t.resultado === 'HIT').length;
   const ks  = turnosVista.filter((t) => t.resultado === 'KS' || t.resultado === 'KL').length;
   const bb  = turnosVista.filter((t) => t.resultado === 'BB' || t.resultado === 'HBP').length;
   const outs = turnosVista.filter((t) => t.resultado === 'OUT').length;
+  const sacCount = turnosVista.filter((t) => t.resultado === 'OUT' && (t.detalleOut?.tipo === 'sac fly' || t.detalleOut?.tipo === 'sac bunt')).length;
+  const ab = turnosVista.length - bb - sacCount;
 
   const ultimoTurno = turnosBateador[turnosBateador.length - 1];
 
