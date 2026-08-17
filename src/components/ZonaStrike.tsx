@@ -165,7 +165,7 @@ export default function ZonaStrikeComponent({ onZonaClick, marcadores = [], heat
                     <span style={{ color: 'var(--text-muted)' }}>|</span>
                     <span style={{ color: 'var(--info)' }}>{zoneStats[logicalZone]!.ks + zoneStats[logicalZone]!.kl} K</span>
                     <span style={{ color: 'var(--text-muted)' }}>|</span>
-                    <span style={{ color: '#03A9F4' }}>{zoneStats[logicalZone]!.bb} BB/HBP</span>
+                    <span style={{ color: '#8892A4' }}>{zoneStats[logicalZone]!.bb} BB/HBP</span>
                   </div>
                   <div style={{ color: 'var(--accent)', fontSize: '0.75rem', textAlign: 'center' }}>
                     {((zoneStats[logicalZone]!.hits + zoneStats[logicalZone]!.outs + zoneStats[logicalZone]!.ks + zoneStats[logicalZone]!.kl) > 0)
@@ -240,7 +240,7 @@ export default function ZonaStrikeComponent({ onZonaClick, marcadores = [], heat
                       <span style={{ color: 'var(--text-muted)' }}>|</span>
                       <span style={{ color: 'var(--info)' }}>{zoneStats[logicalZone]!.ks + zoneStats[logicalZone]!.kl} K</span>
                       <span style={{ color: 'var(--text-muted)' }}>|</span>
-                      <span style={{ color: '#03A9F4' }}>{zoneStats[logicalZone]!.bb} BB/HBP</span>
+                      <span style={{ color: '#8892A4' }}>{zoneStats[logicalZone]!.bb} BB/HBP</span>
                     </div>
                     <div style={{ color: 'var(--accent)', fontSize: '0.75rem', textAlign: 'center' }}>
                       {((zoneStats[logicalZone]!.hits + zoneStats[logicalZone]!.outs + zoneStats[logicalZone]!.ks + zoneStats[logicalZone]!.kl) > 0)

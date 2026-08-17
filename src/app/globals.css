@@ -837,7 +837,7 @@ body {
 .stats-row {
   display: flex;
   gap: 6px;
-  padding: 0 16px 8px;
+  padding: 0 16px 5px;
   width: 100%;
 }
 
@@ -849,7 +849,7 @@ body {
   background: var(--bg-elevated);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 10px 4px;
+  padding: 7px 4px;
   text-align: center;
 }
 
@@ -902,7 +902,7 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 16px;
+  padding: 5px 16px;
 }
 
 .heatmap-legend__bar {

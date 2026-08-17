@@ -415,12 +415,12 @@ export default function StatsPage() {
             <div style={{ fontWeight: 800, fontSize: '1rem', textTransform: 'uppercase', marginBottom: 4 }}>
               <span style={{ marginRight: 8 }}>{bateadorSel.numero}</span>{bateadorSel.apellido}{bateadorSel.nombre ? `, ${bateadorSel.nombre}` : ''} - <span style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>{bateadorSel.equipo.slice(0, 3).toUpperCase()}</span>
             </div>
-            <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+            <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
               {modoAcumulado ? t('stats.accumulated') : t('stats.this_match')}
             </div>
           </div>
 
-          <div className="stats-row" style={{ paddingTop: 12 }}>
+          <div className="stats-row" style={{ paddingTop: 8 }}>
             {[
               { label: 'AB', value: stats.turnosAlBate, color: '#FFFFFF' },
               { label: 'H',  value: stats.hits,  color: 'var(--danger)' },
