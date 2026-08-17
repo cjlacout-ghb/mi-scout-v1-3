@@ -123,7 +123,7 @@ export default function HeatMapModal({ apellido, numero, equipo, nombre, ladoBat
 
         {/* CONTENIDO EXPORTABLE — capturado por contenidoRef */}
         <div ref={contenidoRef} style={{ padding: '16px', background: 'var(--bg-surface)' }}>
-          <div style={{ fontWeight: 800, fontSize: '1rem', textTransform: 'uppercase', marginBottom: 4, paddingRight: 90 }}>
+          <div style={{ fontWeight: 800, fontSize: '1rem', textTransform: 'uppercase', marginBottom: 4, paddingRight: 110, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
             <span style={{ marginRight: 8 }}>{numero}</span>{apellido}{nombre ? `, ${nombre}` : ''} - <span style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>{equipo.slice(0, 3).toUpperCase()}</span>
           </div>
           <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
