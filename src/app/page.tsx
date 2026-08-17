@@ -531,7 +531,7 @@ export default function LineupPage() {
                 {/* Nota de sustitución */}
                 {!b.activo && sustituido && (
                   <div className="lineup-sustitucion" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingRight: 16 }}>
-                    <span>↳ Reemplazado por #{sustituido.numero} {sustituido.apellido} (Inning {b.reemplazadoAInning})</span>
+                    <span>{t('home.replaced_by').replace('{num}', String(sustituido.numero)).replace('{apellido}', sustituido.apellido).replace('{inning}', String(b.reemplazadoAInning))}</span>
                     {b.esAbridor && !estado.partido?.finalizado && (
                       <button
                         className="btn btn-ghost btn-sm"
@@ -541,7 +541,7 @@ export default function LineupPage() {
                           dispatch({ type: 'REINGRESAR_ABRIDOR', payload: { id: b.id, rol: activeTab } });
                         }}
                       >
-                        Reingresar
+                        {t('home.re_enter')}
                       </button>
                     )}
                   </div>

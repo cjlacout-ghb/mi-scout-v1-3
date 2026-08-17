@@ -102,6 +102,8 @@ export const dictionary: Record<Locale, Record<string, string>> = {
     'home.sub_leaving':           'Sale',
     'home.sub_entering_player':   'Ingresá los datos del jugador entrante',
     'home.confirm_sub':           'Confirmar sustitución',
+    'home.replaced_by':           '↳ Reemplazado por #{num} {apellido} (Inning {inning})',
+    'home.re_enter':              'Reingresar',
     
     // ── historial ─────────────────────────────────────────────────────────────
     'historial.loading':          'Cargando historial...',
@@ -318,6 +320,8 @@ export const dictionary: Record<Locale, Record<string, string>> = {
     'home.sub_leaving':           'Out',
     'home.sub_entering_player':   'Enter the incoming player details',
     'home.confirm_sub':           'Confirm substitution',
+    'home.replaced_by':           '↳ Replaced by #{num} {apellido} (Inning {inning})',
+    'home.re_enter':              'Re-enter',
     
     // ── historial ─────────────────────────────────────────────────────────────
     'historial.loading':          'Loading history...',
