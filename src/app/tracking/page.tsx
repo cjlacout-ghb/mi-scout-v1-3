@@ -2,16 +2,19 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useScout } from '@/context/ScoutContext';
+import { useLanguage } from '@/context/LanguageContext';
 import ZonaStrikeComponent from '@/components/ZonaStrike';
 import ModalPitch from '@/components/ModalPitch';
 import ModalConfirm from '@/components/ModalConfirm';
 import ModalBateador, { type FormBateador } from '@/components/ModalBateador';
 import HeatMapModal from '@/components/HeatMapModal';
 import type { ZonaStrike, TurnoAlBate, Coordenadas } from '@/lib/types';
+import Tooltip from '@/components/Tooltip';
 import { db } from '@/lib/dbClient';
 
 export default function TrackingPage() {
   const { estado, dispatch, bateadorActual, bateadoresActivos, equipoAlBate } = useScout();
+  const { t, tv } = useLanguage();
   const [zonaSeleccionada, setZonaSeleccionada] = useState<ZonaStrike | null>(null);
   const [coordenadasSeleccionadas, setCoordenadasSeleccionadas] = useState<Coordenadas | null>(null);
   const [turnoEditando, setTurnoEditando] = useState<TurnoAlBate | null>(null);
@@ -102,8 +105,8 @@ export default function TrackingPage() {
     return (
       <div className="empty-state">
 
-        <div className="empty-state__title">Sin partido activo</div>
-        <p className="empty-state__text">Inicia un partido desde el Line-Up para comenzar el tracking. O selecciona desde el Historial.</p>
+        <div className="empty-state__title">{t('tracking.no_match')}</div>
+        <p className="empty-state__text">{t('tracking.no_match_text')}</p>
       </div>
     );
   }
@@ -111,15 +114,15 @@ export default function TrackingPage() {
   if (bateadoresActivos.length === 0) {
     return (
       <div className="empty-state">
-        <div className="empty-state__title">Line-up vacío</div>
-        <p className="empty-state__text">Carga el primer bateador para comenzar.</p>
+        <div className="empty-state__title">{t('tracking.empty_lineup')}</div>
+        <p className="empty-state__text">{t('tracking.empty_lineup_text')}</p>
         <button className="btn btn-primary" style={{ marginTop: 16 }} onClick={() => setShowAgregarBateador(true)}>
-          Agregar Bateador
+          {t('tracking.add_batter')}
         </button>
         {showAgregarBateador && estado.partido && (
           <ModalBateador
-            titulo="Primer bateador"
-            subtitulo="Orden al bate: 1"
+            titulo={t('home.add_batter')}
+            subtitulo={`${t('home.batting_order')} 1`}
             equipo={equipoAlBate === 'visitante' ? estado.partido!.visitante : estado.partido!.local}
             onGuardar={(d: import('@/components/ModalBateador').FormBateador) => {
               dispatch({
@@ -271,7 +274,7 @@ export default function TrackingPage() {
             <div style={{ fontWeight: 800, fontSize: '1rem', textTransform: 'uppercase', letterSpacing: '0.02em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {bateadorActual?.apellido ?? '—'}{bateadorActual?.nombre ? `, ${bateadorActual.nombre}` : ''}
               <span style={{ marginLeft: 8, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 22, height: 22, fontSize: '0.65rem', background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: 4, color: 'var(--text-secondary)', verticalAlign: 'middle', position: 'relative', top: '-1px' }}>
-                {bateadorActual?.ladoBateo || 'D'}
+                {tv(bateadorActual?.ladoBateo || 'D', true)}
               </span>
             </div>
             <div style={{ display: 'flex', gap: 8, marginTop: 3, alignItems: 'center' }}>
@@ -323,21 +326,26 @@ export default function TrackingPage() {
               </>
             )}
             
-            <button
-              onClick={() => setMostrarHeatMap(true)}
-              style={{
-                background: 'none', border: 'none', cursor: 'pointer',
-                fontSize: '1.1rem', padding: '0 6px', lineHeight: 1,
-                marginLeft: ultimoTurno ? 'auto' : (ab === 0 ? 'auto' : 0),
-              }}
-              aria-label="Ver heat map acumulado"
+            <Tooltip
+              text={t('tracking.view_heatmap')}
+              wrapperStyle={{ marginLeft: ultimoTurno ? 'auto' : (ab === 0 ? 'auto' : 0) }}
             >
-              🔥
-            </button>
+              <button
+                onClick={() => setMostrarHeatMap(true)}
+                style={{
+                  background: 'none', border: 'none', cursor: 'pointer',
+                  fontSize: '1.1rem', padding: '0 6px', lineHeight: 1,
+                }}
+                aria-label={t('tracking.view_heatmap')}
+                title={t('tracking.view_heatmap')}
+              >
+                🔥
+              </button>
+            </Tooltip>
             
             {ab > 0 && ultimoTurno && (
               <div style={{ textAlign: 'right' }}>
-                <div style={{ fontSize: '0.62rem', color: 'var(--text-secondary)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Último</div>
+                <div style={{ fontSize: '0.62rem', color: 'var(--text-secondary)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{t('tracking.last')}</div>
                 <div style={{
                   fontSize: '0.95rem', fontWeight: 800,
                   color: ultimoTurno.resultado === 'HIT' ? 'var(--danger)' : ultimoTurno.resultado === 'OUT' ? 'var(--success)' : ultimoTurno.resultado.startsWith('K') ? 'var(--info)' : 'var(--text-secondary)',
@@ -360,7 +368,7 @@ export default function TrackingPage() {
             onClick={() => setModoAcumulado(false)}
             disabled={!estado.partido?.finalizado}
           >
-            Este partido
+            {t('tracking.this_match')}
           </button>
           <button
             className={`btn btn-sm ${modoAcumulado ? 'btn-primary' : ''}`}
@@ -368,7 +376,7 @@ export default function TrackingPage() {
             onClick={() => setModoAcumulado(true)}
             disabled={!estado.partido?.finalizado}
           >
-            Acumulado
+            {t('tracking.accumulated')}
           </button>
         </div>
         {avisoInning && (
@@ -414,8 +422,8 @@ export default function TrackingPage() {
           marginBottom: 4
         }}>
           {estado.partido?.finalizado 
-            ? 'PARTIDO FINALIZADO - MODO SOLO LECTURA' 
-            : (esperandoConfirmacion ? 'CONFIRMA EL RESULTADO' : turnoEditando ? 'REUBICA EL LANZAMIENTO' : 'MARCA EL LANZAMIENTO')}
+            ? t('tracking.banner_finished')
+            : (esperandoConfirmacion ? t('tracking.banner_confirm') : turnoEditando ? t('tracking.banner_reposition') : t('tracking.banner_mark'))}
         </p>
         <ZonaStrikeComponent 
           onZonaClick={handleZonaClick} 
@@ -434,7 +442,7 @@ export default function TrackingPage() {
               }}
               style={{ width: 120 }}
             >
-              Editar
+              {t('tracking.edit')}
             </button>
             <button
               className="btn btn-primary btn-sm"
@@ -449,7 +457,7 @@ export default function TrackingPage() {
               }}
               style={{ width: 120 }}
             >
-              Confirmar
+              {t('tracking.confirm')}
             </button>
           </div>
         )}
@@ -458,12 +466,12 @@ export default function TrackingPage() {
       <div style={{ padding: '24px 16px 16px' }}>
         <div style={{ display: 'flex', gap: 8, marginBottom: 12, alignItems: 'center' }}>
           <div style={{ flex: 1 }}>
-            <p className="text-xs text-secondary" style={{ margin: 0 }}>Orden al bate</p>
+            <p className="text-xs text-secondary" style={{ margin: 0 }}>{t('tracking.batting_order')}</p>
           </div>
           {!estado.partido?.finalizado && (
             <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
               <p className="text-xs text-secondary" style={{ margin: 0, textAlign: 'right' }}>
-                Cambio inn
+                {t('tracking.change_inn')}
               </p>
             </div>
           )}
@@ -528,7 +536,7 @@ export default function TrackingPage() {
                 justifyContent: 'center',
                 boxShadow: '0 2px 4px rgba(0,0,0,0.15)',
               }}
-              title="Cambiar equipo al bate"
+              title={t('tracking.change_team')}
             >
               <span style={{ fontSize: '1.2rem', lineHeight: 1 }}>⇄</span>
             </button>
@@ -539,34 +547,34 @@ export default function TrackingPage() {
       {/* ── Historial de turnos del bateador actual ── */}
       {turnosBateador.length > 0 && (
         <div style={{ padding: '24px 16px 16px' }}>
-          <p className="text-xs text-secondary" style={{ marginBottom: 12 }}>Turnos de este partido</p>
-          {[...turnosBateador].reverse().map((t, i) => (
+          <p className="text-xs text-secondary" style={{ marginBottom: 12 }}>{t('tracking.at_bats')}</p>
+          {[...turnosBateador].reverse().map((turno, i) => (
             <div
-              key={t.id}
+              key={turno.id}
               style={{
                 display: 'flex', alignItems: 'center', gap: 10,
                 padding: '8px 10px',
                 background: 'var(--bg-elevated)',
                 borderRadius: 8,
                 marginBottom: 6,
-                borderLeft: `3px solid ${t.resultado === 'HIT' ? 'var(--danger)' : t.resultado === 'OUT' ? 'var(--success)' : t.resultado === 'ERROR' ? 'var(--text-secondary)' : t.resultado.startsWith('K') ? 'var(--info)' : 'var(--text-secondary)'}`,
-                border: t.id === turnoEditando?.id ? '2px solid var(--warning)' : undefined,
-                boxShadow: t.id === turnoEditando?.id ? '0 0 8px rgba(243, 156, 18, 0.4)' : 'none',
+                borderLeft: `3px solid ${turno.resultado === 'HIT' ? 'var(--danger)' : turno.resultado === 'OUT' ? 'var(--success)' : turno.resultado === 'ERROR' ? 'var(--text-secondary)' : turno.resultado.startsWith('K') ? 'var(--info)' : 'var(--text-secondary)'}`,
+                border: turno.id === turnoEditando?.id ? '2px solid var(--warning)' : undefined,
+                boxShadow: turno.id === turnoEditando?.id ? '0 0 8px rgba(243, 156, 18, 0.4)' : 'none',
               }}
             >
-              <span className="text-xs text-secondary">Inn {t.inning}</span>
+              <span className="text-xs text-secondary">{t('tracking.inn').replace('{inning}', String(turno.inning))}</span>
               <span style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', flex: 1 }}>
-                Zona {t.zona} · {t.tipoPitch}
+                {t('stats.zone_num').replace('{z}', String(turno.zona))} · {turno.tipoPitch}
               </span>
               <span style={{
                 fontWeight: 800,
                 fontSize: '0.88rem',
-                color: t.resultado === 'HIT' ? 'var(--danger)' : t.resultado === 'OUT' ? 'var(--success)' : t.resultado === 'ERROR' ? 'var(--text-secondary)' : t.resultado.startsWith('K') ? 'var(--info)' : 'var(--text-secondary)',
+                color: turno.resultado === 'HIT' ? 'var(--danger)' : turno.resultado === 'OUT' ? 'var(--success)' : turno.resultado === 'ERROR' ? 'var(--text-secondary)' : turno.resultado.startsWith('K') ? 'var(--info)' : 'var(--text-secondary)',
                 marginRight: 4
               }}>
-                {t.resultado}
-                {t.detalleHit && ` (${t.detalleHit.tipo}) al ${t.detalleHit.ubicacion} (${t.detalleHit.calidad})`}
-                {t.detalleOut && (t.resultado === 'ERROR' ? ` al ${t.detalleOut.defensor} (${t.detalleOut.calidad})` : ` (${t.detalleOut.tipo}) al ${t.detalleOut.defensor} (${t.detalleOut.calidad})`)}
+                {turno.resultado}
+                {turno.detalleHit && ` (${turno.detalleHit.tipo})${t('tracking.at_pos')}${turno.detalleHit.ubicacion} (${turno.detalleHit.calidad})`}
+                {turno.detalleOut && (turno.resultado === 'ERROR' ? `${t('tracking.at_pos')}${turno.detalleOut.defensor} (${turno.detalleOut.calidad})` : ` (${turno.detalleOut.tipo})${t('tracking.at_pos')}${turno.detalleOut.defensor} (${turno.detalleOut.calidad})`)}
               </span>
               {!estado.partido?.finalizado && (
                 <div style={{ display: 'flex', gap: 8, opacity: 0.7 }}>
@@ -574,18 +582,18 @@ export default function TrackingPage() {
                     onClick={(e) => {
                       e.stopPropagation();
                       setEsperandoConfirmacion(false);
-                      setTurnoEditando(t);
+                      setTurnoEditando(turno);
                       window.scrollTo({ top: 0, behavior: 'smooth' });
                     }}
                     style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.9rem', color: 'var(--text-secondary)' }}
-                    title="Editar"
+                    title={t('tracking.edit')}
                   >
                     ✎
                   </button>
                   <button
-                    onClick={() => setTurnoAEliminar(t.id)}
+                    onClick={() => setTurnoAEliminar(turno.id)}
                     style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.9rem', color: 'var(--danger)' }}
-                    title="Eliminar"
+                    title={t('tracking.delete')}
                   >
                     ✕
                   </button>
@@ -600,12 +608,12 @@ export default function TrackingPage() {
       {bateadorActual && (
         <div style={{ padding: '24px 16px', marginBottom: 24 }}>
           <p className="text-xs text-secondary" style={{ marginBottom: 12, fontWeight: 600 }}>
-            Notas
+            {t('tracking.notes')}
           </p>
           <textarea
             className="input"
             style={{ width: '100%', minHeight: 80, resize: 'vertical' }}
-            placeholder="Escribe notas sobre el jugador (fortalezas, debilidades, tendencias...)"
+            placeholder={t('tracking.notes_ph')}
             value={notas}
             onChange={(e) => setNotas(e.target.value)}
             disabled={estado.partido?.finalizado}
@@ -620,7 +628,7 @@ export default function TrackingPage() {
             className="btn btn-danger btn-full"
             onClick={() => setShowFinPartido(true)}
           >
-            Finalizar partido
+            {t('tracking.finish_match')}
           </button>
         </div>
       )}
@@ -639,7 +647,7 @@ export default function TrackingPage() {
       )}
       {turnoAEliminar && (
         <ModalConfirm
-          mensaje="¿Eliminar este lanzamiento?"
+          mensaje={t('modal_confirm.delete_pitch')}
           onConfirmar={() => {
             dispatch({ type: 'ELIMINAR_TURNO_AL_BATE', payload: turnoAEliminar });
             setTurnoAEliminar(null);
@@ -649,7 +657,7 @@ export default function TrackingPage() {
       )}
       {showFinPartido && (
         <ModalConfirm
-          mensaje="¿Estás seguro de finalizar el partido?"
+          mensaje={t('modal_confirm.end_match')}
           onConfirmar={() => {
             setShowFinPartido(false);
             dispatch({ type: 'FINALIZAR_PARTIDO' });
@@ -659,8 +667,8 @@ export default function TrackingPage() {
       )}
       {showAgregarBateador && estado.partido && (
         <ModalBateador
-          titulo="Siguiente bateador"
-          subtitulo={`Orden al bate: ${bateadoresActivos.length + 1}`}
+          titulo={t('home.add_batter')}
+          subtitulo={`${t('home.batting_order')} ${bateadoresActivos.length + 1}`}
           equipo={equipoAlBate === 'visitante' ? estado.partido!.visitante : estado.partido!.local}
           onGuardar={(d: FormBateador) => {
             const lineupActual = equipoAlBate === 'visitante' ? estado.lineupVisitante : estado.lineupLocal;
@@ -694,6 +702,7 @@ export default function TrackingPage() {
           equipo={bateadorActual.equipo}
           nombre={bateadorActual.nombre}
           ladoBateo={bateadorActual.ladoBateo}
+          rival={bateadorActual.rol === 'visitante' ? (estado.partido?.local ?? '') : (estado.partido?.visitante ?? '')}
           onClose={() => setMostrarHeatMap(false)}
         />
       )}

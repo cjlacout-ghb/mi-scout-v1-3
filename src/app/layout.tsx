@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { ScoutProvider } from '@/context/ScoutContext';
+import { LanguageProvider } from '@/context/LanguageContext';
 import AppShell from '@/components/AppShell';
 import LicenseGuard from '@/components/LicenseGuard';
 
@@ -39,9 +40,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         <LicenseGuard>
-          <ScoutProvider>
-            <AppShell>{children}</AppShell>
-          </ScoutProvider>
+          <LanguageProvider>
+            <ScoutProvider>
+              <AppShell>{children}</AppShell>
+            </ScoutProvider>
+          </LanguageProvider>
         </LicenseGuard>
         <script
           dangerouslySetInnerHTML={{

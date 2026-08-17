@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useScout } from '@/context/ScoutContext';
+import { useLanguage } from '@/context/LanguageContext';
 import { calcularEstadisticas, generarReporteMD } from '@/lib/storage';
 import type { Bateador, TurnoAlBate } from '@/lib/types';
 import { db } from '@/lib/dbClient';
@@ -24,6 +25,7 @@ function slugify(s: string) {
 
 export default function ReportePage() {
   const { estado, dispatch, bateadorActual } = useScout();
+  const { locale, t, tv } = useLanguage();
   const selId = estado.jugadorSeleccionadoId || bateadorActual?.id || '';
   const modoAcumuladoGlobal = estado.modoAcumuladoGlobal ?? false;
   const [preview, setPreview] = useState<string>('');
@@ -52,15 +54,15 @@ export default function ReportePage() {
   if (!partido) {
     return (
       <div className="empty-state">
-        <div className="empty-state__title">Sin partido activo</div>
-        <p className="empty-state__text">Inicia un partido y registra al menos un turno al bate para generar reportes. O selecciona desde el Historial.</p>
+        <div className="empty-state__title">{t('report_page.no_match')}</div>
+        <p className="empty-state__text">{t('report_page.no_match_text')}</p>
       </div>
     );
   }
 
   const generarIndividual = (b: Bateador) => {
     const stats = calcularEstadisticas(b.id, estado.turnosAlBate);
-    const md = generarReporteMD(b, stats, estado.turnosAlBate, partido!);
+    const md = generarReporteMD(b, stats, estado.turnosAlBate, partido!, locale);
     setPreview(md);
     setModo('individual');
     dispatch({ type: 'SELECCIONAR_JUGADOR', payload: b.id });
@@ -81,14 +83,14 @@ export default function ReportePage() {
       const turnosHomogeneos = turnosAcumulados.map(t => ({...t, bateadorId: b.id}));
       const stats = calcularEstadisticas(b.id, turnosHomogeneos);
       
-      let md = `# Reporte de Scouting Acumulado — ${b.apellido}${b.nombre ? `, ${b.nombre}` : ''} (#${b.numero})\n\n`;
-      md += `**Equipo:** ${b.equipo}\n\n`;
-      md += `*Datos agregados de todos los partidos registrados.*\n\n`;
+      let md = `# ${t('report.title')} (${t('report_page.accumulated')}) — ${b.apellido}${b.nombre ? `, ${b.nombre}` : ''} (#${b.numero})\n\n`;
+      md += `**${t('report.team')}:** ${b.equipo}\n\n`;
+      md += `*${t('report_page.aggregated_data_note')}*\n\n`;
       md += `---\n\n`;
 
       const avg = stats.turnosAlBate > 0 ? stats.promedio.toFixed(3).replace('0.', '.') : '0.000';
       
-      md += `## Resumen Global\n\n`;
+      md += `## ${t('report.summary')} (${t('report_page.global')})\n\n`;
       md += `AB:${stats.turnosAlBate} H:${stats.hits} 2B:${stats.dobles} 3B:${stats.triples} HR:${stats.homeRuns} K:${stats.strikeoutsSwinging + stats.strikeoutsLooking} BB:${stats.basesPorBolas} AVG:${avg}\n\n`;
 
 
@@ -106,41 +108,41 @@ export default function ReportePage() {
 
 
       if (zonasCalientes.length > 0) {
-        md += `## Zonas Calientes\n\n`;
+        md += `## ${t('report.hot_zones')}\n\n`;
         for (const z of zonasCalientes) {
           const d = stats.porZona[z];
           const pct = d.pitches > 0 ? Math.round((d.hits / d.pitches) * 100) : 0;
-          md += `- **Zona ${z}**: ${d.hits} hit(s) en ${d.pitches} pitch(es) — ${pct}% efectividad\n`;
+          md += `- **${t('report.zone')} ${z}**: ${d.hits} ${t('report.hits_in')} ${d.pitches} ${t('report.pitches')} — ${pct}% ${t('report.effectiveness')}\n`;
         }
         md += '\n';
       }
 
       if (zonasFrias.length > 0) {
-        md += `## Zonas Frías\n\n`;
+        md += `## ${t('report.cold_zones')}\n\n`;
         for (const z of zonasFrias) {
           const d = stats.porZona[z];
-          md += `- **Zona ${z}**: 0 hits en ${d.pitches} pitch(es)\n`;
+          md += `- **${t('report.zone')} ${z}**: ${t('report.zero_hits')} ${d.pitches} ${t('report.pitches')}\n`;
         }
         md += '\n';
       }
 
 
-      md += `---\n\n*Generado por MiScout v1.3*\n`;
+      md += `---\n\n*${t('report.generated_by')}*\n`;
       setPreview(md);
       setModo('acumulado');
       dispatch({ type: 'SELECCIONAR_JUGADOR', payload: b.id });
       dispatch({ type: 'SET_MODO_ACUMULADO', payload: true });
     } catch (e) {
       console.error(e);
-      alert('Error cargando historial del jugador');
+      alert(t('report_page.error_player'));
     }
     setCargando(false);
   };
 
   const generarEquipo = (equipo: string, lineup: Bateador[]) => {
-    let md = `# Reporte de Scouting — Equipo ${equipo}\n\n`;
-    md += `**Partido:** ${partido.descripcion}  \n`;
-    md += `**Fecha:** ${new Date(partido.fecha + 'T12:00:00').toLocaleDateString('es-AR')}\n\n`;
+    let md = `# ${t('report.title')} — ${t('report.team')} ${equipo}\n\n`;
+    md += `**${t('report.match')}:** ${partido.descripcion}  \n`;
+    md += `**${t('report.date')}:** ${new Date(partido.fecha + 'T12:00:00').toLocaleDateString(locale === 'en' ? 'en-US' : 'es-AR')}\n\n`;
     md += `---\n\n`;
 
     for (const b of lineup) {
@@ -152,22 +154,22 @@ export default function ReportePage() {
       // Zonas calientes
       const calientes = ([1,2,3,4,5,6,7,8] as const)
         .filter((z) => stats.porZona[z].hits > 0)
-        .map((z) => `Zona ${z} (${stats.porZona[z].hits} H)`)
+        .map((z) => `${t('report.zone')} ${z} (${stats.porZona[z].hits} H)`)
         .join(', ');
-      if (calientes) md += `**Zonas calientes:** ${calientes}\n\n`;
+      if (calientes) md += `**${t('report.hot_zones')}:** ${calientes}\n\n`;
 
       const frias = ([1,2,3,4,5,6,7,8] as const)
         .filter((z) => {
           const d = stats.porZona[z];
           return (d.hits + d.outs + d.ks + d.kl) > 0 && d.hits === 0;
         })
-        .map((z) => `Zona ${z}`)
+        .map((z) => `${t('report.zone')} ${z}`)
         .join(', ');
-      if (frias) md += `**Zonas frías:** ${frias}\n\n`;
+      if (frias) md += `**${t('report.cold_zones')}:** ${frias}\n\n`;
       md += `---\n\n`;
     }
 
-    md += `*Generado por MiScout v1.3*\n`;
+    md += `*${t('report.generated_by')}*\n`;
     setPreview(md);
     setModo('equipo');
     dispatch({ type: 'SET_MODO_ACUMULADO', payload: false });
@@ -176,8 +178,8 @@ export default function ReportePage() {
   const generarEquipoAcumulado = async (equipo: string, lineup: Bateador[]) => {
     setCargando(true);
     try {
-      let md = `# Reporte de Scouting Acumulado — Equipo ${equipo}\n\n`;
-      md += `*Datos agregados de todos los partidos registrados.*\n\n`;
+      let md = `# ${t('report.title')} (${t('report_page.accumulated')}) — ${t('report.team')} ${equipo}\n\n`;
+      md += `*${t('report_page.aggregated_data_note')}*\n\n`;
       md += `---\n\n`;
 
       for (const b of lineup) {
@@ -197,46 +199,69 @@ export default function ReportePage() {
         
         const calientes = ([1,2,3,4,5,6,7,8] as const)
           .filter((z) => stats.porZona[z].hits > 0)
-          .map((z) => `Zona ${z} (${stats.porZona[z].hits} H)`)
+          .map((z) => `${t('report.zone')} ${z} (${stats.porZona[z].hits} H)`)
           .join(', ');
-        if (calientes) md += `**Zonas calientes:** ${calientes}\n\n`;
+        if (calientes) md += `**${t('report.hot_zones')}:** ${calientes}\n\n`;
         
         const frias = ([1,2,3,4,5,6,7,8] as const)
           .filter((z) => {
             const d = stats.porZona[z];
             return (d.hits + d.outs + d.ks + d.kl) > 0 && d.hits === 0;
           })
-          .map((z) => `Zona ${z}`)
+          .map((z) => `${t('report.zone')} ${z}`)
           .join(', ');
-        if (frias) md += `**Zonas frías:** ${frias}\n\n`;
+        if (frias) md += `**${t('report.cold_zones')}:** ${frias}\n\n`;
         md += `---\n\n`;
       }
 
-      md += `*Generado por MiScout v1.3*\n`;
+      md += `*${t('report.generated_by')}*\n`;
       setPreview(md);
       setModo('equipo_acumulado');
       dispatch({ type: 'SET_MODO_ACUMULADO', payload: true });
     } catch (e) {
       console.error(e);
-      alert('Error cargando historial acumulado del equipo');
+      alert(t('report_page.error_team'));
     }
     setCargando(false);
   };
 
   const descargar = () => {
     if (!preview) return;
+
+    const now = new Date();
+    const yyyy = now.getFullYear();
+    const mm = String(now.getMonth() + 1).padStart(2, '0');
+    const dd = String(now.getDate()).padStart(2, '0');
+    const fecha = `${yyyy}-${mm}-${dd}`;
+    const teamLabel = locale === 'es' ? 'EQUIPO' : 'TEAM';
+    const cumLabel = locale === 'es' ? 'acumulado' : 'cumulative';
+
     if (modo === 'equipo') {
-      descargarMD(preview, `scout_equipo.md`);
+      const eq3 = (partido[selEquipo as 'visitante' | 'local'] || '').slice(0, 3).toUpperCase();
+      const rivalName = selEquipo === 'visitante' ? partido.local : partido.visitante;
+      const rival3 = (rivalName || '').slice(0, 3).toUpperCase();
+      descargarMD(preview, `${fecha}_${teamLabel}-${eq3}_vs${rival3}.md`);
     } else if (modo === 'equipo_acumulado') {
-      descargarMD(preview, `scout_equipo_acumulado.md`);
+      const eq3 = (partido[selEquipo as 'visitante' | 'local'] || '').slice(0, 3).toUpperCase();
+      descargarMD(preview, `${fecha}_${teamLabel}-${eq3}_${cumLabel}.md`);
     } else if (modo === 'acumulado') {
       const b = todos.find((x) => x.id === selId);
       if (!b) return;
-      descargarMD(preview, `scout_acumulado_${slugify(b.apellido)}_${slugify(b.nombre || 'x')}.md`);
+      const num = b.numero ?? '';
+      const ap = (b.apellido ?? '').toUpperCase().replace(/ /g, '_');
+      const nom = (b.nombre ?? '').toUpperCase().replace(/ /g, '_');
+      const eq3 = (b.equipo ?? '').slice(0, 3).toUpperCase();
+      descargarMD(preview, `${fecha}_${num}${ap}_${nom}-${eq3}_${cumLabel}.md`);
     } else {
       const b = todos.find((x) => x.id === selId);
       if (!b) return;
-      descargarMD(preview, `scout_${slugify(b.apellido)}_${slugify(b.nombre || 'x')}.md`);
+      const num = b.numero ?? '';
+      const ap = (b.apellido ?? '').toUpperCase().replace(/ /g, '_');
+      const nom = (b.nombre ?? '').toUpperCase().replace(/ /g, '_');
+      const eq3 = (b.equipo ?? '').slice(0, 3).toUpperCase();
+      const rivalName = b.rol === 'visitante' ? partido?.local : partido?.visitante;
+      const rival3 = (rivalName ?? '').slice(0, 3).toUpperCase();
+      descargarMD(preview, `${fecha}_${num}${ap}_${nom}-${eq3}_vs${rival3}.md`);
     }
   };
 
@@ -249,17 +274,17 @@ export default function ReportePage() {
 
       {/* Botones principales */}
       <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-        <p className="section-title" style={{ marginBottom: 4 }}>Generar reporte</p>
+        <p className="section-title" style={{ marginBottom: 4 }}>{t('report_page.generate')}</p>
 
         {/* Individual */}
         <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <p style={{ fontWeight: 700, fontSize: '0.88rem' }}>Jugador</p>
+          <p style={{ fontWeight: 700, fontSize: '0.88rem' }}>{t('report_page.player')}</p>
           <select
             className="input"
             value={selId}
             onChange={(e) => dispatch({ type: 'SELECCIONAR_JUGADOR', payload: e.target.value })}
           >
-            <option value="" disabled hidden>— Selecciona un jugador —</option>
+            <option value="" disabled hidden>{t('report_page.select_player')}</option>
             {todos.map((b) => (
               <option key={b.id} value={b.id}>
                 #{b.numero} {b.apellido}{b.nombre ? `, ${b.nombre}` : ''} - {b.equipo ? b.equipo.replace(/\w\S*/g, txt => txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase()) : ''}
@@ -281,7 +306,7 @@ export default function ReportePage() {
                 opacity: (!selId || cargando || !partido.finalizado) ? 0.5 : 1
               }}
             >
-              Este partido
+              {t('report_page.this_match')}
             </button>
             <button
               className={`btn btn-sm ${modo === 'acumulado' ? 'btn-primary' : ''}`}
@@ -297,22 +322,22 @@ export default function ReportePage() {
                 opacity: (!selId || cargando || !partido.finalizado) ? 0.5 : 1
               }}
             >
-              {cargando ? 'Cargando...' : 'Acumulado'}
+              {cargando ? t('report_page.loading') : t('report_page.accumulated')}
             </button>
           </div>
         </div>
 
         {/* Equipo */}
         <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <p style={{ fontWeight: 700, fontSize: '0.88rem' }}>Equipo</p>
+          <p style={{ fontWeight: 700, fontSize: '0.88rem' }}>{t('report_page.team')}</p>
           <select
             className="input"
             value={selEquipo}
             onChange={(e) => setSelEquipo(e.target.value as 'visitante' | 'local')}
           >
-            <option value="" disabled hidden>— Selecciona un equipo —</option>
-            <option value="visitante">{partido.visitante} (Visitante)</option>
-            <option value="local">{partido.local} (Local)</option>
+            <option value="" disabled hidden>{t('report_page.select_team')}</option>
+            <option value="visitante">{partido.visitante} ({t('report_page.away')})</option>
+            <option value="local">{partido.local} ({t('report_page.home')})</option>
           </select>
           <div style={{ display: 'flex', gap: 8, background: 'var(--bg-elevated)', padding: 4, borderRadius: 8 }}>
             <button
@@ -329,7 +354,7 @@ export default function ReportePage() {
                 opacity: (!selEquipo || cargando || !partido.finalizado) ? 0.5 : 1
               }}
             >
-              Este partido
+              {t('report_page.this_match')}
             </button>
             <button
               className={`btn btn-sm ${modo === 'equipo_acumulado' ? 'btn-primary' : ''}`}
@@ -345,7 +370,7 @@ export default function ReportePage() {
                 opacity: (!selEquipo || cargando || !partido.finalizado) ? 0.5 : 1
               }}
             >
-              {cargando ? 'Cargando...' : 'Acumulado'}
+              {cargando ? t('report_page.loading') : t('report_page.accumulated')}
             </button>
           </div>
         </div>
@@ -354,7 +379,7 @@ export default function ReportePage() {
       {/* Vista previa */}
       {preview && (
         <div style={{ padding: '0 16px 16px' }}>
-          <p className="section-title" style={{ marginBottom: 8 }}>Vista previa</p>
+          <p className="section-title" style={{ marginBottom: 8 }}>{t('report_page.preview')}</p>
           <div
             className="card"
             style={{
@@ -376,10 +401,10 @@ export default function ReportePage() {
             style={{ marginTop: 12 }}
             onClick={descargar}
           >
-            Descargar .md
+            {t('report_page.download')}
           </button>
           <p className="text-xs text-secondary" style={{ textAlign: 'center', marginTop: 6 }}>
-            El archivo se guardará en tu dispositivo
+            {t('report_page.download_hint')}
           </p>
         </div>
       )}

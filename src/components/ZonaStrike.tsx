@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { ZonaStrike, Coordenadas } from '@/lib/types';
+import { useLanguage } from '@/context/LanguageContext';
 
 interface Props {
   onZonaClick: (zona: ZonaStrike, coordenadas?: Coordenadas) => void;
@@ -58,6 +59,23 @@ function heatColor(intensity: number): string {
 }
 
 export default function ZonaStrikeComponent({ onZonaClick, marcadores = [], heatMap, ladoBateo, perspectiva = 'catcher', zoneStats }: Props) {
+  const { t, tv } = useLanguage();
+  const [activeMarkerIndex, setActiveMarkerIndex] = useState<number | null>(null);
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent | TouchEvent) {
+      const target = e.target as HTMLElement;
+      if (!target.closest('.pitch-marker-touch-target')) {
+        setActiveMarkerIndex(null);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('touchstart', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+    };
+  }, []);
   const hmColores: Partial<Record<ZonaStrike, string>> = {};
   if (heatMap) {
     for (const [z, v] of Object.entries(heatMap)) {
@@ -84,20 +102,20 @@ export default function ZonaStrikeComponent({ onZonaClick, marcadores = [], heat
         {perspectiva === 'catcher' && (
           <>
             {ladoBateo === 'Z' && (
-              <div style={{ position: 'absolute', top: 16, bottom: 16, right: 6, width: 8, background: '#FFB83D', borderRadius: 2 }} title="Bateador Zurdo" />
+              <div style={{ position: 'absolute', top: 16, bottom: 16, right: 6, width: 8, background: '#FFB83D', borderRadius: 2 }} title={t('zonastrike.bateador_zurdo')} />
             )}
             {ladoBateo === 'D' && (
-              <div style={{ position: 'absolute', top: 16, bottom: 16, left: 6, width: 8, background: '#FFB83D', borderRadius: 2 }} title="Bateador Derecho" />
+              <div style={{ position: 'absolute', top: 16, bottom: 16, left: 6, width: 8, background: '#FFB83D', borderRadius: 2 }} title={t('zonastrike.bateador_derecho')} />
             )}
           </>
         )}
         {perspectiva === 'pitcher' && (
           <>
             {ladoBateo === 'Z' && (
-              <div style={{ position: 'absolute', top: 16, bottom: 16, left: 6, width: 8, background: '#FFB83D', borderRadius: 2 }} title="Bateador Zurdo (Pitcher view)" />
+              <div style={{ position: 'absolute', top: 16, bottom: 16, left: 6, width: 8, background: '#FFB83D', borderRadius: 2 }} title={t('zonastrike.bateador_zurdo')} />
             )}
             {ladoBateo === 'D' && (
-              <div style={{ position: 'absolute', top: 16, bottom: 16, right: 6, width: 8, background: '#FFB83D', borderRadius: 2 }} title="Bateador Derecho (Pitcher view)" />
+              <div style={{ position: 'absolute', top: 16, bottom: 16, right: 6, width: 8, background: '#FFB83D', borderRadius: 2 }} title={t('zonastrike.bateador_derecho')} />
             )}
           </>
         )}
@@ -264,45 +282,68 @@ export default function ZonaStrikeComponent({ onZonaClick, marcadores = [], heat
           return (
             <div
               key={i}
-              className={`pitch-marker ${m.tipo} group`}
+              className="pitch-marker-touch-target"
+              onClick={(e) => {
+                e.stopPropagation();
+                setActiveMarkerIndex(activeMarkerIndex === i ? null : i);
+              }}
               style={{
+                position: 'absolute',
                 top: topStr,
                 left: leftStr,
+                width: 24,
+                height: 24,
                 transform: 'translate(-50%, -50%)',
-                ...(m.resultado && colorResultado !== 'var(--text-primary)' ? { background: colorResultado } : {})
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                zIndex: activeMarkerIndex === i ? 110 : 100,
+                WebkitTapHighlightColor: 'transparent',
               }}
             >
-              {m.calidad === 'hard' && (m.resultado === 'HIT' || m.resultado === 'OUT' || m.resultado === 'ERROR') && (
-                <div
-                  style={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    width: 26,
-                    height: 26,
-                    borderRadius: '50%',
-                    border: `2px solid ${m.resultado === 'HIT' ? 'var(--danger)' : 'var(--success)'}`,
-                    pointerEvents: 'none',
-                    boxSizing: 'border-box',
-                  }}
-                />
-              )}
-              {m.resultado && (
-                <div 
-                  className="pitch-tooltip"
-                  style={{ color: colorResultado }}
-                >
-                  {m.resultado}{m.tipoPitch ? `, ${m.tipoPitch.toLowerCase()}` : ''}
-                </div>
-              )}
+              <div
+                className={`pitch-marker ${m.tipo} group`}
+                style={{
+                  position: 'relative',
+                  transform: 'none',
+                  top: 'auto',
+                  left: 'auto',
+                  ...(m.resultado && colorResultado !== 'var(--text-primary)' ? { background: colorResultado } : {})
+                }}
+              >
+                {m.calidad === 'hard' && (m.resultado === 'HIT' || m.resultado === 'OUT' || m.resultado === 'ERROR') && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: '50%',
+                      left: '50%',
+                      transform: 'translate(-50%, -50%)',
+                      width: 26,
+                      height: 26,
+                      borderRadius: '50%',
+                      border: `2px solid ${m.resultado === 'HIT' ? 'var(--danger)' : 'var(--success)'}`,
+                      pointerEvents: 'none',
+                      boxSizing: 'border-box',
+                    }}
+                  />
+                )}
+                {m.resultado && activeMarkerIndex === i && (
+                  <div 
+                    className="pitch-tooltip"
+                    style={{ color: colorResultado, opacity: 1, pointerEvents: 'auto' }}
+                  >
+                    {m.resultado}{m.tipoPitch ? `, ${m.tipoPitch.toLowerCase()}` : ''}
+                  </div>
+                )}
+              </div>
             </div>
           );
         })}
       </div>
     </div>
     <p className="text-xs text-secondary" style={{ textAlign: 'right', marginTop: 4, paddingRight: 16 }}>
-      {perspectiva === 'pitcher' ? 'Vista del pitcher' : 'Vista del catcher'}
+      {perspectiva === 'pitcher' ? t('zonastrike.vista_pitcher') : t('zonastrike.vista_catcher')}
     </p>
     </>
   );

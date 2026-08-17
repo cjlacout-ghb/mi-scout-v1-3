@@ -5,6 +5,7 @@ import type {
   ZonaStrike, TipoPitch, ResultadoAtBat, TipoOut, TipoHit,
   CalidadContacto, NumeroDefensor, DetalleOut, DetalleHit,
 } from '@/lib/types';
+import { useLanguage } from '@/context/LanguageContext';
 
 // ─── Pasos del flujo ──────────────────────────────────────────────────────────
 type PasoModal =
@@ -40,17 +41,6 @@ interface Props {
 }
 
 // ─── Labels ───────────────────────────────────────────────────────────────────
-const NOMBRE_ZONA: Record<number, string> = {
-  1: 'Zona 1',
-  2: 'Zona 2',
-  3: 'Zona 3',
-  4: 'Zona 4',
-  5: 'Zona 5',
-  6: 'Zona 6',
-  7: 'Zona 7',
-  8: 'Zona 8',
-};
-
 const TIPOS_PITCH: { value: TipoPitch; label: string }[] = [
   { value: 'drop',   label: 'Drop' },
   { value: 'riser',  label: 'Riser' },
@@ -79,6 +69,7 @@ const TIPOS_HIT: { value: TipoHit; label: string }[] = [
 ];
 
 export default function ModalPitch({ zona, onConfirmar, onCancelar }: Props) {
+  const { t, tv } = useLanguage();
   const [paso, setPaso] = useState<PasoModal>('tipo_pitch');
   const [estado, setEstado] = useState<EstadoModal>({ zona });
 
@@ -156,7 +147,7 @@ export default function ModalPitch({ zona, onConfirmar, onCancelar }: Props) {
           <div className="options-grid">
             {TIPOS_PITCH.map((t) => (
               <button key={t.value} className="option-btn" onClick={() => elegirTipoPitch(t.value)}>
-                <span>{t.label}</span>
+                <span>{tv(t.value)}</span>
               </button>
             ))}
           </div>
@@ -233,8 +224,8 @@ export default function ModalPitch({ zona, onConfirmar, onCancelar }: Props) {
           <div className="options-grid">
             {TIPOS_OUT.map((t) => (
               <button key={t.value} className="option-btn" onClick={() => elegirTipoOut(t.value)}>
-                <span>{t.label}</span>
-                <span className="option-btn__label">{t.desc}</span>
+                <span>{tv(t.value)}</span>
+                <span className="option-btn__label">{tv(t.value + '_desc')}</span>
               </button>
             ))}
           </div>
@@ -245,7 +236,7 @@ export default function ModalPitch({ zona, onConfirmar, onCancelar }: Props) {
           <div className="options-grid">
             {TIPOS_HIT.map((t) => (
               <button key={t.value} className="option-btn" onClick={() => elegirTipoHit(t.value)}>
-                <span>{t.label}</span>
+                <span>{tv(t.value)}</span>
               </button>
             ))}
           </div>
@@ -272,7 +263,7 @@ export default function ModalPitch({ zona, onConfirmar, onCancelar }: Props) {
               onClick={() => elegirCalidad('soft')}
             >
               <span>Soft</span>
-              <span className="option-btn__label">Contacto débil</span>
+              <span className="option-btn__label">{tv('soft_desc')}</span>
             </button>
             <button
               className="option-btn"
@@ -280,7 +271,7 @@ export default function ModalPitch({ zona, onConfirmar, onCancelar }: Props) {
               onClick={() => elegirCalidad('hard')}
             >
               <span>Hard</span>
-              <span className="option-btn__label">Contacto fuerte</span>
+              <span className="option-btn__label">{tv('hard_desc')}</span>
             </button>
           </div>
         );
@@ -288,17 +279,17 @@ export default function ModalPitch({ zona, onConfirmar, onCancelar }: Props) {
   };
 
   const titulos: Record<PasoModal, string> = {
-    tipo_pitch:      NOMBRE_ZONA[zona],
-    resultado:       'Resultado al bate',
-    detalle_out:     'Tipo de out',
-    detalle_hit:     'Tipo de hit',
-    numero_defensor: estado.resultado === 'HIT' ? 'Ubicación del bateo' : estado.resultado === 'ERROR' ? 'Dirección del bateo' : `Defensor (${estado.tipoOut})`,
-    calidad:         'Calidad del contacto',
+    tipo_pitch:      t('stats.zone_num').replace('{z}', String(zona)),
+    resultado:       t('modal_pitch.at_bat_result'),
+    detalle_out:     t('modal_pitch.out_type'),
+    detalle_hit:     t('modal_pitch.hit_type'),
+    numero_defensor: estado.resultado === 'HIT' ? t('modal_pitch.hit_location') : estado.resultado === 'ERROR' ? t('modal_pitch.error_direction') : t('modal_pitch.fielder').replace('{out}', t(`out_type_short.${estado.tipoOut}`)),
+    calidad:         t('modal_pitch.contact_quality'),
   };
 
   const subtitulos: Partial<Record<PasoModal, React.ReactNode>> = {
-    tipo_pitch:      'Tipo de lanzamiento',
-    resultado:       <>Pitch: <strong>{estado.tipoPitch}</strong></>,
+    tipo_pitch:      t('modal_pitch.pitch_type'),
+    resultado:       <>{t('modal_pitch.pitch_label')} <strong>{estado.tipoPitch}</strong></>,
   };
 
   return (
@@ -315,7 +306,7 @@ export default function ModalPitch({ zona, onConfirmar, onCancelar }: Props) {
                 background: 'none', border: 'none', cursor: 'pointer',
                 color: 'var(--text-secondary)', fontSize: '1.2rem', padding: '0 4px', width: 32, textAlign: 'left'
               }}
-              aria-label="Volver"
+              aria-label={t('modal_pitch.back')}
             >
               ←
             </button>
@@ -334,7 +325,7 @@ export default function ModalPitch({ zona, onConfirmar, onCancelar }: Props) {
               background: 'none', border: 'none', cursor: 'pointer',
               color: 'var(--text-muted)', fontSize: '1.3rem', padding: '0 4px', width: 32, textAlign: 'right'
             }}
-            aria-label="Cancelar"
+            aria-label={t('modal_pitch.cancel')}
           >
             ✕
           </button>

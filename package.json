@@ -1,8 +1,9 @@
 {
   "name": "mi-scout-v1-0",
-  "version": "1.3.0",
+  "version": "1.3.6",
   "private": true,
   "scripts": {
+    "prebuild": "node scripts/sync-sw-version.js",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",

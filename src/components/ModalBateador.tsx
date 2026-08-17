@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import ModalConfirm from './ModalConfirm';
+import { useLanguage } from '@/context/LanguageContext';
 
 export interface FormBateador {
   numero: string;
@@ -27,6 +28,7 @@ export default function ModalBateador({
   onGuardar: (d: FormBateador) => void;
   onClose: () => void;
 }) {
+  const { t, tv } = useLanguage();
   const [form, setForm] = useState<FormBateador>(inicial ?? FORM_VACIO);
   const [mostrarAlerta, setMostrarAlerta] = useState(false);
   
@@ -66,7 +68,7 @@ export default function ModalBateador({
             lineHeight: 1,
             zIndex: 10
           }}
-          aria-label="Cerrar"
+          aria-label={t('modal_bateador.close')}
         >
           ✕
         </button>
@@ -76,19 +78,19 @@ export default function ModalBateador({
         {subtitulo && <p className="sheet-subtitle">{subtitulo}</p>}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <div className="form-group" style={{ width: '40%' }}>
-            <label className="label"># Camiseta *</label>
+            <label className="label">{t('modal_bateador.jersey')}</label>
             <input className="input" placeholder="7" value={form.numero} onChange={set('numero')} maxLength={3} inputMode="numeric" />
           </div>
           <div className="form-group">
-            <label className="label">Apellido *</label>
+            <label className="label">{t('modal_bateador.last_name')}</label>
             <input className="input" placeholder="HORT" value={form.apellido} onChange={set('apellido')} maxLength={40} autoCapitalize="characters" />
           </div>
           <div className="form-group">
-            <label className="label">Nombre *</label>
+            <label className="label">{t('modal_bateador.first_name')}</label>
             <input className="input" placeholder="LOCHLAN" value={form.nombre} onChange={set('nombre')} maxLength={40} autoCapitalize="characters" />
           </div>
           <div className="form-group">
-            <label className="label">Lado de bateo</label>
+            <label className="label">{t('modal_bateador.batting_side')}</label>
             <div style={{ display: 'flex', border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)', overflow: 'hidden' }}>
               {(['D', 'Z', 'S'] as const).map(l => (
                 <button
@@ -97,18 +99,18 @@ export default function ModalBateador({
                   style={{ flex: 1, borderRadius: 0, border: 'none', borderRight: l !== 'S' ? '1px solid var(--border)' : 'none', padding: '10px 0' }}
                   onClick={() => setForm({ ...form, ladoBateo: l })}
                 >
-                  {l}
+                  {tv(l)}
                 </button>
               ))}
             </div>
           </div>
-          <button className="btn btn-primary btn-full" onClick={guardar}>Guardar</button>
+          <button className="btn btn-primary btn-full" onClick={guardar}>{t('modal_bateador.save')}</button>
         </div>
       </div>
       
       {mostrarAlerta && createPortal(
         <ModalConfirm
-          mensaje="Por favor, completa los campos obligatorios (# Camiseta, Apellido y Nombre) para continuar."
+          mensaje={t('modal_bateador.validation')}
           onConfirmar={() => setMostrarAlerta(false)}
           onCancelar={() => setMostrarAlerta(false)}
           soloAviso={true}

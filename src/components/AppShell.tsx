@@ -4,7 +4,10 @@ import { useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useScout } from '@/context/ScoutContext';
+import { useLanguage } from '@/context/LanguageContext';
 import ModalConfirm from '@/components/ModalConfirm';
+import LanguageToggle from '@/components/LanguageToggle';
+import { APP_VERSION_LABEL } from '@/lib/version';
 
 // ─── Íconos SVG inline ────────────────────────────────────────────────────────
 const IconLineup = () => (
@@ -54,17 +57,18 @@ const IconHistorial = () => (
 );
 
 const NAV_ITEMS = [
-  { href: '/',          label: 'Line-Up',  Icon: IconLineup   },
-  { href: '/tracking',  label: 'Tracking', Icon: IconTracking },
-  { href: '/stats',     label: 'Heat Map', Icon: IconStats    },
-  { href: '/reporte',   label: 'Reporte',  Icon: IconReporte  },
-  { href: '/historial', label: 'Historial',Icon: IconHistorial},
+  { href: '/',          labelKey: 'nav.lineup',  Icon: IconLineup   },
+  { href: '/tracking',  labelKey: 'nav.tracking', Icon: IconTracking },
+  { href: '/stats',     labelKey: 'nav.heatmap', Icon: IconStats    },
+  { href: '/reporte',   labelKey: 'nav.report',  Icon: IconReporte  },
+  { href: '/historial', labelKey: 'nav.history',Icon: IconHistorial},
 ];
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const { estado, dispatch, isLoading } = useScout();
+  const { t, locale } = useLanguage();
   const [showConfirm, setShowConfirm] = useState(false);
 
   const partidoInfo = estado.partido;
@@ -73,7 +77,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     <div className="app-shell">
       {showConfirm && (
         <ModalConfirm
-          mensaje="¿Volver al inicio? Se cerrará el partido actual."
+          mensaje={t('modal_confirm.back_to_home')}
           onConfirmar={() => {
             dispatch({ type: 'NUEVO_PARTIDO' });
             setShowConfirm(false);
@@ -96,7 +100,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           }}
         >
           <div>Mi<span>Scout</span></div>
-          <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', fontWeight: 400, letterSpacing: '0.5px' }}>v1.3</span>
+          <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', fontWeight: 400, letterSpacing: '0.5px' }}>{APP_VERSION_LABEL}</span>
         </div>
         <div className="app-header__info" style={{ textAlign: 'center' }}>
           {pathname.startsWith('/admin') ? null : isLoading ? (
@@ -104,7 +108,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                           background: 'var(--bg-elevated)', opacity: 0.4 }} />
           ) : partidoInfo ? (
             <>
-              <div>{new Date(partidoInfo.fecha + 'T12:00:00').toLocaleDateString('es-AR')}</div>
+              <div>{new Date(partidoInfo.fecha + 'T12:00:00').toLocaleDateString(locale === 'en' ? 'en-US' : 'es-AR')}</div>
               <div style={{ fontWeight: 700, fontSize: '0.8rem', 
                             color: 'var(--text-primary)', textTransform: 'uppercase', 
                             letterSpacing: '0.04em' }}>
@@ -112,27 +116,30 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
               </div>
             </>
           ) : (
-            <div style={{ fontStyle: 'italic' }}>Sin partido activo</div>
+            <div style={{ fontStyle: 'italic' }}>{t('home.no_active_match')}</div>
           )}
         </div>
-        <Link
-          href="/guia"
-          title="Guía de Usuario"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: 24,
-            height: 24,
-            color: 'var(--text-secondary)',
-            textDecoration: 'none',
-          }}
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
-            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
-          </svg>
-        </Link>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <LanguageToggle />
+          <Link
+            href="/guia"
+            title={t('appshell.guide')}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: 24,
+              height: 24,
+              color: 'var(--text-secondary)',
+              textDecoration: 'none',
+            }}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+              <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+            </svg>
+          </Link>
+        </div>
       </header>
 
       {/* Contenido principal */}
@@ -142,17 +149,17 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
       {/* Bottom Navigation */}
       <nav className="bottom-nav">
-        {NAV_ITEMS.map(({ href, label, Icon }) => {
+        {NAV_ITEMS.map(({ href, labelKey, Icon }) => {
           const isActive = href === '/' ? pathname === '/' : pathname.startsWith(href);
           return (
             <Link
               key={href}
               href={href}
               className={`nav-item ${isActive ? 'active' : ''}`}
-              aria-label={label}
+              aria-label={t(labelKey)}
             >
               <Icon />
-              {label}
+              {t(labelKey)}
             </Link>
           );
         })}

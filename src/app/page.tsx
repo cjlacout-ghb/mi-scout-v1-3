@@ -7,9 +7,12 @@ import { generarId } from '@/lib/storage';
 import ModalConfirm from '@/components/ModalConfirm';
 import type { Bateador, Partido } from '@/lib/types';
 
+import { useLanguage } from '@/context/LanguageContext';
+
 // ─── Modal: Nuevo Partido ─────────────────────────────────────────────────────
 function ModalNuevoPartido({ onClose }: { onClose: () => void }) {
   const { dispatch } = useScout();
+  const { t, locale } = useLanguage();
   const [visitante, setVisitante] = useState('');
   const [local, setLocal] = useState('');
   const [desc, setDesc] = useState('');
@@ -35,14 +38,14 @@ function ModalNuevoPartido({ onClose }: { onClose: () => void }) {
     <div className="overlay" onClick={onClose}>
       <div className="bottom-sheet" onClick={(e) => e.stopPropagation()}>
         <div className="sheet-handle" />
-        <h2 className="sheet-title">Nuevo Partido</h2>
+        <h2 className="sheet-title">{t('home.new_match')}</h2>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <div className="form-group">
-            <label className="label">Equipo Visitante *</label>
+            <label className="label">{t('home.away_team')}</label>
             <input
               className="input"
-              placeholder="Ej: AUS"
+              placeholder={t('lineup.ph_away')}
               value={visitante}
               onChange={(e) => setVisitante(e.target.value)}
               autoFocus
@@ -50,36 +53,36 @@ function ModalNuevoPartido({ onClose }: { onClose: () => void }) {
             />
           </div>
           <div className="form-group">
-            <label className="label">Equipo Local *</label>
+            <label className="label">{t('home.home_team')}</label>
             <input
               className="input"
-              placeholder="Ej: ARG"
+              placeholder={t('lineup.ph_home')}
               value={local}
               onChange={(e) => setLocal(e.target.value)}
               maxLength={20}
             />
           </div>
           <div className="form-group">
-            <label className="label">Evento</label>
+            <label className="label">{t('home.event')}</label>
             <input
               className="input"
-              placeholder="Ej: Torneo X — Juego 1"
+              placeholder={t('lineup.ph_event')}
               value={desc}
               onChange={(e) => setDesc(e.target.value)}
               maxLength={60}
             />
           </div>
           <div className="form-group">
-            <label className="label">Fecha</label>
+            <label className="label">{t('home.date')}</label>
             <div style={{ position: 'relative' }}>
               <div className="input" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', color: fecha ? 'inherit' : 'var(--text-muted)' }}>
                 <span>
                   {fecha 
                     ? (() => {
                         const [y, m, d] = fecha.split('-');
-                        return `${d}/${m}/${y}`;
+                        return locale === 'en' ? `${m}/${d}/${y}` : `${d}/${m}/${y}`;
                       })() 
-                    : 'DD/MM/AAAA'}
+                    : (locale === 'en' ? 'MM/DD/YYYY' : 'DD/MM/AAAA')}
                 </span>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
@@ -104,9 +107,9 @@ function ModalNuevoPartido({ onClose }: { onClose: () => void }) {
             </div>
           </div>
           <div className="form-group">
-            <label className="label">Vista de zona de strike</label>
+            <label className="label">{t('home.strike_zone_view')}</label>
             <p style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', marginBottom: 8, lineHeight: 1.4 }}>
-              ¿Desde qué perspectiva vas a marcar los lanzamientos?
+              {t('home.strike_zone_desc')}
             </p>
             <div style={{ display: 'flex', border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)', overflow: 'hidden' }}>
               {(['catcher', 'pitcher'] as const).map(p => (
@@ -122,7 +125,7 @@ function ModalNuevoPartido({ onClose }: { onClose: () => void }) {
             </div>
           </div>
           <button className="btn btn-primary btn-lg btn-full" onClick={iniciar}>
-            Comenzar
+            {t('home.start')}
           </button>
         </div>
       </div>
@@ -144,6 +147,7 @@ function ModalSustitucion({
   onClose: () => void;
 }) {
   const { dispatch, estado } = useScout();
+  const { t, tv } = useLanguage();
   const [form, setForm] = useState<FormBateador>(FORM_VACIO);
   const set = (k: keyof FormBateador) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm((p) => ({ ...p, [k]: e.target.value }));
@@ -174,26 +178,26 @@ function ModalSustitucion({
     <div className="overlay" onClick={onClose}>
       <div className="bottom-sheet" onClick={(e) => e.stopPropagation()}>
         <div className="sheet-handle" />
-        <h2 className="sheet-title">Sustitución</h2>
+        <h2 className="sheet-title">{t('home.sub_title')}</h2>
         <p className="sheet-subtitle">
-          Sale: #{saliente.numero} {saliente.apellido}
+          {t('home.sub_leaving')}: #{saliente.numero} {saliente.apellido}
         </p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 4 }}>
-          <p className="text-xs text-secondary" style={{ textAlign: 'center' }}>Ingresa los datos del jugador entrante</p>
+          <p className="text-xs text-secondary" style={{ textAlign: 'center' }}>{t('home.sub_entering_player')}</p>
           <div className="form-group" style={{ width: '40%' }}>
-            <label className="label"># Camiseta *</label>
+            <label className="label">{t('modal_bateador.jersey')}</label>
             <input className="input" placeholder="99" value={form.numero} onChange={set('numero')} maxLength={3} inputMode="numeric" />
           </div>
           <div className="form-group">
-            <label className="label">Apellido *</label>
-            <input className="input" placeholder="APELLIDO" value={form.apellido} onChange={set('apellido')} maxLength={40} autoCapitalize="characters" />
+            <label className="label">{t('modal_bateador.last_name')}</label>
+            <input className="input" placeholder={t('lineup.ph_last_name')} value={form.apellido} onChange={set('apellido')} maxLength={40} autoCapitalize="characters" />
           </div>
           <div className="form-group">
-            <label className="label">Nombre *</label>
-            <input className="input" placeholder="NOMBRE" value={form.nombre} onChange={set('nombre')} maxLength={40} autoCapitalize="characters" />
+            <label className="label">{t('modal_bateador.first_name')}</label>
+            <input className="input" placeholder={t('lineup.ph_first_name')} value={form.nombre} onChange={set('nombre')} maxLength={40} autoCapitalize="characters" />
           </div>
           <div className="form-group">
-            <label className="label">Lado de bateo</label>
+            <label className="label">{t('modal_bateador.batting_side')}</label>
             <div style={{ display: 'flex', border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)', overflow: 'hidden' }}>
               {(['D', 'Z', 'S'] as const).map(l => (
                 <button
@@ -202,12 +206,12 @@ function ModalSustitucion({
                   style={{ flex: 1, borderRadius: 0, border: 'none', borderRight: l !== 'S' ? '1px solid var(--border)' : 'none', padding: '10px 0' }}
                   onClick={() => setForm({ ...form, ladoBateo: l })}
                 >
-                  {l}
+                  {tv(l, true)}
                 </button>
               ))}
             </div>
           </div>
-          <button className="btn btn-primary btn-full" onClick={confirmar}>Confirmar sustitución</button>
+          <button className="btn btn-primary btn-full" onClick={confirmar}>{t('home.confirm_sub')}</button>
         </div>
       </div>
     </div>
@@ -239,6 +243,7 @@ function ModalCargaMasiva({
   const [filas, setFilas] = useState<FormBateador[]>(
     Array(9).fill(null).map(() => ({ ...FORM_VACIO }))
   );
+  const { t, tv } = useLanguage();
 
   const setRow = (index: number, key: keyof FormBateador, val: string) => {
     const n = [...filas];
@@ -274,16 +279,16 @@ function ModalCargaMasiva({
     <div className="overlay" onClick={onClose}>
       <div className="bottom-sheet" style={{ maxHeight: '90vh', display: 'flex', flexDirection: 'column' }} onClick={(e) => e.stopPropagation()}>
         <div className="sheet-handle" />
-        <h2 className="sheet-title">Line-up: {equipo.toUpperCase()}</h2>
-        <p className="sheet-subtitle">Ingresa el orden de los bateadores</p>
+        <h2 className="sheet-title">{t('lineup.title')} {equipo.toUpperCase()}</h2>
+        <p className="sheet-subtitle">{t('lineup.subtitle')}</p>
         
         <div style={{ flex: 1, overflowY: 'auto', margin: '12px -24px', padding: '0 24px', display: 'flex', flexDirection: 'column', gap: 8 }}>
           {/* Cabecera miniatura */}
           <div style={{ display: 'flex', gap: 8, padding: '0 4px', paddingLeft: 22 }}>
             <span className="text-xs text-secondary" style={{ width: 40, textAlign: 'center' }}>#</span>
-            <span className="text-xs text-secondary" style={{ flex: 1, paddingLeft: 8 }}>APELLIDO</span>
-            <span className="text-xs text-secondary" style={{ flex: 1, paddingLeft: 8 }}>NOMBRE</span>
-            <span className="text-xs text-secondary" style={{ width: 68, textAlign: 'center' }}>LADO</span>
+            <span className="text-xs text-secondary" style={{ flex: 1, paddingLeft: 8 }}>{t('lineup.last_name').toUpperCase()}</span>
+            <span className="text-xs text-secondary" style={{ flex: 1, paddingLeft: 8 }}>{t('lineup.first_name').toUpperCase()}</span>
+            <span className="text-xs text-secondary" style={{ width: 68, textAlign: 'center' }}>{t('lineup.side').toUpperCase()}</span>
           </div>
           
           {filas.map((f, i) => (
@@ -295,11 +300,11 @@ function ModalCargaMasiva({
               />
               <input 
                 className="input" style={{ flex: 1, padding: '8px', fontSize: '0.9rem' }} 
-                placeholder="Apellido" value={f.apellido} onChange={(e) => setRow(i, 'apellido', e.target.value)} autoCapitalize="characters" 
+                placeholder={t('lineup.ph_last_name')} value={f.apellido} onChange={(e) => setRow(i, 'apellido', e.target.value)} autoCapitalize="characters" 
               />
               <input 
                 className="input" style={{ flex: 1, padding: '8px', fontSize: '0.9rem' }} 
-                placeholder="Nombre" value={f.nombre} onChange={(e) => setRow(i, 'nombre', e.target.value)} autoCapitalize="words" 
+                placeholder={t('lineup.ph_first_name')} value={f.nombre} onChange={(e) => setRow(i, 'nombre', e.target.value)} autoCapitalize="words" 
               />
               {/* Lado selector rápido */}
               <div style={{ display: 'flex', borderRadius: 'var(--radius-sm)', overflow: 'hidden', width: 68, border: '1px solid var(--border)', flexShrink: 0 }}>
@@ -314,7 +319,7 @@ function ModalCargaMasiva({
                       cursor: 'pointer'
                     }}
                   >
-                    {l}
+                    {tv(l, true)}
                   </div>
                 ))}
               </div>
@@ -322,12 +327,12 @@ function ModalCargaMasiva({
           ))}
           
           <button className="btn btn-ghost" style={{ marginTop: 8 }} onClick={agregarFila}>
-            + Agregar fila
+            + {t('lineup.add_row')}
           </button>
         </div>
         
         <div style={{ paddingTop: 16 }}>
-          <button className="btn btn-primary btn-full" onClick={guardar}>Guardar Line-Up Completo</button>
+          <button className="btn btn-primary btn-full" onClick={guardar}>{t('lineup.save')}</button>
         </div>
       </div>
     </div>
@@ -337,6 +342,7 @@ function ModalCargaMasiva({
 // ─── Pantalla principal: LINE-UP ──────────────────────────────────────────────
 export default function LineupPage() {
   const { estado, dispatch, bateadorActual, bateadoresActivos, equipoAlBate } = useScout();
+  const { t, tv } = useLanguage();
   const router = useRouter();
 
   const [showNuevoPartido, setShowNuevoPartido] = useState(false);
@@ -401,13 +407,13 @@ export default function LineupPage() {
               Mi<span style={{ color: 'var(--accent)' }}>Scout</span>
             </h1>
             <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', lineHeight: 1.5, maxWidth: 300, margin: '0 auto' }}>
-              Tracking de pitcheos y zona de strike
+              {t('home.subtitle')}
             </p>
           </div>
           
           <div style={{ width: '100%', maxWidth: 320, display: 'flex', flexDirection: 'column', gap: 16 }}>
             <button className="btn btn-primary btn-lg btn-full" style={{ boxShadow: 'var(--glow-accent)', padding: '18px 24px', fontSize: '1.05rem' }} onClick={() => setShowNuevoPartido(true)}>
-              Comenzar
+              {t('home.start')}
             </button>
 
           </div>
@@ -431,7 +437,7 @@ export default function LineupPage() {
               style={{ flex: 1, borderRadius: 0, borderBottom: activeTab === 'visitante' ? '2px solid var(--accent)' : '2px solid transparent' }}
               onClick={() => setActiveTab('visitante')}
             >
-              <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Visitante</div>
+              <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', textTransform: 'uppercase' }}>{tv('visitante')}</div>
               <div style={{ fontWeight: 800 }}>{estado.partido.visitante}</div>
             </button>
             <button
@@ -439,28 +445,17 @@ export default function LineupPage() {
               style={{ flex: 1, borderRadius: 0, borderBottom: activeTab === 'local' ? '2px solid var(--accent)' : '2px solid transparent' }}
               onClick={() => setActiveTab('local')}
             >
-              <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Local</div>
+              <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', textTransform: 'uppercase' }}>{tv('local')}</div>
               <div style={{ fontWeight: 800 }}>{estado.partido.local}</div>
             </button>
           </div>
 
-          {/* Cabecera de tabla */}
-          <div style={{
-            display: 'flex', alignItems: 'center',
-            padding: '8px 16px',
-            borderBottom: '1px solid var(--border)',
-          }}>
-            <span className="text-xs text-secondary" style={{ width: 24 }}>ORD</span>
-            <span className="text-xs text-secondary" style={{ width: 44, textAlign: 'center' }}>NUM</span>
-            <span className="text-xs text-secondary" style={{ flex: 1, paddingLeft: 8 }}>APELLIDO Y NOMBRE</span>
-            <span className="text-xs text-secondary" style={{ width: 36, textAlign: 'right' }}>TEAM</span>
-            <span style={{ width: 32 }}></span>
-          </div>
+
 
           {/* Filas del lineup */}
           {filas.length === 0 && (
             <div className="empty-state" style={{ padding: '40px 24px' }}>
-              <p className="text-secondary text-sm">El line-up está vacío</p>
+              <p className="text-secondary text-sm">{t('home.empty_lineup')}</p>
             </div>
           )}
 
@@ -498,7 +493,7 @@ export default function LineupPage() {
                   <div className="lineup-nombre">
                     {b.apellido}{b.nombre ? `, ${b.nombre}` : ''}
                     <span style={{ marginLeft: 6, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 22, height: 22, fontSize: '0.65rem', background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: 4, color: 'var(--text-secondary)' }}>
-                      {b.ladoBateo || 'D'}
+                      {tv(b.ladoBateo || 'D', true)}
                     </span>
                   </div>
                   <span className="lineup-equipo">{b.equipo}</span>
@@ -560,21 +555,21 @@ export default function LineupPage() {
             <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
               {ordenMaximo < 15 && (
                 <button className="btn btn-primary btn-full" onClick={() => setShowAgregarBateador(true)}>
-                  Agregar 1 jugador
+                  {t('home.add_1_player')}
                 </button>
               )}
               {ordenMaximo === 0 && (
                 <button className="btn btn-primary btn-full" onClick={() => setShowCargaMasiva(true)}>
-                  Line-up completo
+                  {t('home.full_lineup')}
                 </button>
               )}
               {bateadorActual && (
                 <button className="btn btn-ghost btn-full" style={{ color: 'var(--warning)', borderColor: 'var(--warning)' }} onClick={() => setSustituyendo(bateadorActual)}>
-                  Sustitución del bateador actual
+                  {t('home.substitute_current')}
                 </button>
               )}
               <button className="btn btn-danger btn-full" onClick={() => setShowConfirmReset(true)}>
-                Nuevo partido
+                {t('home.new_match')}
               </button>
             </div>
           )}
@@ -585,8 +580,8 @@ export default function LineupPage() {
       {showNuevoPartido && <ModalNuevoPartido onClose={() => setShowNuevoPartido(false)} />}
       {showAgregarBateador && (
         <ModalBateador
-          titulo="Agregar bateador"
-          subtitulo={`Orden al bate: ${ordenMaximo + 1}`}
+          titulo={t('home.add_batter')}
+          subtitulo={`${t('home.batting_order')} ${ordenMaximo + 1}`}
           equipo={equipoActual || ''}
           onGuardar={agregarBateador}
           onClose={() => setShowAgregarBateador(false)}
@@ -601,8 +596,8 @@ export default function LineupPage() {
       )}
       {editando && (
         <ModalBateador
-          titulo="Editar bateador"
-          subtitulo={`Orden al bate: ${editando.orden}`}
+          titulo={t('home.edit_batter')}
+          subtitulo={`${t('home.batting_order')} ${editando.orden}`}
           equipo={editando.equipo}
           inicial={{ numero: editando.numero, apellido: editando.apellido, nombre: editando.nombre, equipo: editando.equipo, ladoBateo: editando.ladoBateo || 'D' }}
           onGuardar={(d) => editarBateador(editando, d)}
@@ -618,7 +613,7 @@ export default function LineupPage() {
       )}
       {showConfirmReset && (
         <ModalConfirm
-          mensaje="¿Iniciar un partido nuevo? Se perderán los datos actuales."
+          mensaje={t('home.confirm_new_match')}
           onConfirmar={() => {
             dispatch({ type: 'NUEVO_PARTIDO' });
             setShowConfirmReset(false);
@@ -628,7 +623,7 @@ export default function LineupPage() {
       )}
       {confirmandoEliminarBateador && (
         <ModalConfirm
-          mensaje={`¿Seguro que querés eliminar a ${confirmandoEliminarBateador.apellido} del lineup? Esta acción no se puede deshacer.`}
+          mensaje={t('home.confirm_delete_batter').replace('{nombre}', confirmandoEliminarBateador.apellido)}
           onConfirmar={() => {
             dispatch({ type: 'ELIMINAR_BATEADOR', payload: { id: confirmandoEliminarBateador.id, rol: activeTab } });
             setConfirmandoEliminarBateador(null);

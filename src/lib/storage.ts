@@ -207,11 +207,17 @@ export function calcularHeatMap(turnos: TurnoAlBate[]): Partial<Record<ZonaStrik
 
 // ─── Generador de reporte MD ───────────────────────────────────────────────────
 import type { ZonaStrike as ZS } from './types';
+import { dictionary } from '@/lib/i18n/dictionary';
+import { valueLabels } from '@/lib/i18n/valueLabels';
+import { Locale } from '@/lib/i18n/types';
 
 
-export function generarReporteMD(bateador: import('./types').Bateador, stats: EstadisticasBateador, turnos: import('./types').TurnoAlBate[], partido: import('./types').Partido): string {
-  let md = `# Reporte de Scouting — ${bateador.apellido}${bateador.nombre ? `, ${bateador.nombre}` : ''} (#${bateador.numero})\n\n`;
-  md += `Equipo: ${bateador.equipo}\n\n`;
+export function generarReporteMD(bateador: import('./types').Bateador, stats: EstadisticasBateador, turnos: import('./types').TurnoAlBate[], partido: import('./types').Partido, locale: Locale): string {
+  const t = (key: string) => dictionary[locale]?.[key] || key;
+  const tv = (val: string) => valueLabels[val]?.[locale] || val;
+  
+  let md = `# ${t('report.title')} — ${bateador.apellido}${bateador.nombre ? `, ${bateador.nombre}` : ''} (#${bateador.numero})\n\n`;
+  md += `${t('report.team')}: ${bateador.equipo}\n\n`;
   const avg = stats.promedio.toFixed(3).replace('0.', '.');
   const misTurnos = turnos.filter((t) => t.bateadorId === bateador.id);
 
@@ -226,58 +232,58 @@ export function generarReporteMD(bateador: import('./types').Bateador, stats: Es
       return ab > 0 && v.hits === 0;
     })
     .sort((a, b) => b[1].pitches - a[1].pitches);
-  md += `Partido: ${partido.descripcion}  \n`;
-  md += `Fecha: ${new Date(partido.fecha + 'T12:00:00').toLocaleDateString('es-AR')}\n\n`;
+  md += `${t('report.match')}: ${partido.descripcion}  \n`;
+  md += `${t('report.date')}: ${new Date(partido.fecha + 'T12:00:00').toLocaleDateString(locale === 'en' ? 'en-US' : 'es-AR')}\n\n`;
   md += `---\n\n`;
 
-  md += `## Resumen\n\n`;
+  md += `## ${t('report.summary')}\n\n`;
   md += `AB:${stats.turnosAlBate} H:${stats.hits} 2B:${stats.dobles} 3B:${stats.triples} HR:${stats.homeRuns} K:${stats.strikeoutsSwinging + stats.strikeoutsLooking} BB:${stats.basesPorBolas} AVG:${avg}\n\n`;
 
   md += `---\n\n`;
 
   if (zonasCalientes.length > 0) {
-    md += `## Zonas Calientes\n\n`;
+    md += `## ${t('report.hot_zones')}\n\n`;
     for (const [z, v] of zonasCalientes) {
       const pct = v.pitches > 0 ? Math.round((v.hits / v.pitches) * 100) : 0;
-      md += `- Zona ${z}: ${v.hits} hit(s) en ${v.pitches} pitch(es) — ${pct}% efectividad\n`;
+      md += `- ${t('report.zone')} ${z}: ${v.hits} ${t('report.hits_in')} ${v.pitches} ${t('report.pitches')} — ${pct}% ${t('report.effectiveness')}\n`;
     }
     md += '\n';
   }
 
   if (zonasFrias.length > 0) {
-    md += `## Zonas Frías\n\n`;
+    md += `## ${t('report.cold_zones')}\n\n`;
     for (const [z, v] of zonasFrias) {
-      md += `- Zona ${z}: 0 hits en ${v.pitches} pitch(es)\n`;
+      md += `- ${t('report.zone')} ${z}: ${t('report.zero_hits')} ${v.pitches} ${t('report.pitches')}\n`;
     }
     md += '\n';
   }
 
   md += `---\n\n`;
-  md += `## Detalle de Turnos al Bate\n\n`;
+  md += `## ${t('report.at_bats_detail')}\n\n`;
   for (let i = 0; i < misTurnos.length; i++) {
-    const t = misTurnos[i];
-    md += `### Turno ${i + 1} — Inning ${t.inning}\n\n`;
-    md += `- Zona: ${t.zona}\n`;
-    md += `- Tipo de pitch: ${t.tipoPitch.charAt(0).toUpperCase() + t.tipoPitch.slice(1)}\n`;
-    md += `- Resultado: ${t.resultado}`;
-    if (t.detalleOut) {
-      if (t.resultado === 'ERROR') {
-        md += ` → Error al ${t.detalleOut.defensor} (${t.detalleOut.calidad.toUpperCase()})`;
+    const t_turno = misTurnos[i];
+    md += `### ${t('report.turn')} ${i + 1} — ${t('report.inning')} ${t_turno.inning}\n\n`;
+    md += `- ${t('report.zone')}: ${t_turno.zona}\n`;
+    md += `- ${t('report.pitch_type')}: ${tv(t_turno.tipoPitch)}\n`;
+    md += `- ${t('report.result')}: ${t_turno.resultado}`;
+    if (t_turno.detalleOut) {
+      if (t_turno.resultado === 'ERROR') {
+        md += ` → ${t('report.error_to')} ${t_turno.detalleOut.defensor} (${tv(t_turno.detalleOut.calidad + '_desc')})`;
       } else {
-        md += ` → ${t.detalleOut.tipo.charAt(0).toUpperCase() + t.detalleOut.tipo.slice(1)} al ${t.detalleOut.defensor} (${t.detalleOut.calidad.toUpperCase()})`;
+        md += ` → ${tv(t_turno.detalleOut.tipo)} ${t('report.to_the')} ${t_turno.detalleOut.defensor} (${tv(t_turno.detalleOut.calidad + '_desc')})`;
       }
     }
-    if (t.detalleHit) {
-      md += ` → ${t.detalleHit.tipo.charAt(0).toUpperCase() + t.detalleHit.tipo.slice(1)} al ${t.detalleHit.ubicacion} (${t.detalleHit.calidad.toUpperCase()})`;
+    if (t_turno.detalleHit) {
+      md += ` → ${tv(t_turno.detalleHit.tipo)} ${t('report.to_the')} ${t_turno.detalleHit.ubicacion} (${tv(t_turno.detalleHit.calidad + '_desc')})`;
     }
     md += '\n\n';
   }
 
   if (bateador.notas && bateador.notas.trim() !== '') {
-    md += `---\n\n## Notas sobre el jugador\n\n${bateador.notas.trim()}\n\n`;
+    md += `---\n\n## ${t('report.notes')}\n\n${bateador.notas.trim()}\n\n`;
   }
 
-  md += `---\n\nGenerado por MiScout v1.3\n`;
+  md += `---\n\n${t('report.generated_by')}\n`;
   return md;
 }
 

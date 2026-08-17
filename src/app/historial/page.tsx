@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useScout } from '@/context/ScoutContext';
+import { useLanguage } from '@/context/LanguageContext';
 import ModalConfirm from '@/components/ModalConfirm';
 import type { Partido } from '@/lib/types';
 import { db, getEstadoPartido } from '@/lib/dbClient';
@@ -15,6 +16,7 @@ export default function HistorialPage() {
   const [confirmandoContinuar, setConfirmandoContinuar] = useState<string | null>(null);
   const router = useRouter();
   const { dispatch } = useScout();
+  const { t, locale } = useLanguage();
 
   useEffect(() => {
     db.partidos.toArray()
@@ -126,21 +128,21 @@ export default function HistorialPage() {
   };
 
   if (cargando) {
-    return <div style={{ padding: 16, textAlign: 'center', color: 'var(--text-secondary)' }}>Cargando historial...</div>;
+    return <div style={{ padding: 16, textAlign: 'center', color: 'var(--text-secondary)' }}>{t('historial.loading')}</div>;
   }
 
   if (partidos.length === 0) {
     return (
       <div className="empty-state">
-        <div className="empty-state__title">Historial vacío</div>
-        <p className="empty-state__text">Cuando finalices un partido, aparecerá guardado aquí para consultas futuras.</p>
+        <div className="empty-state__title">{t('historial.empty_title')}</div>
+        <p className="empty-state__text">{t('historial.empty_text')}</p>
       </div>
     );
   }
 
   return (
     <div style={{ padding: 16, paddingBottom: 32 }}>
-      <p className="section-title" style={{ marginBottom: 12 }}>Partidos archivados</p>
+      <p className="section-title" style={{ marginBottom: 12 }}>{t('historial.archived_matches')}</p>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         {partidos.map(p => (
           <div
@@ -158,7 +160,7 @@ export default function HistorialPage() {
             onMouseLeave={(e) => { if (cargandoId !== p.id) { e.currentTarget.style.borderColor = ''; e.currentTarget.style.boxShadow = ''; } }}
           >
             <p className="text-xs text-secondary" style={{ marginBottom: 4 }}>
-              {new Date(p.fecha + 'T12:00:00').toLocaleDateString('es-AR')} · {p.innings} inning{p.innings !== 1 ? 's' : ''}
+              {new Date(p.fecha + 'T12:00:00').toLocaleDateString(locale === 'en' ? 'en-US' : 'es-AR')} · {p.innings} inning{p.innings !== 1 ? 's' : ''}
             </p>
             <p style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--text-primary)', marginBottom: 2 }}>
               {p.visitante} vs {p.local}
@@ -168,7 +170,7 @@ export default function HistorialPage() {
             </p>
             {cargandoId === p.id && (
               <span style={{ position: 'absolute', top: 12, right: 12, fontSize: '0.75rem', color: 'var(--accent)' }}>
-                Cargando...
+                {t('historial.loading_badge')}
               </span>
             )}
 
@@ -189,7 +191,7 @@ export default function HistorialPage() {
               >
                 {/* Botón "Continuar partido" — PASO 4 */}
                 <button
-                  title="Continuar partido"
+                  title={t('historial.continue')}
                   onClick={(e) => {
                     e.stopPropagation();
                     setConfirmandoContinuar(p.id);
@@ -210,7 +212,7 @@ export default function HistorialPage() {
 
                 {/* Botón "Eliminar partido" */}
                 <button
-                  title="Eliminar partido"
+                  title={t('historial.delete')}
                   onClick={(e) => {
                     e.stopPropagation();
                     pedirEliminar(e, p.id);
@@ -244,7 +246,7 @@ export default function HistorialPage() {
                   padding: '8px 12px', fontSize: '0.8rem', lineHeight: 1.2, textAlign: 'center'
                 }}
               >
-                Ver<br/>estadísticas
+                {t('historial.view_stats_line1')}<br/>{t('historial.view_stats_line2')}
               </button>
             )}
           </div>
@@ -254,7 +256,7 @@ export default function HistorialPage() {
       {/* Modal: Eliminar partido */}
       {confirmandoEliminar && (
         <ModalConfirm
-          mensaje="¿Seguro que querés eliminar este partido y todos sus datos? Esta acción no se puede deshacer."
+          mensaje={t('modal_confirm.delete_match')}
           onConfirmar={confirmarEliminar}
           onCancelar={() => setConfirmandoEliminar(null)}
         />
@@ -263,7 +265,7 @@ export default function HistorialPage() {
       {/* Modal: Continuar partido — PASO 3A */}
       {confirmandoContinuar && (
         <ModalConfirm
-          mensaje="¿Continuar este partido? Si tienes otro partido activo, se dará por finalizado."
+          mensaje={t('modal_confirm.continue_match')}
           onConfirmar={() => {
             const id = confirmandoContinuar;
             setConfirmandoContinuar(null);

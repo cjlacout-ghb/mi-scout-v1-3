@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
 
     if (!code || !deviceFingerprint) {
       return NextResponse.json(
-        { valid: false, error: 'Missing code or device fingerprint' },
+        { valid: false, error: 'Missing code or device fingerprint', errorCode: 'SERVER_ERROR' },
         { status: 400 }
       );
     }
@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
 
     if (licenseError || !license) {
       return NextResponse.json(
-        { valid: false, error: 'Invalid or inactive license code' },
+        { valid: false, error: 'Invalid or inactive license code', errorCode: 'LICENSE_INVALID' },
         { status: 403 }
       );
     }
@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
     // Check expiration
     if (license.expires_at && new Date(license.expires_at) < new Date()) {
       return NextResponse.json(
-        { valid: false, error: 'Tu licencia ha vencido. Contactá al administrador para renovarla.' },
+        { valid: false, error: 'Tu licencia ha vencido. Contactá al administrador para renovarla.', errorCode: 'LICENSE_EXPIRED' },
         { status: 403 }
       );
     }
@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
     // 3. Check if max activations reached
     if (license.activations_used >= license.max_activations) {
       return NextResponse.json(
-        { valid: false, error: 'Maximum activations reached for this license' },
+        { valid: false, error: 'Maximum activations reached for this license', errorCode: 'LICENSE_LIMIT_REACHED' },
         { status: 403 }
       );
     }
@@ -85,7 +85,7 @@ export async function POST(req: NextRequest) {
 
     if (activationError) {
       return NextResponse.json(
-        { valid: false, error: 'Failed to register activation' },
+        { valid: false, error: 'Failed to register activation', errorCode: 'SERVER_ERROR' },
         { status: 500 }
       );
     }
@@ -100,7 +100,7 @@ export async function POST(req: NextRequest) {
 
   } catch {
     return NextResponse.json(
-      { valid: false, error: 'Internal server error' },
+      { valid: false, error: 'Internal server error', errorCode: 'SERVER_ERROR' },
       { status: 500 }
     );
   }

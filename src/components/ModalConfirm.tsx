@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useLanguage } from '@/context/LanguageContext';
 
 interface Props {
   mensaje: string;
@@ -10,6 +11,7 @@ interface Props {
 }
 
 export default function ModalConfirm({ mensaje, onConfirmar, onCancelar, soloAviso }: Props) {
+  const { t } = useLanguage();
   return (
     <div
       onClick={onCancelar}
@@ -80,7 +82,7 @@ export default function ModalConfirm({ mensaje, onConfirmar, onCancelar, soloAvi
               onClick={onCancelar}
               style={{ flex: 1, padding: '14px 16px', borderRadius: 12, fontSize: '0.9rem' }}
             >
-              Cancelar
+              {t('modal_confirm.cancel')}
             </button>
           )}
           <button
@@ -88,7 +90,7 @@ export default function ModalConfirm({ mensaje, onConfirmar, onCancelar, soloAvi
             onClick={onConfirmar}
             style={{ flex: 1, padding: '14px 16px', borderRadius: 12, fontSize: '0.9rem' }}
           >
-            {soloAviso ? "Entendido" : "Confirmar"}
+            {soloAviso ? t('modal_confirm.understood') : t('modal_confirm.confirm')}
           </button>
         </div>
       </div>

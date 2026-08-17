@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { toPng } from 'html-to-image';
 import ZonaStrikeComponent from './ZonaStrike';
 import { obtenerTurnosAcumulados, calcularEstadisticas, calcularHeatMap } from '@/lib/storage';
+import { useLanguage } from '@/context/LanguageContext';
 import type { TurnoAlBate } from '@/lib/types';
 
 interface Props {
@@ -11,10 +12,12 @@ interface Props {
   equipo: string;
   nombre?: string;
   ladoBateo?: 'D' | 'Z' | 'S';
+  rival: string;
   onClose: () => void;
 }
 
-export default function HeatMapModal({ apellido, numero, equipo, nombre, ladoBateo, onClose }: Props) {
+export default function HeatMapModal({ apellido, numero, equipo, nombre, ladoBateo, rival, onClose }: Props) {
+  const { t } = useLanguage();
   const [turnos, setTurnos] = useState<TurnoAlBate[] | null>(null);
   const [error, setError] = useState(false);
 
@@ -48,9 +51,17 @@ export default function HeatMapModal({ apellido, numero, equipo, nombre, ladoBat
   const avg = stats && stats.turnosAlBate > 0 ? stats.promedio.toFixed(3).replace('0.', '.') : '.000';
 
   const nombreArchivo = () => {
-    const inicial = nombre ? nombre.charAt(0).toUpperCase() : '';
-    const fecha = new Date().toLocaleDateString('es-AR').split('/').join('-');
-    return `${apellido}-${inicial}_${equipo}_${fecha}.png`;
+    const num = numero ?? '';
+    const ap = (apellido ?? '').toUpperCase().replace(/ /g, '_');
+    const nom = (nombre ?? '').toUpperCase().replace(/ /g, '_');
+    const eq3 = (equipo ?? '').slice(0, 3).toUpperCase();
+    const rival3 = (rival ?? '').slice(0, 3).toUpperCase();
+    const now = new Date();
+    const yyyy = now.getFullYear();
+    const mm = String(now.getMonth() + 1).padStart(2, '0');
+    const dd = String(now.getDate()).padStart(2, '0');
+    const fecha = `${yyyy}-${mm}-${dd}`;
+    return `${fecha}_${num}${ap}_${nom}-${eq3}_vs${rival3}.png`;
   };
 
   const compartirODescargar = async () => {
@@ -99,12 +110,12 @@ export default function HeatMapModal({ apellido, numero, equipo, nombre, ladoBat
             className="btn btn-primary btn-sm"
             style={{ marginRight: 16, lineHeight: 1 }}
           >
-            Exportar
+            {t('heatmap.export')}
           </button>
           <button
             onClick={onClose}
             style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', fontSize: '1.3rem', cursor: 'pointer', lineHeight: 1 }}
-            aria-label="Cerrar"
+            aria-label={t('heatmap.close')}
           >
             ×
           </button>
@@ -116,7 +127,7 @@ export default function HeatMapModal({ apellido, numero, equipo, nombre, ladoBat
             <span style={{ marginRight: 8 }}>{numero}</span>{apellido}{nombre ? `, ${nombre}` : ''} - <span style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>{equipo.slice(0, 3).toUpperCase()}</span>
           </div>
           <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-            Acumulado
+            {t('heatmap.cumulative')}
           </div>
 
           {cargando && (

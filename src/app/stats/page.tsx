@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useScout } from '@/context/ScoutContext';
+import { useLanguage } from '@/context/LanguageContext';
 import { toPng } from 'html-to-image';
 import ZonaStrikeComponent from '@/components/ZonaStrike';
 import { calcularEstadisticas, obtenerTurnosAcumulados, calcularHeatMap } from '@/lib/storage';
@@ -36,6 +37,7 @@ import { db } from '@/lib/dbClient';
 
 export default function StatsPage() {
   const { estado, dispatch, bateadorActual } = useScout();
+  const { t, tv } = useLanguage();
   const todos = [...(estado.lineupVisitante || []), ...(estado.lineupLocal || [])];
   const activos = todos.filter((b) => b.activo);
 
@@ -148,8 +150,8 @@ export default function StatsPage() {
     return (
       <div className="empty-state">
 
-        <div className="empty-state__title">Sin partido activo</div>
-        <p className="empty-state__text">Inicia un partido para ver las estadísticas. O selecciona desde el Historial.</p>
+        <div className="empty-state__title">{t('stats.no_match')}</div>
+        <p className="empty-state__text">{t('stats.no_match_text')}</p>
       </div>
     );
   }
@@ -210,10 +212,18 @@ export default function StatsPage() {
     : '---';
 
   const nombreArchivo = () => {
-    const inicial = bateadorSel?.nombre ? bateadorSel.nombre.charAt(0).toUpperCase() : '';
-    const fecha = new Date().toLocaleDateString('es-AR').split('/').join('-');
-    const equipoStr = bateadorSel?.equipo || '';
-    return `${bateadorSel?.apellido}-${inicial}_${equipoStr}_${fecha}.png`;
+    const num = bateadorSel?.numero ?? '';
+    const ap = (bateadorSel?.apellido ?? '').toUpperCase().replace(/ /g, '_');
+    const nom = (bateadorSel?.nombre ?? '').toUpperCase().replace(/ /g, '_');
+    const eq3 = (bateadorSel?.equipo ?? '').slice(0, 3).toUpperCase();
+    const rivalName = bateadorSel?.rol === 'visitante' ? estado.partido?.local : estado.partido?.visitante;
+    const rival3 = (rivalName ?? '').slice(0, 3).toUpperCase();
+    const now = new Date();
+    const yyyy = now.getFullYear();
+    const mm = String(now.getMonth() + 1).padStart(2, '0');
+    const dd = String(now.getDate()).padStart(2, '0');
+    const fecha = `${yyyy}-${mm}-${dd}`;
+    return `${fecha}_${num}${ap}_${nom}-${eq3}_vs${rival3}.png`;
   };
 
   const compartirODescargar = async () => {
@@ -240,21 +250,21 @@ export default function StatsPage() {
     <div style={{ paddingBottom: 16 }}>
       <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--border)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-          <label className="label" style={{ margin: 0 }}>Bateador</label>
+          <label className="label" style={{ margin: 0 }}>{t('stats.batter')}</label>
           <div style={{ display: 'flex', gap: 4, background: 'var(--bg-elevated)', padding: 3, borderRadius: 6 }}>
             <button
               className="btn btn-sm"
               style={{ padding: '2px 8px', fontSize: '0.65rem', background: 'transparent', color: 'var(--text-primary)', border: 'none', fontWeight: 'normal' }}
               onClick={compartirODescargar}
             >
-              Exportar
+              {t('stats.export')}
             </button>
             <button
               className="btn btn-sm"
               style={{ padding: '2px 8px', fontSize: '0.65rem', background: !ordenarPorAvg ? 'var(--accent)' : 'transparent', color: !ordenarPorAvg ? '#000' : 'var(--text-secondary)', border: !ordenarPorAvg ? '1px solid var(--accent)' : 'none', fontWeight: !ordenarPorAvg ? 'bold' : 'normal' }}
               onClick={() => setOrdenarPorAvg(false)}
             >
-              Orden al bate
+              {t('stats.batting_order')}
             </button>
             <button
               className="btn btn-sm"
@@ -279,17 +289,17 @@ export default function StatsPage() {
             <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {(() => {
                 const b = bateadorSel;
-                if (!b) return 'Seleccionar bateador';
+                if (!b) return t('stats.select_batter');
                 const avgVal = activeAvgMap.get(b.id) ?? -1;
                 const avgStr = avgVal >= 0 ? avgVal.toFixed(3).replace('0.', '.') : null;
                 const equipo = b.equipo ? b.equipo.replace(/\w\S*/g, txt => txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase()) : '';
-                const inicial = b.nombre ? `, ${b.nombre.charAt(0).toUpperCase()}` : '';
+                const nombreStr = b.nombre ? `, ${b.nombre}` : '';
                 return (
                   <span>
                     {ordenarPorAvg && avgStr && (
                       <span style={{ color: valueColor(avgVal), fontWeight: 700, marginRight: 6 }}>{avgStr}</span>
                     )}
-                    #{b.numero} {b.apellido}{inicial} - {equipo}
+                    #{b.numero} {b.apellido}{nombreStr} - {equipo}
                   </span>
                 );
               })()}
@@ -309,14 +319,14 @@ export default function StatsPage() {
             }}>
               {cargandoAvgAcumulado && modoAcumulado && ordenarPorAvg ? (
                 <div style={{ padding: '14px', textAlign: 'center', color: 'var(--text-secondary)', fontSize: '0.8rem' }}>
-                  Cargando AVG acumulado...
+                  {t('stats.loading_avg')}
                 </div>
               ) : (
                 todosOrdenados.map((b, idx) => {
                   const avgVal = activeAvgMap.get(b.id) ?? -1;
                   const avgStr = avgVal >= 0 ? avgVal.toFixed(3).replace('0.', '.') : '---';
                   const equipo = b.equipo ? b.equipo.replace(/\w\S*/g, txt => txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase()) : '';
-                  const inicial = b.nombre ? `, ${b.nombre.charAt(0).toUpperCase()}` : '';
+                  const nombreStr = b.nombre ? `, ${b.nombre}` : '';
                   const isSelected = b.id === (selId ?? bateadorSel?.id);
                   const prevEquipo = idx > 0 ? todosOrdenados[idx - 1].equipo : null;
                   const showDivider = idx > 0 && b.equipo !== prevEquipo;
@@ -353,7 +363,7 @@ export default function StatsPage() {
                           </span>
                         )}
                         <span style={{ fontSize: '0.85rem', color: isSelected ? 'var(--accent)' : 'var(--text-primary)' }}>
-                          #{b.numero} {b.apellido}{inicial}
+                          #{b.numero} {b.apellido}{nombreStr}
                           <span style={{ color: 'var(--text-secondary)', fontSize: '0.75rem' }}> — {equipo}</span>
                         </span>
                       </div>
@@ -372,7 +382,7 @@ export default function StatsPage() {
             disabled={!estado.partido?.finalizado}
             onClick={() => setModoAcumulado(false)}
           >
-            Este partido
+            {t('stats.this_match')}
           </button>
           <button
             className={`btn btn-sm ${modoAcumulado ? 'btn-primary' : ''}`}
@@ -380,20 +390,21 @@ export default function StatsPage() {
             disabled={!estado.partido?.finalizado}
             onClick={() => setModoAcumulado(true)}
           >
-            Acumulado
+            {t('stats.accumulated')}
           </button>
         </div>
       </div>
 
       {!bateadorSel && (
         <div className="empty-state">
-          <p className="text-secondary">Cargá bateadores en el Line-Up.</p>
+              <div className="text-xs text-secondary">{t('stats.batter')}</div>
+              <p className="text-secondary">{t('stats.load_lineup')}</p>
         </div>
       )}
 
       {cargandoAcumulado && modoAcumulado && (
         <div style={{ padding: 24, textAlign: 'center', color: 'var(--text-secondary)' }}>
-          Cargando stats acumuladas...
+          {t('stats.loading_stats')}
         </div>
       )}
 
@@ -405,7 +416,7 @@ export default function StatsPage() {
               <span style={{ marginRight: 8 }}>{bateadorSel.numero}</span>{bateadorSel.apellido}{bateadorSel.nombre ? `, ${bateadorSel.nombre}` : ''} - <span style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>{bateadorSel.equipo.slice(0, 3).toUpperCase()}</span>
             </div>
             <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-              {modoAcumulado ? 'Acumulado' : 'Este partido'}
+              {modoAcumulado ? t('stats.accumulated') : t('stats.this_match')}
             </div>
           </div>
 
@@ -439,16 +450,16 @@ export default function StatsPage() {
           />
 
           <div style={{ padding: '4px 16px 16px' }}>
-            <p className="section-title" style={{ marginBottom: 8 }}>Desglose por zona</p>
+            <p className="section-title" style={{ marginBottom: 8 }}>{t('stats.zone_breakdown')}</p>
             <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
               <table className="data-table">
                 <thead>
                   <tr>
-                    <th>Zona</th>
-                    <th style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>Pitcheos</th>
+                    <th>{t('stats.zone')}</th>
+                    <th style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>{t('stats.pitches')}</th>
                     <th style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>AB</th>
-                    <th style={{ textAlign: 'center' }}>Hits</th>
-                    <th style={{ textAlign: 'center' }}>A/F</th>
+                    <th style={{ textAlign: 'center' }}>{t('stats.hits')}</th>
+                    <th style={{ textAlign: 'center' }}>{t('stats.af')}</th>
                     <th style={{ textAlign: 'center' }}>K</th>
                     <th style={{ textAlign: 'center' }}>AVG</th>
                   </tr>
@@ -462,7 +473,13 @@ export default function StatsPage() {
                       <React.Fragment key={z}>
                       <tr>
                         <td>
-                          <span>Zona {z}</span>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                            <span style={{ 
+                              display: 'inline-block', width: 8, height: 8, borderRadius: '50%', 
+                              background: d.hits > 0 ? valueColor(d.hits / Math.max(1, d.hits + d.outs + d.ks + d.kl)) : 'var(--border)' 
+                            }} />
+                            <span>{t('stats.zone_num').replace('{z}', String(z))}</span>
+                          </div>
                         </td>
                         <td style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>{d.pitches}</td>
                         <td style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>{d.ab}</td>
@@ -493,13 +510,13 @@ export default function StatsPage() {
           </div>
 
           <div style={{ padding: '0 16px 16px' }}>
-            <p className="section-title" style={{ marginBottom: 8 }}>Tipo de pitch / K</p>
+            <p className="section-title" style={{ marginBottom: 8 }}>{t('stats.pitch_type')}</p>
             <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
               <table className="data-table">
                 <thead>
                   <tr>
-                    <th>Pitch</th>
-                    <th style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>Vistos</th>
+                    <th>{t('stats.pitch')}</th>
+                    <th style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>{t('stats.seen')}</th>
                     <th style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>AB</th>
                     <th style={{ textAlign: 'center' }}>K</th>
                     <th style={{ textAlign: 'center' }}>AVG</th>

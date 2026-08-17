@@ -1,6 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { APP_VERSION, APP_VERSION_LABEL } from '@/lib/version';
 
 export default function GuiaPage() {
   const router = useRouter();
@@ -39,7 +40,7 @@ export default function GuiaPage() {
           <h1 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
             Guía de Usuario
           </h1>
-          <p style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', margin: 0 }}>MiScout v1.3</p>
+          <p style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', margin: 0 }}>MiScout {APP_VERSION_LABEL}</p>
         </div>
       </div>
 
@@ -372,7 +373,7 @@ export default function GuiaPage() {
             MiScout es software propietario. Queda expresamente prohibida su copia,<br />
             redistribución, modificación o uso comercial sin autorización escrita del autor.<br /><br />
             <em>Disclaimer: MiScout es una herramienta de análisis y seguimiento estadístico. Su uso no garantiza resultados deportivos, victorias ni mejoras de rendimiento específicas.</em><br /><br />
-            Meta info: Versión 1.3.6 | Idioma: Español | Última actualización: Agosto 2026
+            Meta info: Versión {APP_VERSION} | Idioma: Español | Última actualización: Agosto 2026
           </p>
         </div>
 

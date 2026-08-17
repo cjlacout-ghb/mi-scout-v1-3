@@ -3,16 +3,20 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getDeviceFingerprint, getDeviceInfo } from '@/lib/deviceFingerprint';
+import { useLanguage } from '@/context/LanguageContext';
+import LanguageToggle from '@/components/LanguageToggle';
+import { APP_VERSION_LABEL } from '@/lib/version';
 
 export default function ActivatePage() {
   const router = useRouter();
+  const { t } = useLanguage();
   const [code, setCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   const handleActivate = async () => {
     if (!code.trim()) {
-      setError('Por favor ingresá tu código de licencia.');
+      setError(t('activate.error_empty'));
       return;
     }
 
@@ -42,10 +46,16 @@ export default function ActivatePage() {
         localStorage.setItem('miscout_last_verified', new Date().toISOString());
         router.push('/');
       } else {
-        setError(data.error || 'Código inválido. Verificá e intentá de nuevo.');
+        // If errorCode is present and mapped in dictionary, show translated message.
+        // Fallback: raw error string from API (Spanish), or generic local error.
+        const errorKey = data.errorCode ? `error.${data.errorCode}` : null;
+        const translatedError = errorKey ? t(errorKey) : null;
+        // t() returns the key itself when not found — check for that
+        const hasTranslation = translatedError && translatedError !== errorKey;
+        setError(hasTranslation ? translatedError : (data.error || t('activate.error_invalid')));
       }
     } catch {
-      setError('Error de conexión. Verificá tu internet e intentá de nuevo.');
+      setError(t('activate.error_connection'));
     } finally {
       setLoading(false);
     }
@@ -62,12 +72,17 @@ export default function ActivatePage() {
       background: 'var(--bg-base)',
       gap: '1.5rem',
     }}>
+      {/* Language toggle — esquina superior derecha */}
+      <div style={{ position: 'absolute', top: '1rem', right: '1rem' }}>
+        <LanguageToggle />
+      </div>
+
       {/* Logo */}
       <div style={{ textAlign: 'center' }}>
         <h1 style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--text-primary)' }}>
           Mi<span style={{ color: 'var(--accent)' }}>Scout</span>
         </h1>
-        <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>v1.3</p>
+        <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>{APP_VERSION_LABEL}</p>
       </div>
 
       {/* Card */}
@@ -82,16 +97,17 @@ export default function ActivatePage() {
         gap: '1rem',
       }}>
         <h2 style={{ color: 'var(--text-primary)', fontSize: '1.1rem', fontWeight: 700 }}>
-          Activar licencia
+          {t('activate.title')}
         </h2>
         <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', lineHeight: 1.5 }}>
-          Ingresá tu código de activación para acceder a <span style={{ color: '#FFFFFF', fontWeight: 700 }}>Mi</span><span style={{ color: '#F5A623', fontWeight: 700 }}>Scout</span>.
-          Esta licencia quedará vinculada a este dispositivo.
+          {t('activate.subtitle')}{' '}
+          <span style={{ color: '#FFFFFF', fontWeight: 700 }}>Mi</span><span style={{ color: '#F5A623', fontWeight: 700 }}>Scout</span>.{' '}
+          {t('activate.subtitle_suffix')}
         </p>
 
         <input
           type="text"
-          placeholder="MISCOUT-v13-XXXX-XXXX"
+          placeholder={t('activate.placeholder_code')}
           value={code}
           onChange={(e) => setCode(e.target.value.toUpperCase())}
           style={{
@@ -117,7 +133,7 @@ export default function ActivatePage() {
           disabled={loading}
           className="btn btn-primary btn-full"
         >
-          {loading ? 'Verificando...' : 'Activar'}
+          {loading ? t('activate.button_activating') : t('activate.button_activate')}
         </button>
       </div>
 
@@ -129,9 +145,16 @@ export default function ActivatePage() {
         maxWidth: '340px',
         lineHeight: 1.6,
       }}>
-        © 2026 <span style={{ color: '#FFFFFF', fontWeight: 700 }}>Mi</span><span style={{ color: '#F5A623', fontWeight: 700 }}>Scout</span> — Todos los derechos reservados.
-        El uso no autorizado de esta licencia puede resultar en la 
-        suspensión permanente del acceso sin reembolso.
+        {t('activate.legal').split('MiScout').map((part, i, arr) =>
+          i < arr.length - 1 ? (
+            <span key={i}>
+              {part}
+              <span style={{ color: '#FFFFFF', fontWeight: 700 }}>Mi</span><span style={{ color: '#F5A623', fontWeight: 700 }}>Scout</span>
+            </span>
+          ) : (
+            <span key={i}>{part}</span>
+          )
+        )}
       </p>
     </div>
   );
