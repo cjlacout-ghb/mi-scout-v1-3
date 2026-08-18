@@ -36,11 +36,28 @@ La primera vez que abrís MiScout, la app verifica tu licencia antes de darte ac
 - La app verifica la licencia con el servidor; necesitás conexión a internet **solo en este paso inicial**.
 - Una vez activada, serás redirigido a la pantalla principal.
 
+Luego de la activación, MiScout revalida la licencia periódicamente cuando hay conexión disponible. Si el dispositivo pasa un tiempo prolongado sin conectarse a internet (ej. durante un torneo de varios días sin wifi), la app se puede seguir usando con normalidad durante un período de gracia de 10 días. Pasado ese plazo sin conexión, es necesario conectarse al menos una vez para seguir usando la app.
+
+### Planes de Licencia
+
+MiScout ofrece dos tipos de licencia:
+- **Profesional**: 1 año de duración, con acceso a las actualizaciones (releases) publicadas durante ese período.
+- **Lanzamiento**: duración más corta, sin acceso a actualizaciones adicionales durante su vigencia.
+
+Ambas se activan de la misma forma, ingresando el código de activación correspondiente.
+
 > **Nota:** Podés acceder a la guía de usuario en cualquier momento tocando el **ícono de libro** ubicado en la esquina superior derecha del encabezado.
 
 ---
 
 ## 3. Navegación
+
+### Cambio de idioma (ES/EN)
+
+En el encabezado, junto al ícono del libro, hay dos botones: **ES** y **EN**, para elegir el idioma de la interfaz. Tené en cuenta que:
+- El cambio afecta a la interfaz, etiquetas y formato de fecha (DD/MM/AAAA en español, MM/DD/AAAA en inglés).
+- Los datos ya cargados (nombres de equipos, jugadores, tipos de lanzamiento, etc.) no se traducen — se guardan tal cual se ingresaron.
+- Podés cambiar de idioma en cualquier momento, incluso durante un partido en curso.
 
 La app tiene **5 secciones** accesibles desde la barra de navegación inferior:
 
@@ -291,6 +308,12 @@ Desde el historial podés:
 - **Tocar una tarjeta** para cargar el partido y ver sus estadísticas en la sección **Heat Map**.
 - **Tocar "Seleccionar jugador"** (botón dorado pequeño en la tarjeta) para cargar el partido y ver su **Line-Up**, desde donde podés navegar a las stats de cualquier jugador.
 - **✕ Eliminar** el partido (solicita confirmación, ya que esta acción **borra todos los datos permanentemente** y no se puede deshacer).
+
+### Reanudar un partido (▶ Continuar)
+
+Si un partido quedó sin finalizar, su tarjeta en el Historial muestra el botón **▶ Continuar**. Al tocarlo, la app reabre ese partido exactamente donde se dejó, listo para seguir el tracking.
+
+> **Nota:** Solo puede haber un partido activo a la vez. Si se reanuda un partido mientras hay otro en curso, el que estaba activo se finaliza automáticamente antes de reabrir el elegido.
 
 ---
 

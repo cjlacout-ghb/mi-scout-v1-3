@@ -68,7 +68,7 @@ export default function GuiaPage() {
             ['3', 'Navegación'],
             ['4', 'Line-Up: gestión del partido'],
             ['5', 'Tracking: registrar en vivo'],
-            ['6', 'Heat Map: estadísticas'],
+            ['6', 'Heat Map: estadísticas y exportación'],
             ['7', 'Reporte: generación de informes'],
             ['8', 'Historial de partidos'],
             ['9', 'Código de colores'],
@@ -126,11 +126,29 @@ export default function GuiaPage() {
             <li>La app verifica la licencia con el servidor; necesitás conexión a internet <strong>solo en este paso inicial</strong>.</li>
             <li>Una vez activada, serás redirigido a la pantalla principal.</li>
           </ul>
+          <P>Luego de la activación, MiScout revalida la licencia periódicamente cuando hay conexión disponible. Si el dispositivo pasa un tiempo prolongado sin conectarse a internet (ej. durante un torneo de varios días sin wifi), la app se puede seguir usando con normalidad durante un período de gracia de 10 días. Pasado ese plazo sin conexión, es necesario conectarse al menos una vez para seguir usando la app.</P>
+
+          <SubTitle>Planes de Licencia</SubTitle>
+          <P>MiScout ofrece dos tipos de licencia:</P>
+          <ul style={ulStyle}>
+            <li><strong>Profesional</strong>: 1 año de duración, con acceso a las actualizaciones (releases) publicadas durante ese período.</li>
+            <li><strong>Lanzamiento</strong>: duración más corta, sin acceso a actualizaciones adicionales durante su vigencia.</li>
+          </ul>
+          <P>Ambas se activan de la misma forma, ingresando el código de activación correspondiente.</P>
+
           <Note>Podés acceder a esta guía en cualquier momento tocando el <strong>ícono de libro</strong> ubicado en la esquina superior derecha del encabezado.</Note>
         </Section>
 
         {/* ── S3 ── */}
         <Section id="s3" num="3" title="Navegación">
+          <SubTitle>Cambio de idioma (ES/EN)</SubTitle>
+          <P>En el encabezado, junto al ícono de libro, hay dos botones: <strong>ES</strong> y <strong>EN</strong>, para elegir el idioma de la interfaz. Tené en cuenta que:</P>
+          <ul style={ulStyle}>
+            <li>El cambio afecta a la interfaz, etiquetas y formato de fecha (DD/MM/AAAA en español, MM/DD/AAAA en inglés).</li>
+            <li>Los datos ya cargados (nombres de equipos, jugadores, tipos de lanzamiento, etc.) no se traducen — se guardan tal cual se ingresaron.</li>
+            <li>Se puede cambiar de idioma en cualquier momento, incluso durante un partido en curso.</li>
+          </ul>
+
           <P>La app tiene <strong>5 secciones</strong> accesibles desde la barra de navegación inferior:</P>
           <Table
             headers={['Sección', 'Función']}
@@ -309,6 +327,19 @@ export default function GuiaPage() {
 
           <SubTitle>Tabla por Tipo de Lanzamiento</SubTitle>
           <P>Rendimiento del bateador según el tipo de lanzamiento recibido (Drop, Riser, Curva, Cambio, Screw, Otro): cuántos vio, cuántos terminaron en AB, K y AVG. Solo aparecen los tipos que se registraron.</P>
+
+          <SubTitle>Heat Map en vivo (on-the-fly)</SubTitle>
+          <P>No hace falta esperar a que el partido finalice para consultar el mapa de calor. Podés ir a la sección <strong>Heat Map</strong> en cualquier momento durante el partido y ver el estado actualizado de las estadísticas del bateador seleccionado, con los datos que se hayan registrado hasta ese momento.</P>
+          <Note>El modo <strong>Acumulado</strong> sigue estando disponible solo una vez que el partido está finalizado. Durante el juego en curso, el Heat Map muestra únicamente los datos de <strong>este partido</strong>.</Note>
+
+          <SubTitle>Exportar el Heat Map como imagen (PNG)</SubTitle>
+          <P>Podés guardar el mapa de calor del bateador seleccionado como una imagen PNG directamente en tu dispositivo.</P>
+          <ul style={ulStyle}>
+            <li>Tocá el botón <strong>"Exportar PNG"</strong> debajo del mapa de calor.</li>
+            <li>La imagen captura la zona de strike con el coloreado actual, incluyendo los tooltips de estadísticas por zona.</li>
+            <li>El archivo se descarga automáticamente con el nombre del jugador (ej. <code style={codeStyle}>heatmap_smith.png</code>).</li>
+            <li>Útil para compartir el análisis con entrenadores o jugadores sin necesidad de acceder a la app.</li>
+          </ul>
         </Section>
 
         {/* ── S7 ── */}
@@ -339,6 +370,10 @@ export default function GuiaPage() {
             <li><strong>Botón "Seleccionar jugador"</strong> (dorado) → carga el partido y va al Line-Up para elegir jugador.</li>
             <li><strong>✕ Eliminar</strong> → borra el partido y <em>todos sus datos permanentemente</em> (pide confirmación).</li>
           </ul>
+
+          <SubTitle>Reanudar un partido (▶ Continuar)</SubTitle>
+          <P>Si un partido quedó sin finalizar, su tarjeta en el Historial muestra el botón <strong>▶ Continuar</strong>. Al tocarlo, la app reabre ese partido exactamente donde se dejó, listo para seguir el tracking.</P>
+          <Note>Solo puede haber un partido activo a la vez: si se reanuda un partido mientras hay otro en curso, el que estaba activo se finaliza automáticamente antes de reabrir el elegido.</Note>
         </Section>
 
         {/* ── S9 ── */}
