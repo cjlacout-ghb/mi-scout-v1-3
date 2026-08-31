@@ -333,7 +333,7 @@ export default function ZonaStrikeComponent({ onZonaClick, marcadores = [], heat
                     className="pitch-tooltip"
                     style={{ color: colorResultado, opacity: 1, pointerEvents: 'auto' }}
                   >
-                    {m.resultado}{m.tipoPitch ? `, ${m.tipoPitch.toLowerCase()}` : ''}
+                    {m.resultado}{m.tipoPitch ? `, ${tv(m.tipoPitch)}` : ''}
                   </div>
                 )}
               </div>

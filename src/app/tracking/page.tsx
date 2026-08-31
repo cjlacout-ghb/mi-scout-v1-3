@@ -564,7 +564,7 @@ export default function TrackingPage() {
             >
               <span className="text-xs text-secondary">{t('tracking.inn').replace('{inning}', String(turno.inning))}</span>
               <span style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', flex: 1 }}>
-                {t('stats.zone_num').replace('{z}', String(turno.zona))} · {turno.tipoPitch}
+                {t('stats.zone_num').replace('{z}', String(turno.zona))} · {turno.tipoPitch ? tv(turno.tipoPitch) : ''}
               </span>
               <span style={{
                 fontWeight: 800,

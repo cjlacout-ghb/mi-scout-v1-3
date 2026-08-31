@@ -289,7 +289,7 @@ export default function ModalPitch({ zona, onConfirmar, onCancelar }: Props) {
 
   const subtitulos: Partial<Record<PasoModal, React.ReactNode>> = {
     tipo_pitch:      t('modal_pitch.pitch_type'),
-    resultado:       <>{t('modal_pitch.pitch_label')} <strong>{estado.tipoPitch}</strong></>,
+    resultado:       <>{t('modal_pitch.pitch_label')} <strong>{tv(estado.tipoPitch ?? '')}</strong></>,
   };
 
   return (

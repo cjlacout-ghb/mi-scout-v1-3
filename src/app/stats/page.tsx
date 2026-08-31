@@ -535,7 +535,7 @@ export default function StatsPage() {
                       const ks = d.ks + d.kl;
                       return (
                         <tr key={p}>
-                          <td style={{ textTransform: 'capitalize', fontWeight: 700 }}>{p}</td>
+                          <td style={{ fontWeight: 700 }}>{tv(p)}</td>
                           <td style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>{d.pitches}</td>
                           <td style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>{d.ab}</td>
                           <td style={{ textAlign: 'center', color: ks > 0 ? 'var(--info)' : 'var(--text-secondary)' }}>
