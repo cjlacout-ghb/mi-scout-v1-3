@@ -124,6 +124,10 @@ export const dictionary: Record<Locale, Record<string, string>> = {
     'lineup.subtitle':            'Ingresa el orden de los bateadores',
     'lineup.ph_last_name':        'Apellido',
     'lineup.ph_first_name':       'Nombre',
+    'lineup.last_name':           'Apellido',
+    'lineup.first_name':          'Nombre',
+    'lineup.side':                'Lado',
+    'lineup.add_row':             'Agregar Bateador',
     'lineup.save':                'Guardar Line-Up Completo',
     'lineup.full_name':           'APELLIDO Y NOMBRE',
 
@@ -342,6 +346,10 @@ export const dictionary: Record<Locale, Record<string, string>> = {
     'lineup.subtitle':            'Enter the batting order',
     'lineup.ph_last_name':        'Last name',
     'lineup.ph_first_name':       'First name',
+    'lineup.last_name':           'Last name',
+    'lineup.first_name':          'First name',
+    'lineup.side':                'Side',
+    'lineup.add_row':             'Add Batter',
     'lineup.save':                'Save Complete Line-Up',
     'lineup.full_name':           'LAST AND FIRST NAME',
 

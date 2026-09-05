@@ -155,13 +155,13 @@ export default function GuiaEN() {
         <P>While the game is in progress:</P>
         <ul style={ulStyle}>
           <li><strong>Edit</strong>: Tap the pencil icon next to a player to correct their info.</li>
-          <li><strong>Remove</strong>: Tap the <strong>red ✕</strong> to remove a player from the lineup. <em>To protect your data, this option disappears once the game is finalized.</em></li>
+          <li><strong>Remove</strong>: Tap the <strong>red ?</strong> to remove a player from the lineup. <em>To protect your data, this option disappears once the game is finalized.</em></li>
         </ul>
 
         <SubTitle>Substitutions</SubTitle>
         <P>If a pinch hitter comes in during the game, tap <strong>&quot;Substitute current batter&quot;</strong>:</P>
         <ul style={ulStyle}>
-          <li>The outgoing player shows up struck through in the lineup, with a note reading &quot;↳ Replaced by #X LASTNAME (Inning Y).&quot;</li>
+          <li>The outgoing player shows up struck through in the lineup, with a note reading &quot;? Replaced by #X LASTNAME (Inning Y).&quot;</li>
           <li>If the original player was a <strong>starter</strong>, a <strong>&quot;Re-enter&quot;</strong> button appears next to their name, letting them return to the game later.</li>
         </ul>
 
@@ -181,8 +181,8 @@ export default function GuiaEN() {
           <li>The current batter&apos;s <strong>jersey number</strong> (in the gold box).</li>
           <li>Their <strong>last name, first name</strong>, and batting-side initial.</li>
           <li>Their <strong>team</strong>.</li>
-          <li>The <strong>current inning</strong>, with ▲ for Top and ▼ for Bottom.</li>
-          <li><strong>+</strong> and <strong>−</strong> controls to manually move the inning forward or back.</li>
+          <li>The <strong>current inning</strong>, with ? for Top and ? for Bottom.</li>
+          <li><strong>+</strong> and <strong>-</strong> controls to manually move the inning forward or back.</li>
           <li>Quick game stats: <strong>AB</strong>, <strong>H</strong>, <strong>O</strong>, <strong>K</strong>, <strong>BB/HBP</strong>, and the result of their <strong>last at-bat</strong>.</li>
         </ul>
 
@@ -202,15 +202,15 @@ export default function GuiaEN() {
         <Table
           headers={['Result', 'Additional steps']}
           rows={[
-            ['OUT', 'Out type (Assisted / Fly / Sac bunt / Line out) → Fielder (1–9, 7/8, 8/9) → Contact quality (Soft / Hard)'],
+            ['OUT', 'Out type (Assisted / Fly / Sac bunt / Line out) ? Fielder (1–9, 7/8, 8/9) ? Contact quality (Soft / Hard)'],
             ['KS', 'Strikeout swinging — ends the at-bat immediately'],
             ['KL', 'Strikeout looking — ends the at-bat immediately'],
-            ['HIT', 'Hit type (Single / Double / Triple / Home Run / Infield Hit / Bunt Hit) → Field location → Contact quality (Soft / Hard)'],
+            ['HIT', 'Hit type (Single / Double / Triple / Home Run / Infield Hit / Bunt Hit) ? Field location ? Contact quality (Soft / Hard)'],
             ['BB', 'Walk — ends the at-bat immediately'],
             ['HBP', 'Hit by pitch — ends the at-bat immediately'],
           ]}
         />
-        <Note>You can back up in the panel by tapping the <strong>← arrow</strong> in the top-left corner, or cancel by tapping <strong>✕</strong> to exit without saving.</Note>
+        <Note>You can back up in the panel by tapping the <strong>? arrow</strong> in the top-left corner, or cancel by tapping <strong>?</strong> to exit without saving.</Note>
 
         <SubTitle>Confirming or Correcting a Pitch</SubTitle>
         <ul style={ulStyle}>
@@ -219,7 +219,7 @@ export default function GuiaEN() {
         </ul>
 
         <SubTitle>Switching Half-Innings</SubTitle>
-        <P>Once the defense records 3 outs, tap the <strong>⇄</strong> button (to the right of the batting-order carousel) to switch which team is up. You&apos;ll get a confirmation prompt showing the half-inning about to start. You can also adjust the inning manually using the <strong>+</strong> and <strong>−</strong> buttons.</P>
+        <P>Once the defense records 3 outs, tap the <strong>?</strong> button (to the right of the batting-order carousel) to switch which team is up. You&apos;ll get a confirmation prompt showing the half-inning about to start. You can also adjust the inning manually using the <strong>+</strong> and <strong>-</strong> buttons.</P>
 
         <SubTitle>Picking a Different Batter</SubTitle>
         <P>The &quot;Batting Order&quot; carousel below the strike zone shows the jersey numbers of all active players. You can tap any player there — including one out of the regular batting order — if you want to track them directly.</P>
@@ -227,8 +227,8 @@ export default function GuiaEN() {
         <SubTitle>Batter&apos;s At-Bat History</SubTitle>
         <P>Below the strike zone, you&apos;ll see every at-bat logged for the current player in this game, most recent first. From here you can:</P>
         <ul style={ulStyle}>
-          <li><strong>✎ Edit</strong> an at-bat: Change the zone by tapping a new point, and/or update the pitch details from the panel.</li>
-          <li><strong>✕ Delete</strong> an at-bat (with confirmation).</li>
+          <li><strong>? Edit</strong> an at-bat: Change the zone by tapping a new point, and/or update the pitch details from the panel.</li>
+          <li><strong>? Delete</strong> an at-bat (with confirmation).</li>
         </ul>
 
         <SubTitle>Player Notes</SubTitle>
@@ -281,7 +281,7 @@ export default function GuiaEN() {
           <li><span style={{ color: '#FFC20E', fontWeight: 700 }}>Yellow</span>: Neutral zone.</li>
           <li><span style={{ color: '#F58220', fontWeight: 700 }}>Orange</span> / <span style={{ color: '#F15B40', fontWeight: 700 }}>Red</span>: Hot zone — this batter is dangerous here.</li>
         </ul>
-        <P>A <strong>COLD → HOT</strong> legend below the zone helps you read the color scale.</P>
+        <P>A <strong>COLD ? HOT</strong> legend below the zone helps you read the color scale.</P>
 
         <SubTitle>Zone Breakdown</SubTitle>
         <P>A table shows, for each of the 8 zones: Pitches, AB, Hits, A/F, K, and AVG (color-coded). The inner zones (1–4) are visually separated from the perimeter zones (5–8).</P>
@@ -310,8 +310,8 @@ export default function GuiaEN() {
         <Table
           headers={['', 'This Game', 'Career']}
           rows={[
-            ['Individual player', '✓', '✓'],
-            ['Full team', '✓', '✓'],
+            ['Individual player', '?', '?'],
+            ['Full team', '?', '?'],
           ]}
         />
         <ul style={ulStyle}>
@@ -329,11 +329,11 @@ export default function GuiaEN() {
         <ul style={ulStyle}>
           <li><strong>Tap a card</strong> to load the game and view its stats in <strong>Heat Map</strong>.</li>
           <li><strong>Tap &quot;Select Player&quot;</strong> (the small gold button on the card) to load the game&apos;s <strong>Line-Up</strong>, from where you can jump into any player&apos;s stats.</li>
-          <li><strong>✕ Delete</strong> a game (asks for confirmation, since this <em>permanently erases all data</em> and can&apos;t be undone).</li>
+          <li><strong>? Delete</strong> a game (asks for confirmation, since this <em>permanently erases all data</em> and can&apos;t be undone).</li>
         </ul>
 
-        <SubTitle>Resuming a Game (▶ Continue)</SubTitle>
-        <P>If a game was left unfinished, its card in History shows a <strong>▶ Continue</strong> button. Tapping it reopens that game exactly where you left off, ready to keep tracking.</P>
+        <SubTitle>Resuming a Game (? Continue)</SubTitle>
+        <P>If a game was left unfinished, its card in History shows a <strong>? Continue</strong> button. Tapping it reopens that game exactly where you left off, ready to keep tracking.</P>
         <Note>Only one game can be active at a time. If you resume a game while another one is in progress, the active game is automatically finalized before the one you selected reopens.</Note>
       </Section>
 
@@ -369,7 +369,7 @@ export default function GuiaEN() {
           MiScout is proprietary software. Copying, redistribution, modification, or commercial use<br />
           without the author&apos;s written permission is strictly prohibited.<br /><br />
           <em>Disclaimer: MiScout is a statistical tracking and analysis tool. Its use does not guarantee athletic results, wins, or specific performance improvements.</em><br /><br />
-          Meta info: Version {APP_VERSION} | Language: English | Last updated: August 2026
+          Meta info: Version {APP_VERSION} | Language: English
         </p>
       </div>
     </>
