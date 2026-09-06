@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import ModalConfirm from '@/components/ModalConfirm';
+import { GRACE_PERIOD_MS } from '@/lib/licenseConstants';
 
 const ADMIN_PASSWORD = 'MS@Admin#CJL@2026';
 
@@ -28,6 +29,16 @@ type Activation = {
   last_verified_at: string;
 };
 
+type TabCategory = 'Activas' | 'Vencidas' | 'Sin activar' | 'Revocadas' | 'Administrador';
+
+const getCategory = (lic: License): TabCategory => {
+  if (lic.code === 'MISCOUT-DEV-LACOUT-2026') return 'Administrador';
+  if (lic.status === 'revoked') return 'Revocadas';
+  if (lic.activations_used === 0) return 'Sin activar';
+  if (lic.expires_at && new Date(lic.expires_at) < new Date()) return 'Vencidas';
+  return 'Activas';
+};
+
 export default function AdminPage() {
   const [authenticated, setAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
@@ -39,8 +50,11 @@ export default function AdminPage() {
   const [newPlan, setNewPlan] = useState<'full' | 'promo'>('full');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
+  const [activeTab, setActiveTab] = useState<TabCategory>('Activas');
   const [confirmandoLiberacion, setConfirmandoLiberacion] = useState<{activationId: string, licenseCode: string} | null>(null);
   const [confirmandoRevocacion, setConfirmandoRevocacion] = useState<string | null>(null);
+  // Per-license toggle: key = license code, value = whether to show inactive activations
+  const [showInactiveMap, setShowInactiveMap] = useState<Record<string, boolean>>({});
 
   const handleLogin = () => {
     if (password === ADMIN_PASSWORD) {
@@ -254,9 +268,36 @@ export default function AdminPage() {
         </div>
       </div>
 
-      {/* Lista de licencias */}
-      <h2 style={{ marginBottom: '1rem' }}>Licencias activas</h2>
-      {licenses.map((lic) => {
+      {/* Pestañas de licencias */}
+      <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem', borderBottom: '1px solid var(--border)', overflowX: 'auto' }}>
+        {(['Activas', 'Vencidas', 'Sin activar', 'Revocadas', 'Administrador'] as TabCategory[]).map(tab => {
+          const count = licenses.filter(l => getCategory(l) === tab).length;
+          const isActive = activeTab === tab;
+          return (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              style={{
+                background: 'none',
+                border: 'none',
+                padding: '0.75rem 1rem',
+                color: isActive ? 'var(--accent)' : 'var(--text-secondary)',
+                fontWeight: isActive ? 700 : 500,
+                borderBottom: isActive ? '3px solid var(--accent)' : '3px solid transparent',
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+                transition: 'all 0.2s',
+                fontSize: '0.9rem',
+              }}
+            >
+              {tab} ({count})
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Lista de licencias filtradas */}
+      {licenses.filter(lic => getCategory(lic) === activeTab).map((lic) => {
         const acts = getActivationsForLicense(lic.code);
         return (
           <div key={lic.code} style={{
@@ -291,44 +332,90 @@ export default function AdminPage() {
             </div>
 
             {/* Activaciones de esta licencia */}
-            {acts.length > 0 && (
-              <div style={{ marginTop: '0.75rem' }}>
-                {acts.map((act) => {
-                  const info = act.device_info ? JSON.parse(act.device_info) : null;
-                  return (
-                    <div key={act.id} style={{
-                      background: 'var(--bg-base)', borderRadius: '8px',
-                      padding: '0.75rem', marginTop: '0.5rem',
-                      fontSize: '0.75rem', color: 'var(--text-secondary)',
+            {acts.length > 0 && (() => {
+              const inactiveCount = acts.filter(a =>
+                Date.now() - new Date(a.last_verified_at).getTime() > GRACE_PERIOD_MS
+              ).length;
+              const showInactive = !!showInactiveMap[lic.code];
+              const visibleActs = acts.filter(a => {
+                const inactive = Date.now() - new Date(a.last_verified_at).getTime() > GRACE_PERIOD_MS;
+                return !inactive || showInactive;
+              });
+              return (
+                <div style={{ marginTop: '0.75rem' }}>
+                  {/* Toggle — only rendered when there are inactive activations */}
+                  {inactiveCount > 0 && (
+                    <label style={{
+                      display: 'inline-flex', alignItems: 'center', gap: '0.4rem',
+                      fontSize: '0.72rem', color: 'var(--text-secondary)',
+                      cursor: 'pointer', marginBottom: '0.4rem', userSelect: 'none',
                     }}>
-                      <p>📱 {info?.userAgent || 'Desconocido'}</p>
-                      <p>🌍 {info?.timezone || '-'} · {info?.screen || '-'}</p>
-                      <p>🔑 FP: {act.device_fingerprint.substring(0, 16)}...</p>
-                      <p>📅 Activado: {new Date(act.activated_at).toLocaleString('es-AR')}</p>
-                      <p>✅ Última verificación: {new Date(act.last_verified_at).toLocaleString('es-AR')}</p>
-                      {/* Only show Liberar if release_count < 1 */}
-                      {lic.release_count < 1 && (
-                        <button
-                          onClick={() => handleReleaseActivation(act.id, lic.code)}
-                          style={{
-                            marginTop: '0.5rem',
-                            background: '#f59e0b',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '6px',
-                            padding: '0.35rem 0.75rem',
-                            cursor: 'pointer',
-                            fontSize: '0.75rem',
-                          }}
-                        >
-                          Liberar activación
-                        </button>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            )}
+                      <input
+                        type="checkbox"
+                        checked={showInactive}
+                        onChange={() => setShowInactiveMap(prev => ({
+                          ...prev,
+                          [lic.code]: !prev[lic.code],
+                        }))}
+                        style={{ cursor: 'pointer' }}
+                      />
+                      Mostrar inactivas ({inactiveCount})
+                    </label>
+                  )}
+                  {visibleActs.map((act) => {
+                    const info = act.device_info ? JSON.parse(act.device_info) : null;
+                    const isInactive = Date.now() - new Date(act.last_verified_at).getTime() > GRACE_PERIOD_MS;
+                    return (
+                      <div key={act.id} style={{
+                        background: 'var(--bg-base)', borderRadius: '8px',
+                        padding: '0.75rem', marginTop: '0.5rem',
+                        fontSize: '0.75rem', color: 'var(--text-secondary)',
+                        opacity: isInactive ? 0.5 : 1,
+                      }}>
+                        <p>📱 {info?.userAgent || 'Desconocido'}</p>
+                        <p>🌍 {info?.timezone || '-'} · {info?.screen || '-'}</p>
+                        <p>🔑 FP: {act.device_fingerprint.substring(0, 16)}...</p>
+                        <p>📅 Activado: {new Date(act.activated_at).toLocaleString('es-AR')}</p>
+                        <p>✅ Última verificación: {new Date(act.last_verified_at).toLocaleString('es-AR')}{' '}
+                          {isInactive && (
+                            <span style={{
+                              display: 'inline-block',
+                              background: '#6b7280',
+                              color: '#fff',
+                              fontSize: '0.65rem',
+                              fontWeight: 700,
+                              letterSpacing: '0.05em',
+                              padding: '0.1rem 0.4rem',
+                              borderRadius: '4px',
+                              verticalAlign: 'middle',
+                              marginLeft: '0.35rem',
+                            }}>Inactiva</span>
+                          )}
+                        </p>
+                        {/* Only show Liberar if release_count < 1 */}
+                        {lic.release_count < 1 && (
+                          <button
+                            onClick={() => handleReleaseActivation(act.id, lic.code)}
+                            style={{
+                              marginTop: '0.5rem',
+                              background: '#f59e0b',
+                              color: 'white',
+                              border: 'none',
+                              borderRadius: '6px',
+                              padding: '0.35rem 0.75rem',
+                              cursor: 'pointer',
+                              fontSize: '0.75rem',
+                            }}
+                          >
+                            Liberar activación
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            })()}
           </div>
         );
       })}

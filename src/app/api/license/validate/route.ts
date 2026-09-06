@@ -13,15 +13,28 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 1. Check if license exists and is active
+    // 1. Check if license exists (no status filter — differentiate revoked from invalid)
     const { data: license, error: licenseError } = await supabase
       .from('licenses')
       .select('*')
       .eq('code', code.toUpperCase())
-      .eq('status', 'active')
       .single();
 
     if (licenseError || !license) {
+      return NextResponse.json(
+        { valid: false, error: 'Invalid license code', errorCode: 'LICENSE_INVALID' },
+        { status: 403 }
+      );
+    }
+
+    if (license.status === 'revoked') {
+      return NextResponse.json(
+        { valid: false, error: 'License has been revoked', errorCode: 'LICENSE_REVOKED' },
+        { status: 403 }
+      );
+    }
+
+    if (license.status !== 'active') {
       return NextResponse.json(
         { valid: false, error: 'Invalid or inactive license code', errorCode: 'LICENSE_INVALID' },
         { status: 403 }

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { getDeviceFingerprint } from '@/lib/deviceFingerprint';
+import { GRACE_PERIOD_MS } from '@/lib/licenseConstants';
 
 const UNPROTECTED_ROUTES = ['/activate', '/admin', '/guia'];
 
@@ -18,7 +19,6 @@ export default function LicenseGuard({ children }: { children: React.ReactNode }
       return;
     }
 
-    const GRACE_PERIOD_MS = 10 * 24 * 60 * 60 * 1000; // 10 days in milliseconds
 
     const validateLicense = async () => {
       const savedCode    = localStorage.getItem('miscout_license');

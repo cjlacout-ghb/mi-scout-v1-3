@@ -18,6 +18,7 @@ export const dictionary: Record<Locale, Record<string, string>> = {
     // ── error codes (API) ──────────────────────────────────────────────────────
     'error.LICENSE_EXPIRED':      'Tu licencia ha vencido. Contactá al administrador para renovarla.',
     'error.LICENSE_INVALID':      'Código inválido o licencia inactiva. Verificá e intentá de nuevo.',
+    'error.LICENSE_REVOKED':      'Tu licencia fue revocada por el administrador. Contactalo para más información.',
     'error.LICENSE_LIMIT_REACHED': 'Se alcanzó el límite de activaciones para esta licencia.',
     'error.SERVER_ERROR':         'Error interno del servidor. Intentá de nuevo en unos minutos.',
 
@@ -240,6 +241,7 @@ export const dictionary: Record<Locale, Record<string, string>> = {
     // ── error codes (API) ──────────────────────────────────────────────────────
     'error.LICENSE_EXPIRED':      'Your license has expired. Contact the administrator to renew it.',
     'error.LICENSE_INVALID':      'Invalid or inactive license code. Please check and try again.',
+    'error.LICENSE_REVOKED':      'Your license has been revoked by the administrator. Contact them for more information.',
     'error.LICENSE_LIMIT_REACHED': 'The maximum number of activations for this license has been reached.',
     'error.SERVER_ERROR':         'Internal server error. Please try again in a few minutes.',
 
