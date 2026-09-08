@@ -53,6 +53,7 @@ export default function AdminPage() {
   const [activeTab, setActiveTab] = useState<TabCategory>('Activas');
   const [confirmandoLiberacion, setConfirmandoLiberacion] = useState<{activationId: string, licenseCode: string} | null>(null);
   const [confirmandoRevocacion, setConfirmandoRevocacion] = useState<string | null>(null);
+  const [confirmandoEliminacion, setConfirmandoEliminacion] = useState<{activationId: string, licenseCode: string} | null>(null);
   // Per-license toggle: key = license code, value = whether to show inactive activations
   const [showInactiveMap, setShowInactiveMap] = useState<Record<string, boolean>>({});
 
@@ -170,6 +171,42 @@ export default function AdminPage() {
       .eq('code', licenseCode);
 
     setConfirmandoLiberacion(null);
+    loadData();
+  };
+
+  const handleDeleteActivation = (activationId: string, licenseCode: string) => {
+    setConfirmandoEliminacion({ activationId, licenseCode });
+  };
+
+  const ejecutarEliminacion = async () => {
+    if (!confirmandoEliminacion) return;
+    const { activationId, licenseCode } = confirmandoEliminacion;
+
+    // Delete the activation row
+    await supabase
+      .from('activations')
+      .delete()
+      .eq('id', activationId);
+
+    // Re-fetch the fresh activations_used value from Supabase (Approach B)
+    // to avoid decrementing from stale local React state.
+    const { data: freshLicense } = await supabase
+      .from('licenses')
+      .select('activations_used')
+      .eq('code', licenseCode)
+      .single();
+
+    if (freshLicense) {
+      // Decrement activations_used ONLY — do NOT touch release_count
+      await supabase
+        .from('licenses')
+        .update({
+          activations_used: Math.max(0, freshLicense.activations_used - 1),
+        })
+        .eq('code', licenseCode);
+    }
+
+    setConfirmandoEliminacion(null);
     loadData();
   };
 
@@ -392,13 +429,30 @@ export default function AdminPage() {
                             }}>Inactiva</span>
                           )}
                         </p>
-                        {/* Only show Liberar if release_count < 1 */}
-                        {lic.release_count < 1 && (
+                        {/* Action buttons for this activation */}
+                        <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem', flexWrap: 'wrap' }}>
+                          {/* Only show Liberar if release_count < 1 */}
+                          {lic.release_count < 1 && (
+                            <button
+                              onClick={() => handleReleaseActivation(act.id, lic.code)}
+                              style={{
+                                background: '#f59e0b',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '6px',
+                                padding: '0.35rem 0.75rem',
+                                cursor: 'pointer',
+                                fontSize: '0.75rem',
+                              }}
+                            >
+                              Liberar activación
+                            </button>
+                          )}
+                          {/* Hard delete — always visible, does NOT consume release_count */}
                           <button
-                            onClick={() => handleReleaseActivation(act.id, lic.code)}
+                            onClick={() => handleDeleteActivation(act.id, lic.code)}
                             style={{
-                              marginTop: '0.5rem',
-                              background: '#f59e0b',
+                              background: '#ef4444',
                               color: 'white',
                               border: 'none',
                               borderRadius: '6px',
@@ -407,9 +461,9 @@ export default function AdminPage() {
                               fontSize: '0.75rem',
                             }}
                           >
-                            Liberar activación
+                            Eliminar activación
                           </button>
-                        )}
+                        </div>
                       </div>
                     );
                   })}
@@ -433,6 +487,14 @@ export default function AdminPage() {
           mensaje={`¿Estás seguro de que deseas revocar la licencia ${confirmandoRevocacion}? Esta acción no se puede deshacer.`}
           onConfirmar={ejecutarRevocacion}
           onCancelar={() => setConfirmandoRevocacion(null)}
+        />
+      )}
+
+      {confirmandoEliminacion && (
+        <ModalConfirm
+          mensaje="ATENCIÓN: Esto eliminará permanentemente esta activación (hard delete). NO consumirá una liberación (release_count queda intacto). ¿Confirmar eliminación? Esta acción no se puede deshacer."
+          onConfirmar={ejecutarEliminacion}
+          onCancelar={() => setConfirmandoEliminacion(null)}
         />
       )}
     </div>

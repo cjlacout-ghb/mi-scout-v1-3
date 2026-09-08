@@ -14,6 +14,10 @@ export const dictionary: Record<Locale, Record<string, string>> = {
     'activate.error_invalid':     'Código inválido. Verificá e intentá de nuevo.',
     'activate.error_connection':  'Error de conexión. Verificá tu internet e intentá de nuevo.',
     'activate.legal':             '© 2026 MiScout — Todos los derechos reservados. El uso no autorizado de esta licencia puede resultar en la suspensión permanente del acceso sin reembolso.',
+    'activate.pwa_warning':       'Estás abriendo MiScout desde el navegador. Para evitar problemas con tu licencia, te recomendamos instalar la app en tu pantalla de inicio antes de activar. Buscá la opción \'Instalar app\' o \'Agregar a pantalla de inicio\' en el menú de tu navegador.',
+    'activate.success_title':     '¡Licencia activada correctamente!',
+    'activate.success_message':   'Para evitar problemas futuros, guardá MiScout en tu pantalla de inicio y usá siempre ese mismo ícono para abrir la app.',
+    'activate.success_button':    'Continuar',
 
     // ── error codes (API) ──────────────────────────────────────────────────────
     'error.LICENSE_EXPIRED':      'Tu licencia ha vencido. Contactá al administrador para renovarla.',
@@ -237,6 +241,10 @@ export const dictionary: Record<Locale, Record<string, string>> = {
     'activate.error_invalid':     'Invalid code. Please check and try again.',
     'activate.error_connection':  'Connection error. Check your internet and try again.',
     'activate.legal':             '© 2026 MiScout — All rights reserved. Unauthorized use of this license may result in permanent suspension of access without refund.',
+    'activate.pwa_warning':       'You are opening MiScout from the browser. To avoid issues with your license, we recommend installing the app to your home screen before activating. Look for the \'Install app\' or \'Add to home screen\' option in your browser menu.',
+    'activate.success_title':     'License activated successfully!',
+    'activate.success_message':   'To avoid future issues, save MiScout to your home screen and always use that same icon to open the app.',
+    'activate.success_button':    'Continue',
 
     // ── error codes (API) ──────────────────────────────────────────────────────
     'error.LICENSE_EXPIRED':      'Your license has expired. Contact the administrator to renew it.',

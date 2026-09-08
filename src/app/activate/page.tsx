@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { getDeviceFingerprint, getDeviceInfo } from '@/lib/deviceFingerprint';
 import { useLanguage } from '@/context/LanguageContext';
@@ -13,6 +13,26 @@ export default function ActivatePage() {
   const [code, setCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showPwaWarning, setShowPwaWarning] = useState(false);
+  const [activationSuccess, setActivationSuccess] = useState(false);
+
+  useEffect(() => {
+    // ── Guard: if already activated, skip the form and go straight to the app
+    const existingLicense = localStorage.getItem('miscout_license');
+    if (existingLicense) {
+      router.replace('/');
+      return;
+    }
+
+    // ── Standalone detection: warn if running in a regular browser tab
+    const isStandalone =
+      window.matchMedia('(display-mode: standalone)').matches ||
+      (window.navigator as any).standalone === true;
+
+    if (!isStandalone) {
+      setShowPwaWarning(true);
+    }
+  }, []);
 
   const handleActivate = async () => {
     if (!code.trim()) {
@@ -40,11 +60,13 @@ export default function ActivatePage() {
       const data = await res.json();
 
       if (data.valid) {
-        // Save activation locally in IndexedDB
+        // Save activation locally
         localStorage.setItem('miscout_license',       code.trim().toUpperCase());
         localStorage.setItem('miscout_device_fp',     deviceFingerprint);
         localStorage.setItem('miscout_last_verified', new Date().toISOString());
-        router.push('/');
+        // Show success screen instead of redirecting immediately;
+        // the mount guard ensures any re-entry to /activate redirects to /.
+        setActivationSuccess(true);
       } else {
         // If errorCode is present and mapped in dictionary, show translated message.
         // Fallback: raw error string from API (Spanish), or generic local error.
@@ -96,45 +118,85 @@ export default function ActivatePage() {
         flexDirection: 'column',
         gap: '1rem',
       }}>
-        <h2 style={{ color: 'var(--text-primary)', fontSize: '1.1rem', fontWeight: 700 }}>
-          {t('activate.title')}
-        </h2>
-        <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', lineHeight: 1.5 }}>
-          {t('activate.subtitle')}{' '}
-          <span style={{ color: '#FFFFFF', fontWeight: 700 }}>Mi</span><span style={{ color: '#F5A623', fontWeight: 700 }}>Scout</span>.{' '}
-          {t('activate.subtitle_suffix')}
-        </p>
+        {activationSuccess ? (
+          // ── Success screen ─────────────────────────────────────────────
+          <>
+            <h2 style={{ color: 'var(--accent)', fontSize: '1.1rem', fontWeight: 700 }}>
+              {t('activate.success_title')}
+            </h2>
 
-        <input
-          type="text"
-          placeholder={t('activate.placeholder_code')}
-          value={code}
-          onChange={(e) => setCode(e.target.value.toUpperCase())}
-          style={{
-            padding: '0.75rem 1rem',
-            borderRadius: '8px',
-            border: '1px solid var(--border)',
-            background: 'var(--bg-base)',
-            color: 'var(--text-primary)',
-            fontSize: '1rem',
-            letterSpacing: '0.05em',
-            width: '100%',
-          }}
-        />
+            {/* PWA reminder only shown when NOT already in standalone mode */}
+            {showPwaWarning && (
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', lineHeight: 1.5 }}>
+                {t('activate.success_message')}
+              </p>
+            )}
 
-        {error && (
-          <p style={{ color: 'var(--error, #ef4444)', fontSize: '0.85rem' }}>
-            {error}
-          </p>
+            <button
+              onClick={() => router.push('/')}
+              className="btn btn-primary btn-full"
+            >
+              {t('activate.success_button')}
+            </button>
+          </>
+        ) : (
+          // ── Activation form ────────────────────────────────────────────
+          <>
+            <h2 style={{ color: 'var(--text-primary)', fontSize: '1.1rem', fontWeight: 700 }}>
+              {t('activate.title')}
+            </h2>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', lineHeight: 1.5 }}>
+              {t('activate.subtitle')}{' '}
+              <span style={{ color: '#FFFFFF', fontWeight: 700 }}>Mi</span><span style={{ color: '#F5A623', fontWeight: 700 }}>Scout</span>.{' '}
+              {t('activate.subtitle_suffix')}
+            </p>
+
+            {showPwaWarning && (
+              <div style={{
+                padding: '1rem',
+                borderRadius: '8px',
+                backgroundColor: 'rgba(245, 166, 35, 0.1)',
+                border: '1px solid rgba(245, 166, 35, 0.3)',
+                color: 'var(--text-secondary)',
+                fontSize: '0.85rem',
+                lineHeight: 1.5
+              }}>
+                {t('activate.pwa_warning')}
+              </div>
+            )}
+
+            <input
+              type="text"
+              placeholder={t('activate.placeholder_code')}
+              value={code}
+              onChange={(e) => setCode(e.target.value.toUpperCase())}
+              style={{
+                padding: '0.75rem 1rem',
+                borderRadius: '8px',
+                border: '1px solid var(--border)',
+                background: 'var(--bg-base)',
+                color: 'var(--text-primary)',
+                fontSize: '1rem',
+                letterSpacing: '0.05em',
+                width: '100%',
+              }}
+            />
+
+            {error && (
+              <p style={{ color: 'var(--error, #ef4444)', fontSize: '0.85rem' }}>
+                {error}
+              </p>
+            )}
+
+            <button
+              onClick={handleActivate}
+              disabled={loading}
+              className="btn btn-primary btn-full"
+            >
+              {loading ? t('activate.button_activating') : t('activate.button_activate')}
+            </button>
+          </>
         )}
-
-        <button
-          onClick={handleActivate}
-          disabled={loading}
-          className="btn btn-primary btn-full"
-        >
-          {loading ? t('activate.button_activating') : t('activate.button_activate')}
-        </button>
       </div>
 
       {/* Legal warning */}
