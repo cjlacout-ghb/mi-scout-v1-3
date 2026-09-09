@@ -283,7 +283,7 @@ export default function ModalPitch({ zona, onConfirmar, onCancelar }: Props) {
     resultado:       t('modal_pitch.at_bat_result'),
     detalle_out:     t('modal_pitch.out_type'),
     detalle_hit:     t('modal_pitch.hit_type'),
-    numero_defensor: estado.resultado === 'HIT' ? t('modal_pitch.hit_location') : estado.resultado === 'ERROR' ? t('modal_pitch.error_direction') : t('modal_pitch.fielder').replace('{out}', t(`out_type_short.${estado.tipoOut}`)),
+    numero_defensor: estado.resultado === 'HIT' ? t('modal_pitch.hit_location') : estado.resultado === 'ERROR' ? t('modal_pitch.error_direction') : t('modal_pitch.fielder').replace('{out}', tv(estado.tipoOut ?? '', true)),
     calidad:         t('modal_pitch.contact_quality'),
   };
 

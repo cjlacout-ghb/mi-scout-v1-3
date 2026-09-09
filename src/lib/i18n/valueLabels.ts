@@ -10,19 +10,22 @@ export const valueLabels: Record<string, ValueLabelEntry> = {
   'screw': { es: 'Screw', en: 'Screw' },
   'otro': { es: 'Otro', en: 'Other' },
   
-  'asistencia': { es: 'Asistencia', en: 'Assisted' },
-  'sac bunt': { es: 'Sac Bunt', en: 'Sac bunt' },
-  'sac fly': { es: 'Sac Fly', en: 'Sac fly' },
-  'fly': { es: 'Fly', en: 'Fly' },
-  'linea': { es: 'Línea', en: 'Line out' },
-  'error': { es: 'Error', en: 'Error' },
+  'asistencia': { es: 'Asistencia', en: 'Assisted', es_short: 'asistencia', en_short: 'assist' },
+  'sac bunt': { es: 'Sac Bunt', en: 'Sac bunt', es_short: 'sac bunt', en_short: 'sac bunt' },
+  'sac fly': { es: 'Sac Fly', en: 'Sac fly', es_short: 'sac fly', en_short: 'sac fly' },
+  'fly': { es: 'Fly', en: 'Fly', es_short: 'fly', en_short: 'fly ball' },
+  'linea': { es: 'Línea', en: 'Line out', es_short: 'línea', en_short: 'line out' },
+  'error': { es: 'Error', en: 'Error', es_short: 'error', en_short: 'error' },
 
-  'single': { es: 'Single', en: 'Single' },
-  'doble': { es: 'Doble', en: 'Double' },
-  'triple': { es: 'Triple', en: 'Triple' },
-  'homerun': { es: 'Home run', en: 'Home run' },
-  'infield hit': { es: 'Infield hit', en: 'Infield hit' },
-  'bunt': { es: 'Bunt hit', en: 'Bunt hit' },
+  'soft': { es: 'soft', en: 'soft' },
+  'hard': { es: 'hard', en: 'hard' },
+
+  'single': { es: 'Single', en: 'Single', es_short: 'single', en_short: 'single' },
+  'doble': { es: 'Doble', en: 'Double', es_short: 'doble', en_short: 'double' },
+  'triple': { es: 'Triple', en: 'Triple', es_short: 'triple', en_short: 'triple' },
+  'homerun': { es: 'Home run', en: 'Home run', es_short: 'homerun', en_short: 'homerun' },
+  'infield hit': { es: 'Infield hit', en: 'Infield hit', es_short: 'infield hit', en_short: 'infield hit' },
+  'bunt': { es: 'Bunt hit', en: 'Bunt hit', es_short: 'bunt', en_short: 'bunt' },
 
   'alta': { es: 'Alta', en: 'Top' },
   'baja': { es: 'Baja', en: 'Bottom' },
@@ -44,7 +47,7 @@ export const valueLabels: Record<string, ValueLabelEntry> = {
   'fly_desc': { es: 'Elevado', en: 'Fly ball' },
   'sac bunt_desc': { es: 'Toque de sacrificio', en: 'Sacrifice bunt' },
   'sac fly_desc': { es: 'Elevado de sacrificio', en: 'Sacrifice fly' },
-  'linea_desc': { es: 'Line drive', en: 'Line drive' },
+  'linea_desc': { es: 'Line out', en: 'Line drive' },
   
   // Calidad contacto
   'soft_desc': { es: 'Contacto débil', en: 'Weak contact' },

@@ -573,8 +573,8 @@ export default function TrackingPage() {
                 marginRight: 4
               }}>
                 {turno.resultado}
-                {turno.detalleHit && ` (${turno.detalleHit.tipo})${t('tracking.at_pos')}${turno.detalleHit.ubicacion} (${turno.detalleHit.calidad})`}
-                {turno.detalleOut && (turno.resultado === 'ERROR' ? `${t('tracking.at_pos')}${turno.detalleOut.defensor} (${turno.detalleOut.calidad})` : ` (${turno.detalleOut.tipo})${t('tracking.at_pos')}${turno.detalleOut.defensor} (${turno.detalleOut.calidad})`)}
+                {turno.detalleHit && ` (${tv(turno.detalleHit.tipo, true)})${t('tracking.at_pos')}${turno.detalleHit.ubicacion} (${tv(turno.detalleHit.calidad)})`}
+                {turno.detalleOut && (turno.resultado === 'ERROR' ? `${t('tracking.at_pos')}${turno.detalleOut.defensor} (${tv(turno.detalleOut.calidad)})` : ` (${tv(turno.detalleOut.tipo, true)})${t('tracking.at_pos')}${turno.detalleOut.defensor} (${tv(turno.detalleOut.calidad)})`)}
               </span>
               {!estado.partido?.finalizado && (
                 <div style={{ display: 'flex', gap: 8, opacity: 0.7 }}>
