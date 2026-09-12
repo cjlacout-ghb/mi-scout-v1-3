@@ -312,7 +312,7 @@ export const dictionary: Record<Locale, Record<string, string>> = {
     'report.pitches':             'pitch(es)',
     'report.effectiveness':       'effectiveness',
     'report.zero_hits':           '0 hits in',
-    'report.turn':                'Turn',
+    'report.turn':                'At bat',
     'report.inning':              'Inning',
     'report.pitch_type':          'Pitch type',
     'report.result':              'Result',

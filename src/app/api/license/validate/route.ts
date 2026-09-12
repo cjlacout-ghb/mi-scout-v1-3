@@ -82,12 +82,28 @@ export async function POST(req: NextRequest) {
       await supabase
         .from('licenses')
         .update({ expires_at: newExpiresAt })
-        .eq('code', code.toUpperCase());
+        .eq('code', code.toUpperCase())
+        .is('expires_at', null);
       // Use the newly computed expiry for this request's expiration check
       license.expires_at = newExpiresAt;
     }
 
-    // 5. Register new activation
+    // 5. Increment activations_used conditionally (compare-and-swap)
+    const { data: updatedLicense } = await supabase
+      .from('licenses')
+      .update({ activations_used: license.activations_used + 1 })
+      .eq('code', code.toUpperCase())
+      .eq('activations_used', license.activations_used)
+      .select();
+
+    if (!updatedLicense || updatedLicense.length === 0) {
+      return NextResponse.json(
+        { valid: false, error: 'Maximum activations reached for this license', errorCode: 'LICENSE_LIMIT_REACHED' },
+        { status: 403 }
+      );
+    }
+
+    // 6. Register new activation
     const { error: activationError } = await supabase
       .from('activations')
       .insert({
@@ -97,17 +113,23 @@ export async function POST(req: NextRequest) {
       });
 
     if (activationError) {
+      // Revert increment (rollback) if insert fails, only if counter was not modified concurrently
+      const { data: rollbacked } = await supabase
+        .from('licenses')
+        .update({ activations_used: license.activations_used })
+        .eq('code', code.toUpperCase())
+        .eq('activations_used', license.activations_used + 1)
+        .select();
+
+      if (!rollbacked || rollbacked.length === 0) {
+        console.error(`Rollback of activations_used failed for license ${code.toUpperCase()}: counter modified concurrently.`);
+      }
+
       return NextResponse.json(
         { valid: false, error: 'Failed to register activation', errorCode: 'SERVER_ERROR' },
         { status: 500 }
       );
     }
-
-    // 6. Increment activations_used
-    await supabase
-      .from('licenses')
-      .update({ activations_used: license.activations_used + 1 })
-      .eq('code', code.toUpperCase());
 
     return NextResponse.json({ valid: true, message: 'License activated successfully' });
 

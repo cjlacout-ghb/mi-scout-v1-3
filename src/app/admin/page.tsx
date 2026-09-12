@@ -149,26 +149,46 @@ export default function AdminPage() {
   const ejecutarLiberacion = async () => {
     if (!confirmandoLiberacion) return;
     const { activationId, licenseCode } = confirmandoLiberacion;
-    const license = licenses.find((l) => l.code === licenseCode);
-    if (!license) {
+
+    // Fetch fresh license data from Supabase to avoid stale React state
+    const { data: freshLicense } = await supabase
+      .from('licenses')
+      .select('activations_used, release_count')
+      .eq('code', licenseCode)
+      .single();
+
+    if (!freshLicense || freshLicense.release_count >= 1) {
+      alert('Esta licencia ya usó su único permiso de liberación. No se pueden liberar más activaciones.');
       setConfirmandoLiberacion(null);
       return;
     }
 
-    // Delete the activation
-    await supabase
+    // Decrement activations_used and increment release_count conditionally (WHERE release_count < 1)
+    const { data: updatedLicense } = await supabase
+      .from('licenses')
+      .update({
+        activations_used: Math.max(0, freshLicense.activations_used - 1),
+        release_count: freshLicense.release_count + 1,
+      })
+      .eq('code', licenseCode)
+      .lt('release_count', 1)
+      .select();
+
+    if (!updatedLicense || updatedLicense.length === 0) {
+      alert('Esta licencia ya usó su único permiso de liberación. No se pueden liberar más activaciones.');
+      setConfirmandoLiberacion(null);
+      return;
+    }
+
+    // Delete the activation only after confirming license release update succeeded
+    const { error: deleteError } = await supabase
       .from('activations')
       .delete()
       .eq('id', activationId);
 
-    // Decrement activations_used and increment release_count
-    await supabase
-      .from('licenses')
-      .update({
-        activations_used: license.activations_used - 1,
-        release_count: (license as any).release_count + 1,
-      })
-      .eq('code', licenseCode);
+    if (deleteError) {
+      console.error(`release_count and activations_used were updated for license ${licenseCode}, but activation row ${activationId} could not be deleted: ${deleteError.message}`);
+    }
 
     setConfirmandoLiberacion(null);
     loadData();
