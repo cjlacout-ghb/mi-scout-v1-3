@@ -924,23 +924,45 @@ body {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.82rem;
+  table-layout: fixed;
+}
+
+.data-table col.col-label {
+  width: 23%;
+}
+
+.data-table col.col-num {
+  width: 11%;
 }
 
 .data-table th {
-  padding: 8px 10px;
+  padding: 8px 2px;
   text-align: left;
-  font-size: 0.68rem;
+  font-size: 0.65rem;
   font-weight: 700;
-  letter-spacing: 0.07em;
+  letter-spacing: 0.02em;
   text-transform: uppercase;
   color: var(--text-secondary);
   border-bottom: 1px solid var(--border);
 }
 
 .data-table td {
-  padding: 9px 10px;
+  padding: 9px 2px;
   border-bottom: 1px solid var(--border-light);
   color: var(--text-primary);
+}
+
+.data-table td:first-child {
+  padding-left: 8px;
+}
+
+.data-table th:first-child {
+  padding-left: 22px; /* 8px padding base + 8px dot + 6px gap */
+}
+
+.data-table th:last-child,
+.data-table td:last-child {
+  padding-right: 6px;
 }
 
 .data-table tr:last-child td { border-bottom: none; }

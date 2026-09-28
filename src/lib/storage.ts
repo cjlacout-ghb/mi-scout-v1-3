@@ -89,7 +89,7 @@ export function calcularEstadisticas(
 
   const porPitch = {} as EstadisticasBateador['porPitch'];
   for (const p of TIPOS_PITCH) {
-    porPitch[p] = { pitches: 0, hits: 0, ab: 0, ks: 0, kl: 0 };
+    porPitch[p] = { pitches: 0, hits: 0, outs: 0, ab: 0, ks: 0, kl: 0, bb: 0 };
   }
 
   let hits = 0, dobles = 0, triples = 0, homeRuns = 0;
@@ -120,6 +120,7 @@ export function calcularEstadisticas(
         const esSacrificio = t.detalleOut?.tipo === 'sac fly' || t.detalleOut?.tipo === 'sac bunt';
         outs++;
         porZona[z].outs++;
+        porPitch[p].outs++;
         porZona[z].contacto++;
         if (!esSacrificio) {
           porPitch[p].ab++;
@@ -142,6 +143,7 @@ export function calcularEstadisticas(
       case 'HBP':
         bb++;
         porZona[z].bb++;
+        porPitch[p].bb++;
         break;
     }
   }

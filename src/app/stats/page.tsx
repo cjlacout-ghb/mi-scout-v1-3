@@ -453,6 +453,16 @@ export default function StatsPage() {
             <p className="section-title" style={{ marginBottom: 8 }}>{t('stats.zone_breakdown')}</p>
             <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
               <table className="data-table">
+                <colgroup>
+                  <col className="col-label" />
+                  <col className="col-num" />
+                  <col className="col-num" />
+                  <col className="col-num" />
+                  <col className="col-num" />
+                  <col className="col-num" />
+                  <col className="col-num" />
+                  <col className="col-num" />
+                </colgroup>
                 <thead>
                   <tr>
                     <th>{t('stats.zone')}</th>
@@ -461,6 +471,7 @@ export default function StatsPage() {
                     <th style={{ textAlign: 'center' }}>{t('stats.hits')}</th>
                     <th style={{ textAlign: 'center' }}>{t('stats.af')}</th>
                     <th style={{ textAlign: 'center' }}>K</th>
+                    <th style={{ textAlign: 'center' }}>{t('stats.bb')}</th>
                     <th style={{ textAlign: 'center' }}>AVG</th>
                   </tr>
                 </thead>
@@ -492,13 +503,16 @@ export default function StatsPage() {
                         <td style={{ textAlign: 'center', color: (d.ks + d.kl) > 0 ? 'var(--info)' : 'var(--text-secondary)' }}>
                           {d.ks + d.kl}
                         </td>
+                        <td style={{ textAlign: 'center', color: d.bb > 0 ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
+                          {d.bb}
+                        </td>
                         <td style={{ textAlign: 'center', color: valueColor(avgZonaVal), fontWeight: avgZonaVal !== null ? 600 : 'normal' }}>
                           {avgZona}
                         </td>
                       </tr>
                       {z === 4 && (
                         <tr>
-                          <td colSpan={7} style={{ padding: 0, height: 2, background: 'var(--text-muted)' }} />
+                          <td colSpan={8} style={{ padding: 0, height: 2, background: 'var(--text-muted)' }} />
                         </tr>
                       )}
                       </React.Fragment>
@@ -513,12 +527,25 @@ export default function StatsPage() {
             <p className="section-title" style={{ marginBottom: 8 }}>{t('stats.pitch_type')}</p>
             <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
               <table className="data-table">
+                <colgroup>
+                  <col className="col-label" />
+                  <col className="col-num" />
+                  <col className="col-num" />
+                  <col className="col-num" />
+                  <col className="col-num" />
+                  <col className="col-num" />
+                  <col className="col-num" />
+                  <col className="col-num" />
+                </colgroup>
                 <thead>
                   <tr>
                     <th>{t('stats.pitch')}</th>
-                    <th style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>{t('stats.seen')}</th>
+                    <th style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>{t('stats.pitches')}</th>
                     <th style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>AB</th>
+                    <th style={{ textAlign: 'center' }}>{t('stats.hits')}</th>
+                    <th style={{ textAlign: 'center' }}>{t('stats.af')}</th>
                     <th style={{ textAlign: 'center' }}>K</th>
+                    <th style={{ textAlign: 'center' }}>{t('stats.bb')}</th>
                     <th style={{ textAlign: 'center' }}>AVG</th>
                   </tr>
                 </thead>
@@ -535,11 +562,28 @@ export default function StatsPage() {
                       const ks = d.ks + d.kl;
                       return (
                         <tr key={p}>
-                          <td style={{ fontWeight: 700 }}>{tv(p)}</td>
+                          <td>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                              <span style={{ 
+                                display: 'inline-block', width: 8, height: 8, borderRadius: '50%', 
+                                background: d.hits > 0 ? valueColor(d.hits / Math.max(1, d.hits + d.outs + d.ks + d.kl)) : 'var(--border)' 
+                              }} />
+                              <span style={{ fontWeight: 700 }}>{tv(p)}</span>
+                            </div>
+                          </td>
                           <td style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>{d.pitches}</td>
                           <td style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>{d.ab}</td>
+                          <td style={{ textAlign: 'center', color: d.hits > 0 ? 'var(--danger)' : 'var(--text-secondary)' }}>
+                            {d.hits}
+                          </td>
+                          <td style={{ textAlign: 'center', color: d.outs > 0 ? 'var(--success)' : 'var(--text-secondary)' }}>
+                            {d.outs}
+                          </td>
                           <td style={{ textAlign: 'center', color: ks > 0 ? 'var(--info)' : 'var(--text-secondary)' }}>
-                            {ks > 0 ? ks : '0'}
+                            {ks}
+                          </td>
+                          <td style={{ textAlign: 'center', color: d.bb > 0 ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
+                            {d.bb}
                           </td>
                           <td style={{ textAlign: 'center', color: valueColor(avgPitchVal), fontWeight: avgPitchVal !== null ? 600 : 'normal' }}>
                             {avgPitch}
