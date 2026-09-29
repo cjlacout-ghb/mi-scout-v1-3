@@ -928,11 +928,23 @@ body {
 }
 
 .data-table col.col-label {
-  width: 23%;
+  width: 21%;
+}
+
+.data-table col.col-num-wide {
+  width: 14%;
+}
+
+.data-table col.col-num-mid {
+  width: 12%;
 }
 
 .data-table col.col-num {
   width: 11%;
+}
+
+.data-table col.col-num-narrow {
+  width: 8.5%;
 }
 
 .data-table th {

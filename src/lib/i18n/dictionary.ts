@@ -164,7 +164,7 @@ export const dictionary: Record<Locale, Record<string, string>> = {
     'stats.load_lineup':          'Cargá bateadores en el Line-Up.',
     'stats.zone_breakdown':       'Desglose por zona',
     'stats.zone':                 'Zona',
-    'stats.pitches':              'Pitcheos',
+    'stats.pitches':              'Tiros',
     'stats.hits':                 'Hits',
     'stats.af':                   'A/F',
     'stats.bb':                   'BB/HBP',

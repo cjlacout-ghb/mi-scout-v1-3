@@ -455,13 +455,13 @@ export default function StatsPage() {
               <table className="data-table">
                 <colgroup>
                   <col className="col-label" />
+                  <col className="col-num-wide" />
+                  <col className="col-num-narrow" />
                   <col className="col-num" />
                   <col className="col-num" />
-                  <col className="col-num" />
-                  <col className="col-num" />
-                  <col className="col-num" />
-                  <col className="col-num" />
-                  <col className="col-num" />
+                  <col className="col-num-narrow" />
+                  <col className="col-num-wide" />
+                  <col className="col-num-mid" />
                 </colgroup>
                 <thead>
                   <tr>
@@ -529,13 +529,13 @@ export default function StatsPage() {
               <table className="data-table">
                 <colgroup>
                   <col className="col-label" />
+                  <col className="col-num-wide" />
+                  <col className="col-num-narrow" />
                   <col className="col-num" />
                   <col className="col-num" />
-                  <col className="col-num" />
-                  <col className="col-num" />
-                  <col className="col-num" />
-                  <col className="col-num" />
-                  <col className="col-num" />
+                  <col className="col-num-narrow" />
+                  <col className="col-num-wide" />
+                  <col className="col-num-mid" />
                 </colgroup>
                 <thead>
                   <tr>
